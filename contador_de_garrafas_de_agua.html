@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Água do Dia</title>
+
+<style>
+:root {
+    --azul: #1e88e5;
+    --vermelho: #e53935;
+    --fundo: #f2f6ff;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--fundo);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.app {
+    background: #fff;
+    width: 360px;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+h1 {
+    margin: 0 0 16px;
+}
+
+.config {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.config div {
+    font-size: 14px;
+}
+
+.config input {
+    width: 70px;
+    padding: 6px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.info {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.progresso {
+    background: #e0e0e0;
+    height: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.progresso div {
+    height: 100%;
+    background: var(--azul);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.garrafas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.garrafa {
+    width: 28px;
+    height: 56px;
+}
+
+.acoes {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.botao {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    background: var(--azul);
+    color: #fff;
+    font-size: 36px;
+    cursor: pointer;
+}
+
+.botao-reset {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    background: var(--vermelho);
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.botao:active,
+.botao-reset:active {
+    transform: scale(0.95);
+}
+
+.reset-texto {
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    width: 280px;
+    text-align: center;
+    animation: aparecer 0.25s ease;
+}
+
+@keyframes aparecer {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-box button {
+    margin: 10px 6px 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.confirmar { background: var(--vermelho); color: #fff; }
+.cancelar { background: #ddd; }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <h1>💧 Água do Dia</h1>
+
+    <div class="config">
+        <div>
+            Garrafa<br>
+            <input type="number" id="mlGarrafa" value="500"> ml
+        </div>
+        <div>
+            Meta<br>
+            <input type="number" id="metaLitros" value="2"> L
+        </div>
+    </div>
+
+    <div class="info">
+        Garrafas: <strong id="totalGarrafas">0</strong><br>
+        Total: <strong id="totalAgua">0 ml</strong>
+    </div>
+
+    <div class="progresso">
+        <div id="barra"></div>
+    </div>
+
+    <div class="garrafas" id="garrafas"></div>
+
+    <div class="acoes">
+        <button class="botao" id="btnAdd">+</button>
+        <button class="botao-reset" id="btnResetGarrafas">↺</button>
+    </div>
+
+    <div class="reset-texto" id="btnResetDia">Resetar dia inteiro</div>
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <p id="modalTexto"></p>
+        <button class="confirmar" id="confirmar">Confirmar</button>
+        <button class="cancelar" id="cancelar">Cancelar</button>
+    </div>
+</div>
+
+<script>
+let estado = JSON.parse(localStorage.getItem("aguaApp")) || {
+    garrafas: 0,
+    totalMl: 0,
+    mlGarrafa: 500,
+    metaLitros: 2,
+    data: new Date().toDateString()
+};
+
+let acaoConfirmada = null;
+
+function vibrar() {
+    if (navigator.vibrate) navigator.vibrate(50);
+}
+
+function salvar() {
+    localStorage.setItem("aguaApp", JSON.stringify(estado));
+}
+
+function verificarDia() {
+    const hoje = new Date().toDateString();
+    if (estado.data !== hoje) {
+        estado.garrafas = 0;
+        estado.totalMl = 0;
+        estado.data = hoje;
+        salvar();
+    }
+}
+
+function criarGarrafa() {
+    const div = document.createElement("div");
+    div.className = "garrafa";
+    div.innerHTML = `
+    <svg viewBox="0 0 40 80">
+        <rect x="14" y="2" width="12" height="10" rx="2" fill="#ccc"/>
+        <rect x="10" y="12" width="20" height="60" rx="6"
+            fill="rgba(30,136,229,0.25)"
+            stroke="rgba(30,136,229,0.9)"
+            stroke-width="2"/>
+    </svg>`;
+    document.getElementById("garrafas").appendChild(div);
+}
+
+function atualizarUI() {
+    document.getElementById("mlGarrafa").value = estado.mlGarrafa;
+    document.getElementById("metaLitros").value = estado.metaLitros;
+    document.getElementById("totalGarrafas").innerText = estado.garrafas;
+
+    document.getElementById("totalAgua").innerText =
+        estado.totalMl >= 1000
+        ? (estado.totalMl / 1000).toFixed(2) + " L"
+        : estado.totalMl + " ml";
+
+    const metaMl = estado.metaLitros * 1000;
+    const porcentagem = Math.min((estado.totalMl / metaMl) * 100, 100);
+    document.getElementById("barra").style.width = porcentagem + "%";
+
+    const container = document.getElementById("garrafas");
+    container.innerHTML = "";
+    for (let i = 0; i < estado.garrafas; i++) criarGarrafa();
+}
+
+function adicionarGarrafa() {
+    vibrar();
+    estado.mlGarrafa = parseInt(document.getElementById("mlGarrafa").value) || 0;
+    estado.metaLitros = parseFloat(document.getElementById("metaLitros").value) || 0;
+    estado.garrafas++;
+    estado.totalMl += estado.mlGarrafa;
+    salvar();
+    atualizarUI();
+}
+
+function abrirModal(texto, acao) {
+    acaoConfirmada = acao;
+    document.getElementById("modalTexto").innerText = texto;
+    document.getElementById("modal").classList.add("active");
+}
+
+function fecharModal() {
+    document.getElementById("modal").classList.remove("active");
+}
+
+function resetarGarrafas() {
+    vibrar();
+    estado.garrafas = 0;
+    estado.totalMl = 0;
+    salvar();
+    atualizarUI();
+}
+
+function resetarDia() {
+    vibrar();
+    estado.garrafas = 0;
+    estado.totalMl = 0;
+    estado.data = new Date().toDateString();
+    salvar();
+    atualizarUI();
+}
+
+verificarDia();
+atualizarUI();
+
+btnAdd.onclick = adicionarGarrafa;
+btnResetGarrafas.onclick = () => abrirModal("Resetar apenas as garrafas?", resetarGarrafas);
+btnResetDia.onclick = () => abrirModal("Resetar todo o dia?", resetarDia);
+
+confirmar.onclick = () => {
+    if (acaoConfirmada) acaoConfirmada();
+    fecharModal();
+};
+
+cancelar.onclick = fecharModal;
+</script>
+
+</body>
+</html>
