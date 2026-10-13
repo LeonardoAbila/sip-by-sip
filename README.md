@@ -21,7 +21,7 @@ node --test tests/achievements.test.mjs  # Check points and streak rules
 
 ## How React works here
 
-The original `contador_de_garrafas_de_agua.html` is kept for comparison. It updates the page with `document.getElementById`. React instead renders the interface from the current state.
+React renders the interface from the current state instead of updating individual elements with `document.getElementById`.
 
 1. **Components:** `src/App.jsx` contains `App`, `Bottle`, and `ResetDialog`. Each is a JavaScript function returning JSX, which looks like HTML inside JavaScript. `<Bottle />` reuses the bottle illustration.
 2. **State:** `const [state, setState] = useState(readState)` stores today's count, volume, and settings. `setState` changes that data and asks React to update the screen.

@@ -11,7 +11,6 @@
 - `src/theme.js`: saved and system theme preferences.
 - `src/styles.css`: layout, styling, and theme palettes.
 - `src/main.jsx`: React entry point.
-- `contador_de_garrafas_de_agua.html`: original app retained for comparison.
 - `README.md`: setup, behavior, and learning notes.
 
 ## Working conventions
