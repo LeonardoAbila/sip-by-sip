@@ -31,6 +31,12 @@ dependencies with Node.js 22, builds the app, and deploys `dist/`. The **Actions
 tab shows deployment progress and errors. You can also select the deployment
 workflow and choose **Run workflow** to publish manually.
 
+If the first deployment failed before Pages was enabled, rerun that failed
+workflow after selecting **GitHub Actions**. Changing the Pages source alone
+does not rerun the Vite build. A blank page requesting `/src/main.jsx` means
+the unbuilt source HTML was published; a successful deployment from this
+workflow publishes compiled scripts under `/sip-by-sip/assets/` instead.
+
 `vite.config.js` sets the `/sip-by-sip/` base path for scripts and assets. After
 `npm run build`, preview the published layout with `npm run preview` and open
 `http://localhost:4173/sip-by-sip/`. If the repository name or hosting path changes,
