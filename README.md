@@ -1,4 +1,4 @@
-# Água do Dia — learning React
+# Sip by Sip — learning React
 
 A water bottle counter built with React and JavaScript. The interface supports Brazilian Portuguese (the default), English, and Spanish.
 

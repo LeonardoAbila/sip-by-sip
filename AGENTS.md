@@ -2,7 +2,7 @@
 
 ## Project
 
-Água do Dia is a water bottle counter built with React, JavaScript, and Vite. The app interface is in Portuguese. Keep code approachable: this repository also serves as a React learning project.
+Sip by Sip is a water bottle counter built with React, JavaScript, and Vite. The app interface is in Portuguese. Keep code approachable: this repository also serves as a React learning project.
 
 ## Main files
 

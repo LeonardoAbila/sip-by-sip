@@ -62,7 +62,7 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
 
   return <main className="onboarding-page">
     <header className="onboarding-header">
-      <div className="auth-brand"><span className="brand-mark"><Icon name="drop" /></span> Água do Dia</div>
+      <div className="auth-brand"><span className="brand-mark"><Icon name="drop" /></span> Sip by Sip</div>
       <button className="theme-toggle" onClick={onLogout}>Sair</button>
     </header>
     <section className="auth-card onboarding-card" aria-labelledby="onboarding-title">

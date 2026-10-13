@@ -64,7 +64,7 @@ export default function Prototype() {
   return (
     <main className="auth-page">
       <section className="auth-intro">
-        <div className="auth-brand"><span className="brand-mark"><Icon name="drop" /></span> Água do Dia</div>
+        <div className="auth-brand"><span className="brand-mark"><Icon name="drop" /></span> Sip by Sip</div>
         <p className="eyebrow">UM HÁBITO, UM GOLE DE CADA VEZ</p>
         <h1>Seu dia começa<br />com mais água.</h1>
         <p>Acompanhe suas garrafas e tenha uma meta diária calculada com sua idade e seu peso.</p>
