@@ -1,0 +1,7 @@
+node_modules/
+dist/
+
+# Local source backups; maintain the source itself in Git.
+/*.tar.gz
+/*.tar.gz.sha256
+/*.zip
