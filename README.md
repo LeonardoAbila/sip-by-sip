@@ -19,6 +19,27 @@ npm run preview  # Preview that production build locally
 node --test tests/achievements.test.mjs  # Check points and streak rules
 ```
 
+## Publish on GitHub Pages
+
+The site is configured for https://leonardoabila.github.io/sip-by-sip/.
+In the GitHub repository, open **Settings → Pages** and select **GitHub Actions**
+under **Build and deployment → Source**. GitHub Free requires a public repository
+for Pages hosting.
+
+Push changes to `main` to publish. `.github/workflows/deploy.yml` installs locked
+dependencies with Node.js 22, builds the app, and deploys `dist/`. The **Actions**
+tab shows deployment progress and errors. You can also select the deployment
+workflow and choose **Run workflow** to publish manually.
+
+`vite.config.js` sets the `/sip-by-sip/` base path for scripts and assets. After
+`npm run build`, preview the published layout with `npm run preview` and open
+`http://localhost:4173/sip-by-sip/`. If the repository name or hosting path changes,
+update the base path before deploying. Keep `dist/` out of Git; the workflow builds it.
+
+Hosting does not add backend authentication or shared storage. Profiles and
+progress remain local to each browser and origin; data saved on localhost is
+separate from data saved on the published site.
+
 ## How React works here
 
 React renders the interface from the current state instead of updating individual elements with `document.getElementById`.
