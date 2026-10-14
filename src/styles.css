@@ -248,7 +248,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .theme-toggle { min-height: 42px; padding: 9px 13px; border-radius: 10px; background: transparent; font-size: 13px; }
 .theme-toggle:hover, .icon-button:hover { background: var(--secondary); }
 .app { max-width: 1040px; margin: 0 auto; padding: 48px 0 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; text-align: left; }
-.page-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 32px; }
+.page-heading { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 32px; text-align: center; }
 .eyebrow { margin: 0 0 8px; font-size: 10px; letter-spacing: 2px; font-weight: 700; color: var(--accent-text); }
 h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px; font-weight: 650; line-height: 1.2; }
 .subtitle { margin: 0; font-size: 14px; }
@@ -279,17 +279,18 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .card-note .icon { width: 14px; height: 14px; color: var(--accent-text); }
 .daily-panel { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.stat-card { padding: 20px; }
-.stat-icon { width: 34px; height: 34px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-text); border-radius: 10px; }
+.stat-card { padding: 20px; text-align: center; }
+.stat-icon { margin-inline: auto; width: 34px; height: 34px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-text); border-radius: 10px; }
 .stat-icon.warm { background: var(--warm); color: var(--warm-text); }
 .stat-card p { font-size: 11px; color: var(--muted); margin: 12px 0 4px; }
 .stat-card strong { font-size: 28px; font-weight: 650; letter-spacing: -.9px; overflow-wrap: anywhere; }
 .stat-card small { font-size: 13px; font-weight: 500; color: var(--muted); }
-.bottle-card { padding: 24px; flex: 1; }
+.bottle-card { padding: 24px; flex: 1; text-align: center; }
+.hydration-card .card-heading, .bottle-card .card-heading { justify-content: center; flex-wrap: wrap; }
 .section-description { color: var(--muted); font-size: 11px; margin: 5px 0 0; }
-.bottles { justify-content: flex-start; min-height: 94px; gap: 8px; padding: 16px 0; margin: 4px 0 12px; border-bottom: 1px solid var(--border); }
+.bottles { justify-content: center; min-height: 94px; gap: 8px; padding: 16px 0; margin: 4px 0 12px; border-bottom: 1px solid var(--border); }
 .bottle { width: 25px; height: 50px; }
-.empty-bottles { display: flex; gap: 10px; align-items: center; width: 100%; padding: 14px; border-radius: 10px; background: var(--input); color: var(--muted); }
+.empty-bottles { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 10px; background: var(--input); color: var(--muted); }
 .empty-bottles > .icon { width: 25px; height: 32px; color: var(--accent-text); }
 .empty-bottles p { margin: 0; font-size: 12px; }
 .overflow-count { color: var(--accent-text); font-size: 12px; }
@@ -300,6 +301,7 @@ progress::-webkit-progress-value { background: var(--accent); }
 progress::-moz-progress-bar { background: var(--accent); }
 .reminder-card { display: flex; align-items: center; gap: 14px; background: var(--accent-soft); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
 .reminder-card-icon { flex-shrink: 0; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--surface); color: var(--accent-text); }
+.reminder-card > div { flex: 1; text-align: center; }
 .reminder-card h2 { margin: 0 0 4px; font-size: 13px; }
 .reminder-card p { margin: 0; color: var(--muted); font-size: 11px; }
 .icon-button { flex-shrink: 0; margin-left: auto; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent; color: var(--accent-text); }
