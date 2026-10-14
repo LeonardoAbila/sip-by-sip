@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, today } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY, appColors } from './theme.js';
 import { languages, LANGUAGE_KEY, readLanguage, translations } from './language.js';
-import { readReminders, reminderIntervals, validReminderMinutes, REMINDER_KEY } from './reminders.js';
+import { readReminders, reminderIntervals, validReminderMinutes, readReminderDeadline, remainingReminderSeconds, formatReminderCountdown, REMINDER_KEY } from './reminders.js';
 import Fade from './Fade.jsx';
 import Icon from './Icon.jsx';
 import HydrationCalendar from './HydrationCalendar.jsx';
@@ -58,11 +58,11 @@ function PourDialog({ t, amount, onClose, fadingOut }) {
   );
 }
 
-function ReminderNotice({ t, onAdd, onDismiss, fadingOut }) {
+function ReminderNotice({ t, onAdd, onDismiss, fadingOut, floating = false }) {
   const titleId = useId();
   return (
-    <aside inert={fadingOut} className="reminder-notice" aria-labelledby={titleId}>
-      <div role="status">
+    <aside inert={fadingOut} className={`reminder-notice${floating ? ' reminder-toast' : ''}`} aria-labelledby={titleId}>
+      <div role="alert">
         <h2 id={titleId}>{t.reminderTitle}</h2>
         <p>{t.reminderMessage}</p>
       </div>
@@ -311,6 +311,17 @@ export default function App({ profile, onLogout }) {
   const [reminders, setReminders] = useState(readReminders);
   const [reminderVisible, setReminderVisible] = useState(false);
   const [reminderCycle, setReminderCycle] = useState(0);
+  const [reminderSeconds, setReminderSeconds] = useState(0);
+  const reminderSoundEnabled = useRef(reminders.sound);
+  reminderSoundEnabled.current = reminders.sound;
+  const reminderAlarm = useRef({ due: false, sounded: false });
+  const playDueReminder = useCallback(() => {
+    if (!reminderSoundEnabled.current || !reminderAlarm.current.due || reminderAlarm.current.sounded) return;
+    reminderAlarm.current.sounded = true;
+    void playReminderSound().then(played => {
+      if (!played) reminderAlarm.current.sounded = false;
+    });
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.color = color;
@@ -320,6 +331,7 @@ export default function App({ profile, onLogout }) {
   }, [color]);
 
   function dismissReminder() {
+    reminderAlarm.current = { due: false, sounded: false };
     stopReminderSound();
     setReminderVisible(false);
     setReminderCycle(previous => previous + 1);
@@ -335,42 +347,52 @@ export default function App({ profile, onLogout }) {
 
   useEffect(() => {
     if (!reminders.enabled || !reminders.sound) return;
-    const unlockSound = () => { void prepareReminderSound(); };
-    document.addEventListener('pointerdown', unlockSound, { once: true });
-    document.addEventListener('keydown', unlockSound, { once: true });
+    const unlockSound = () => { void prepareReminderSound().then(playDueReminder); };
+    document.addEventListener('pointerdown', unlockSound);
+    document.addEventListener('keydown', unlockSound);
     return () => {
       document.removeEventListener('pointerdown', unlockSound);
       document.removeEventListener('keydown', unlockSound);
       stopReminderSound();
     };
-  }, [reminders]);
+  }, [reminders, playDueReminder]);
 
   useEffect(() => {
-    if (!reminders.enabled) return;
-    const deadline = Date.now() + reminders.minutes * 60_000;
+    const deadlineKey = `${REMINDER_KEY}:deadline:${storageKey}`;
+    setReminderVisible(false);
+    reminderAlarm.current = { due: false, sounded: false };
+    if (!reminders.enabled) {
+      setReminderSeconds(0);
+      try { localStorage.removeItem(deadlineKey); } catch { /* Keep working without storage. */ }
+      return;
+    }
+    let deadline = Date.now() + reminders.minutes * 60_000;
+    try {
+      deadline = readReminderDeadline(localStorage, deadlineKey, reminders.minutes, Date.now(), reminderCycle > 0);
+    } catch { /* Keep an in-memory timer if localStorage itself is blocked. */ }
     let shown = false;
-    let timer;
     const checkReminder = () => {
-      const remaining = deadline - Date.now();
-      if (remaining > 0) {
-        clearTimeout(timer);
-        timer = setTimeout(checkReminder, Math.min(remaining, 2_147_483_647));
-      }
-      if (!shown && document.visibilityState === 'visible' && remaining <= 0) {
+      const seconds = remainingReminderSeconds(deadline);
+      setReminderSeconds(seconds);
+      if (!shown && seconds === 0 && document.visibilityState === 'visible') {
         shown = true;
         setReminderVisible(true);
-        if (reminders.sound) void playReminderSound();
+        reminderAlarm.current.due = true;
+        playDueReminder();
       }
     };
-    timer = setTimeout(checkReminder, Math.min(reminders.minutes * 60_000, 2_147_483_647));
+    checkReminder();
+    const timer = setInterval(checkReminder, 1000);
     document.addEventListener('visibilitychange', checkReminder);
     window.addEventListener('focus', checkReminder);
+    window.addEventListener('pageshow', checkReminder);
     return () => {
-      clearTimeout(timer);
+      clearInterval(timer);
       document.removeEventListener('visibilitychange', checkReminder);
       window.removeEventListener('focus', checkReminder);
+      window.removeEventListener('pageshow', checkReminder);
     };
-  }, [reminders, reminderCycle]);
+  }, [reminders.enabled, reminders.minutes, reminderCycle, storageKey, playDueReminder]);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -473,7 +495,7 @@ export default function App({ profile, onLogout }) {
         </nav>
       </header>
       <main className="app">
-        <Fade visible={reminderVisible}><ReminderNotice t={t} onAdd={addBottle} onDismiss={dismissReminder} /></Fade>
+        <Fade visible={reminderVisible}><ReminderNotice floating t={t} onAdd={addBottle} onDismiss={dismissReminder} /></Fade>
         {screen === 'benefits' && <WaterBenefits language={language} />}
         <div id="home" hidden={screen !== 'home'}>
         <header className="page-heading">
@@ -489,7 +511,11 @@ export default function App({ profile, onLogout }) {
         </section>
         <section className="reminder-card" aria-labelledby="reminder-card-title">
           <span className="reminder-card-icon"><Icon name="bell" /></span>
-          <div><h2 id="reminder-card-title">{t.reminders}</h2><p>{reminders.enabled ? t.everyMinutes(reminders.minutes) : t.remindersOff}</p></div>
+          <div><h2 id="reminder-card-title">{t.reminders}</h2><p>{reminders.enabled ? t.everyMinutes(reminders.minutes) : t.remindersOff}</p>
+            {reminders.enabled && <p className={reminderVisible ? 'reminder-countdown is-due' : 'reminder-countdown'} role="timer" aria-live="off">
+              {reminderVisible ? t.reminderDue : <>{t.nextReminder} <span>{formatReminderCountdown(reminderSeconds)}</span></>}
+            </p>}
+          </div>
           <button className="icon-button" onClick={() => setRemindersOpen(true)} aria-label={t.reminders} aria-haspopup="dialog"><Icon name="arrow" /></button>
         </section>
         </div>

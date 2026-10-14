@@ -553,3 +553,12 @@ progress::-moz-progress-bar { background: var(--accent); }
 @media (max-height: 500px) and (orientation: landscape) {
   .reset-dialog, .pour-dialog { max-height: calc(100dvh - 16px); margin-block: 8px; }
 }
+
+.daily-summary .reminder-card .reminder-countdown { margin-top: 8px; font-size: 11px; color: var(--muted); }
+.reminder-countdown span { margin-left: 4px; font-variant-numeric: tabular-nums; font-weight: 650; color: var(--accent-text); }
+.daily-summary .reminder-card .reminder-countdown.is-due { color: var(--accent-text); }
+.reminder-toast { position: fixed; z-index: 100; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); width: min(380px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; margin: 0; padding: 20px; background: var(--surface); box-shadow: 0 8px 32px #0002; text-align: center; }
+.reminder-toast .reminder-actions button { min-height: 44px; }
+@media (max-width: 540px) {
+  .reminder-toast { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); }
+}

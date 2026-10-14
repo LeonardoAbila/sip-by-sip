@@ -1,57 +1,56 @@
-import soundUrl from './assets/water-pour.mp3?url';
-
 let context;
-let bufferPromise;
-let source;
+let voices = [];
 let playRequest = 0;
 
-// Resume from a button click so later reminders can use browser audio.
+// Prepare audio during a user gesture for both mobile and desktop browsers.
 export async function prepareReminderSound() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return null;
+    if (!AudioContext) return false;
     context ||= new AudioContext();
-    await context.resume();
-    bufferPromise ||= fetch(soundUrl)
-      .then(response => {
-        if (!response.ok) throw new Error('Sound unavailable');
-        return response.arrayBuffer();
-      })
-      .then(data => context.decodeAudioData(data))
-      .catch(() => { bufferPromise = undefined; return null; });
-    return await bufferPromise;
+    if (context.state !== 'running') await context.resume();
+    return context.state === 'running';
   } catch {
-    // Visual reminders still work if the browser blocks audio.
-    return null;
+    return false;
   }
 }
 
 export function stopReminderSound() {
   playRequest += 1;
-  if (source) {
-    source.stop();
-    source.disconnect();
-    source = undefined;
+  for (const voice of voices.splice(0)) {
+    try { voice.stop(); } catch { /* A completed note is already stopped. */ }
   }
 }
 
+// A brief two-note chime avoids downloads and sounds like a notification.
 export async function playReminderSound() {
   stopReminderSound();
   const request = playRequest;
-  const buffer = await prepareReminderSound();
-  if (!buffer || request !== playRequest || context.state !== 'running') return;
-  source = context.createBufferSource();
-  source.buffer = buffer;
-  const volume = context.createGain();
-  volume.gain.value = 0.65;
-  source.connect(volume);
-  volume.connect(context.destination);
-  source.onended = () => {
-    volume.disconnect();
-    if (request === playRequest) {
-      source.disconnect();
-      source = undefined;
-    }
-  };
-  source.start();
+  if (!await prepareReminderSound() || request !== playRequest) return false;
+  try {
+    [880, 1174.66].forEach((frequency, index) => {
+      const voice = context.createOscillator();
+      const volume = context.createGain();
+      const start = context.currentTime + 0.01 + index * 0.18;
+      voice.type = 'sine';
+      voice.frequency.value = frequency;
+      volume.gain.setValueAtTime(0, start);
+      volume.gain.linearRampToValueAtTime(0.18, start + 0.015);
+      volume.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+      voice.connect(volume);
+      volume.connect(context.destination);
+      voice.onended = () => {
+        voice.disconnect();
+        volume.disconnect();
+        voices = voices.filter(item => item !== voice);
+      };
+      voices.push(voice);
+      voice.start(start);
+      voice.stop(start + 0.23);
+    });
+    return true;
+  } catch {
+    stopReminderSound();
+    return false;
+  }
 }
