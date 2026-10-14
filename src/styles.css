@@ -252,7 +252,7 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .subtitle { margin: 0; font-size: 14px; }
 .date-chip { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 9px 13px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); color: var(--muted); font-size: 12px; text-transform: capitalize; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-.dashboard-grid { display: grid; grid-template-columns: 1.13fr 1fr; gap: 24px; align-items: stretch; }
+.dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.13fr) minmax(0, 1fr); gap: 24px; align-items: stretch; }
 .hydration-card, .bottle-card, .stat-card { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 20px; }
 .hydration-card { text-align: center; padding: 28px; display: flex; flex-direction: column; align-items: center; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
@@ -276,7 +276,7 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .card-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: var(--muted); margin: 16px 0 0; }
 .card-note .icon { width: 14px; height: 14px; color: var(--accent-text); }
 .daily-panel { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .stat-card { padding: 20px; text-align: center; }
 .stat-icon { margin-inline: auto; width: 34px; height: 34px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-text); border-radius: 10px; }
 .stat-icon.warm { background: var(--warm); color: var(--warm-text); }
@@ -339,7 +339,7 @@ progress::-moz-progress-bar { background: var(--accent); }
   .app { padding-top: 30px; }
   .dashboard-grid { grid-template-columns: 1fr; gap: 18px; }
   .page-heading { margin-bottom: 22px; }
-  .goal-ring { width: 260px; margin: 22px 0; }
+  .goal-ring { width: min(100%, 260px); margin: 22px 0; }
   .total { font-size: 46px; }
   .daily-panel { gap: 16px; }
 }
@@ -431,3 +431,43 @@ progress::-moz-progress-bar { background: var(--accent); }
 .color-option[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); }
 .color-swatch { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: white; }
 .color-swatch .icon { width: 18px; height: 18px; }
+
+/* Keep the dashboard and its controls proportional to narrow phone screens. */
+#home, .dashboard-grid > *, .stat-card, .auth-intro, .auth-card { min-width: 0; }
+.auth-card, .hydration-card, .bottle-card, .reminder-card, .hydration-calendar { overflow-wrap: anywhere; }
+.bottle { flex-shrink: 0; }
+@media (max-width: 720px) {
+  .theme-toggle, .icon-button, .reset-button, .calendar-navigation button, .dialog-actions button { min-height: 44px; }
+  .icon-button, .calendar-navigation button { min-width: 44px; }
+  input, select, .settings-dialog input { font-size: 16px; }
+  .reset-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
+}
+@media (max-width: 540px) {
+  .navbar { flex-direction: column; align-items: center; gap: 12px; }
+  .nav-actions { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .nav-actions .theme-toggle { display: flex; justify-content: center; align-items: center; gap: 6px; min-width: 0; text-align: center; }
+  .hydration-card, .bottle-card, .reminder-card { padding: 20px 16px; }
+  .add-button { flex-wrap: wrap; }
+  .card-note { flex-wrap: wrap; text-align: center; }
+  .calendar-navigation { gap: 6px; }
+  .calendar-navigation h3 { font-size: 16px; }
+  .calendar-weekday { font-size: 10px; }
+  .calendar-legend { gap: 10px; }
+  .onboarding-header { flex-wrap: wrap; justify-content: center; }
+  .settings-dialog .settings { flex-direction: column; }
+  .reminder-settings { min-width: 0; }
+  .dialog-actions, .reminder-actions { flex-wrap: wrap; }
+  .auth-card { padding: 24px 18px; }
+}
+@media (max-width: 360px) {
+  #root { padding-inline: 12px; }
+  .site-header { width: calc(100% + 24px); }
+  .navbar { padding-inline: 12px; }
+  .ring-content { padding: 24px; }
+  .total { font-size: 34px; }
+  .percentage-pill { margin-top: 10px; }
+  .stats-grid { gap: 10px; }
+  .stat-card { padding: 16px 10px; }
+  .reset-dialog { padding: 20px 16px; }
+  .auth-measurements { grid-template-columns: 1fr; }
+}
