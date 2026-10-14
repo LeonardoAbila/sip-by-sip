@@ -463,13 +463,13 @@ export default function App({ profile, onLogout }) {
             <span className="brand-mark"><Icon name="drop" /></span> {t.title}
           </a>
           <div className="nav-actions">
-            <a className="theme-toggle" href="#home" aria-current={screen === 'home' ? 'page' : undefined}>{t.home}</a>
+            <a className="theme-toggle" href="#home" aria-current={screen === 'home' ? 'page' : undefined}><Icon name="home" />{t.home}</a>
             <a className="theme-toggle" href="#benefits" aria-current={screen === 'benefits' ? 'page' : undefined}><Icon name="heart" />{benefitsCopy[language].nav}</a>
             <button className="theme-toggle" aria-haspopup="dialog" onClick={() => setSettingsOpen(true)}>
               <Icon name="settings" /> {t.settings}
             </button>
-            {profile && <button type="button" className="theme-toggle" onClick={onLogout}>{t.exit}</button>}
           </div>
+          {profile && <button type="button" className="theme-toggle nav-logout" onClick={onLogout}><Icon name="logout" /> {t.exit}</button>}
         </nav>
       </header>
       <main className="app">

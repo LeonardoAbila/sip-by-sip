@@ -349,8 +349,6 @@ progress::-moz-progress-bar { background: var(--accent); }
   .brand-mark { width: 30px; height: 34px; }
   .nav-actions { gap: 6px; }
   .theme-toggle { padding: 8px; min-height: 36px; font-size: 11px; }
-  .theme-toggle:last-child span { display: none; }
-  .theme-toggle:last-child .icon { width: 17px; }
   .hydration-card, .bottle-card { padding: 20px; }
   .stat-card { padding: 17px; }
   .add-button { font-size: 12px; padding: 16px 12px; }
@@ -444,7 +442,7 @@ progress::-moz-progress-bar { background: var(--accent); }
 }
 @media (max-width: 540px) {
   .navbar { flex-direction: column; align-items: center; gap: 12px; }
-  .nav-actions { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .nav-actions { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .nav-actions .theme-toggle { display: flex; justify-content: center; align-items: center; gap: 6px; min-width: 0; text-align: center; }
   .hydration-card, .bottle-card, .reminder-card { padding: 20px 16px; }
   .add-button { flex-wrap: wrap; }
@@ -508,3 +506,50 @@ progress::-moz-progress-bar { background: var(--accent); }
 .reminder-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0 18px; }
 .reminder-presets button { min-height: 44px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--input); color: var(--text); font-size: 13px; }
 .reminder-presets button[aria-pressed='true'] { border-color: var(--accent-text); background: var(--accent-soft); color: var(--accent-text); }
+
+/* Phone navigation uses one compact row and preserves readable touch controls. */
+.nav-actions { margin-left: auto; }
+.page-heading h1[tabindex='-1']:focus { outline: none; }
+@media (max-width: 720px) {
+  .navbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 10px 16px; }
+  .nav-brand { justify-self: start; font-size: 17px; }
+  .nav-logout { grid-column: 2; grid-row: 1; justify-self: end; }
+  .nav-actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; gap: 6px; margin-left: 0; }
+  .nav-actions .theme-toggle { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; min-width: 0; min-height: 56px; padding: 8px 4px; font-size: 12px; text-align: center; text-decoration: none; overflow-wrap: anywhere; }
+  .nav-actions .icon { width: 18px; height: 18px; }
+  .nav-logout { font-size: 13px; }
+  .app { padding-top: 24px; }
+  .page-heading { gap: 10px; margin-bottom: 20px; }
+  .page-heading h1 { font-size: clamp(25px, 7vw, 32px); letter-spacing: -.8px; }
+  .daily-summary { gap: 12px; margin-bottom: 16px; }
+  .daily-summary .achievement-panel > div, .daily-summary .reminder-card { padding: 16px 12px; }
+  .daily-summary .reminder-card p { font-size: 12px; line-height: 1.5; }
+  .goal-ring { width: min(100%, 240px); margin: 20px 0; }
+  .ring-content { padding: 26px; }
+  .total { font-size: clamp(32px, 9vw, 42px); }
+  .goal-caption, .percentage-pill { font-size: 12px; }
+  .card-heading h2 { font-size: 15px; }
+  .section-description, .remaining-row { font-size: 13px; line-height: 1.6; }
+  .remaining-row { margin-bottom: 0; }
+  .add-button { min-height: 48px; padding: 14px 12px; font-size: 14px; }
+  .card-note { font-size: 12px; }
+  .bottle-size-editor { padding: 12px; }
+  .bottle-size-editor .dialog-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .calendar-weekday { font-size: 11px; }
+  .calendar-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); font-size: 11px; text-align: left; }
+  .calendar-legend > span { min-width: 0; }
+  .calendar-legend i { flex-shrink: 0; }
+  .calendar-summary { font-size: 13px; }
+  .auth-card input { min-height: 48px; }
+  .password-toggle { width: 44px; height: 44px; }
+}
+@media (max-width: 360px) {
+  .navbar { padding-inline: 12px; }
+  .add-button { flex-direction: column; gap: 6px; }
+  .button-volume { border-left: 0; padding-left: 0; font-size: 12px; }
+  .calendar-navigation h3 { font-size: 14px; }
+  .calendar-grid { gap: 4px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .reset-dialog, .pour-dialog { max-height: calc(100dvh - 16px); margin-block: 8px; }
+}
