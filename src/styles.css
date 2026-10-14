@@ -43,6 +43,10 @@ body { margin: 0; min-width: 280px; }
 .auth-description { color: var(--muted); line-height: 1.5; margin-bottom: 24px; }
 .auth-card fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 18px; }
 .auth-card label { display: block; font-size: 14px; font-weight: 600; }
+.password-field { position: relative; margin-top: 8px; }
+.password-field input { margin-top: 0; padding-right: 52px; }
+.password-toggle { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; display: grid; place-items: center; padding: 8px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); }
+.password-toggle:hover { color: var(--accent-text); background: var(--secondary); }
 .auth-measurements { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .auth-goal { display: grid; gap: 8px; padding: 20px; border-radius: 16px; background: var(--secondary); color: var(--accent-text); }
 .auth-goal strong { font-size: 24px; }

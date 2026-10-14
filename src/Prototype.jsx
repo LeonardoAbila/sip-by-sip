@@ -5,6 +5,23 @@ import { hashPassword, readProfiles, readSession, registerProfile, setSession } 
 import Onboarding from './Onboarding.jsx';
 import { refreshDatabase } from './database.js';
 
+function PasswordField({ id, label, ...inputProps }) {
+  const [visible, setVisible] = useState(false);
+  const action = visible ? 'Ocultar' : 'Mostrar';
+
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <div className="password-field">
+        <input {...inputProps} id={id} type={visible ? 'text' : 'password'} />
+        <button className="password-toggle" type="button" aria-label={`${action} ${label.toLowerCase()}`} aria-controls={id} onClick={() => setVisible(current => !current)} title={`${action} senha`}>
+          <Icon name={visible ? 'eyeOff' : 'eye'} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Prototype() {
   const [profile, setProfile] = useState(readSession);
   const [page, setPage] = useState('login');
@@ -80,9 +97,9 @@ export default function Prototype() {
         <form onSubmit={submit}>
           <fieldset disabled={busy}>
             <label htmlFor="auth-username">Usuário<input id="auth-username" autoComplete="username" required maxLength={40} value={username} onChange={event => setUsername(event.target.value)} /></label>
-            <label htmlFor="auth-password">Senha<input id="auth-password" type="password" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} /></label>
+            <PasswordField key={page} label="Senha" id="auth-password" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
             {registering && <>
-              <label htmlFor="auth-confirmation">Confirme a senha<input id="auth-confirmation" type="password" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} /></label>
+              <PasswordField label="Confirme a senha" id="auth-confirmation" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
             </>}
             {error && <p className="notice" role="alert">{error}</p>}
             <button className="add-button" type="submit">{busy ? 'Aguarde…' : registering ? 'Criar perfil e continuar' : 'Entrar'}</button>
