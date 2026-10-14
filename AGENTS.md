@@ -7,7 +7,8 @@ Sip by Sip is a water bottle counter built with React, JavaScript, and Vite. The
 ## Main files
 
 - `src/App.jsx`: app components, dialogs, and user interactions.
-- `src/state.js`: saved-state loading, validation, and migration.
+- `src/state.js`: hydration-state loading, validation, and rule migration.
+- `src/database.js`: browser SQLite, IndexedDB persistence, and localStorage import.
 - `src/theme.js`: saved and system theme preferences.
 - `src/styles.css`: layout, styling, and theme palettes.
 - `src/main.jsx`: React entry point.
@@ -29,10 +30,11 @@ Sip by Sip is a water bottle counter built with React, JavaScript, and Vite. The
 
 - `npm install`: install dependencies.
 - `npm run dev`: start the Vite development server.
+- `npm test`: validate hydration rules, SQLite persistence, and migration.
 - `npm run build`: validate the production build.
 - `npm run preview`: serve the production build locally.
 
-There is currently no automated test script. For app changes, run `npm run build` and manually verify the affected behavior when a browser is available. Relevant checks include adding bottles, saving/cancelling settings, refreshing saved progress, confirming/cancelling a reset, and switching themes. Report any verification that could not be performed.
+For app changes, run `npm test` and `npm run build` and manually verify the affected behavior when a browser is available. Relevant checks include adding bottles, saving/cancelling settings, refreshing saved progress, confirming/cancelling a reset, and switching themes. Report any verification that could not be performed.
 
 ## Commits
 

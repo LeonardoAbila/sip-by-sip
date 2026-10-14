@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { achievements, calendarKey, currentDay, newState, readState, rewardGoal, today } from '../src/state.js';
+import { achievements, calendarKey, currentDay, newState, readState as loadState, rewardGoal, today } from '../src/state.js';
 import { calendarStatus, monthDays } from '../src/calendar.js';
 
 const NativeDate = Date;
@@ -9,7 +9,8 @@ globalThis.Date = class extends NativeDate {
   constructor(...args) { super(...(args.length ? args : [clock])); }
 };
 const saved = new Map();
-globalThis.localStorage = { getItem: key => saved.get(key) ?? null };
+// Inject saved JSON so the rule tests stay independent of the browser database.
+const readState = key => loadState(key, 2, key => saved.get(key) ?? null);
 
 test('goal grants ten points once; extra bottles and resets preserve the reward', () => {
   const pending = { ...newState(), totalMl: 1999 };

@@ -1,4 +1,4 @@
-const PROFILES_KEY = 'aguaPrototypeProfiles';
+import { readStoredProfiles, saveProfile } from './database.js';
 const SESSION_KEY = 'aguaPrototypeSession';
 
 export function hydrationGoal(age, weight) {
@@ -8,7 +8,7 @@ export function hydrationGoal(age, weight) {
 
 export function readProfiles() {
   try {
-    const profiles = JSON.parse(localStorage.getItem(PROFILES_KEY));
+    const profiles = readStoredProfiles();
     if (!Array.isArray(profiles)) return [];
     return profiles.filter(profile => profile && typeof profile.id === 'string'
       && typeof profile.username === 'string' && profile.username.trim()
@@ -53,14 +53,15 @@ export async function registerProfile(username, password) {
   const profile = { id: crypto.randomUUID(), username, salt,
     passwordHash: await hashPassword(password, salt), onboardingComplete: false };
   try {
-    localStorage.setItem(PROFILES_KEY, JSON.stringify([...profiles, profile]));
-  } catch {
+    await saveProfile(profile, { create: true });
+  } catch (error) {
+    if (error.message?.startsWith('Este usuário já existe.')) throw error;
     throw new Error('Não foi possível salvar o cadastro. Verifique se o navegador permite armazenamento local.');
   }
   return profile;
 }
 
-export function completeProfile(profile, age, weight) {
+export async function completeProfile(profile, age, weight) {
   if (!Number.isInteger(age) || age < 1 || age > 120 || !Number.isFinite(weight) || weight <= 0 || weight > 500) {
     throw new Error('Informe uma idade entre 1 e 120 anos e um peso válido, até 500 kg.');
   }
@@ -68,7 +69,7 @@ export function completeProfile(profile, age, weight) {
   const profiles = readProfiles();
   if (!profiles.some(item => item.id === profile.id)) throw new Error('Perfil não encontrado. Entre novamente.');
   try {
-    localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles.map(item => item.id === profile.id ? updated : item)));
+    await saveProfile(updated);
   } catch {
     throw new Error('Não foi possível salvar sua meta. Verifique o armazenamento do navegador e tente novamente.');
   }

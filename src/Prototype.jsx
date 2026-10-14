@@ -3,6 +3,7 @@ import App from './App.jsx';
 import Icon from './Icon.jsx';
 import { hashPassword, readProfiles, readSession, registerProfile, setSession } from './profiles.js';
 import Onboarding from './Onboarding.jsx';
+import { refreshDatabase } from './database.js';
 
 export default function Prototype() {
   const [profile, setProfile] = useState(readSession);
@@ -37,6 +38,7 @@ export default function Prototype() {
     if (registering && password !== confirmation) return setError('As senhas precisam ser iguais.');
     setBusy(true);
     try {
+      await refreshDatabase();
       if (registering) {
         enter(await registerProfile(name, password));
       } else {

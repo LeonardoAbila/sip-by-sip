@@ -37,6 +37,7 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
   const [weight, setWeight] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
   const heading = useRef(null);
   useEffect(() => { heading.current?.focus(); }, [result]);
 
@@ -52,18 +53,22 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
     setResult({ age: years, weight: kilos, ...hydrationGoal(years, kilos) });
   }
 
-  function finish() {
+  async function finish() {
+    setBusy(true);
+    setError('');
     try {
-      onComplete(completeProfile(profile, result.age, result.weight));
+      onComplete(await completeProfile(profile, result.age, result.weight));
     } catch (failure) {
       setError(failure.message);
+    } finally {
+      setBusy(false);
     }
   }
 
   return <main className="onboarding-page">
     <header className="onboarding-header">
       <div className="auth-brand"><span className="brand-mark"><Icon name="drop" /></span> Sip by Sip</div>
-      <button className="theme-toggle" onClick={onLogout}>Sair</button>
+      <button className="theme-toggle" disabled={busy} onClick={onLogout}>Sair</button>
     </header>
     <section className="auth-card onboarding-card" aria-labelledby="onboarding-title">
       <p className="eyebrow">PRIMEIRO ACESSO · {result ? 'SUA META' : 'VAMOS CONHECER VOCÊ'}</p>
@@ -73,8 +78,8 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
         <AnimatedGoal liters={result.liters} />
         <p className="onboarding-equation">{result.age} anos · {format.format(result.weight)} kg × {result.mlPerKg} ml/kg = <strong>{format.format(result.liters * 1000)} ml</strong></p>
         <p className="auth-description">Essa é uma estimativa. Você pode ajustar a meta a qualquer momento nas configurações.</p>
-        <button className="add-button" onClick={finish}>Começar meu dia</button>
-        <button className="onboarding-back" onClick={() => { setResult(null); setError(''); }}>Revisar idade e peso</button>
+        <button className="add-button" onClick={finish} disabled={busy}>{busy ? 'Salvando…' : 'Começar meu dia'}</button>
+        <button className="onboarding-back" disabled={busy} onClick={() => { setResult(null); setError(''); }}>Revisar idade e peso</button>
       </> : <>
         <p className="auth-description">Antes de começarmos, precisamos saber sua idade e seu peso! Com essas informações, vamos estimar quanta água você precisa beber por dia.</p>
         <div className="onboarding-reasons">

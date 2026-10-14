@@ -16,7 +16,7 @@ Open the local URL printed by Vite. You must use the development server; opening
 ```bash
 npm run build    # Create the production app in dist/
 npm run preview  # Preview that production build locally
-npm test         # Check points, streak, and calendar rules
+npm test         # Check hydration rules, SQLite persistence, and migration
 ```
 
 Tests also run automatically on every push and pull request through
@@ -50,6 +50,40 @@ Hosting does not add backend authentication or shared storage. Profiles and
 progress remain local to each browser and origin; data saved on localhost is
 separate from data saved on the published site.
 
+## Browser database
+
+Profiles and hydration progress are stored in **SQLite**, running in the browser
+with **sql.js**. SQLite tables hold profiles (including password hashes and setup)
+and each profile's hydration state. Progress is kept as JSON in a SQLite row so
+the existing validation, new-day, points, and streak rules stay unchanged.
+
+sql.js works in memory, so every save exports the SQLite file to **IndexedDB**.
+The app loads that file before showing login and waits for profile saves before
+continuing. Progress saves show the existing warning if persistence fails.
+Writes read and update the latest file in one IndexedDB transaction, preventing
+separate tabs from replacing unrelated profiles or progress. Two tabs editing
+the same profile's progress still use the most recently saved state.
+
+On the first successful upgrade, the app imports `aguaPrototypeProfiles`,
+`aguaApp`, and every `aguaApp:perfil:*` entry from localStorage. The import and
+its completion marker are saved together; failed imports can be retried.
+Original entries stay untouched as backups and are not imported again after a
+successful migration. Invalid legacy JSON uses the existing defaults. If the
+database cannot be opened, the app offers **Tentar novamente** and does not
+replace it with empty data.
+
+Theme, language, and reminder preferences still use localStorage; the active
+login still uses sessionStorage. Data stays in this browser and origin, survives
+closing/reopening tabs, and does not sync between devices. Clearing site data
+removes the database and backups.
+
+No server or GitHub configuration change is needed. Vite bundles sql.js and its
+WebAssembly file under `/sip-by-sip/assets/`, so the existing GitHub Pages
+workflow publishes everything. After deployment, open the site in the same
+browser/origin used before, log in with an existing profile, check its progress,
+record water, then close and reopen the tab to confirm it was saved. Keep the
+old localStorage entries until you have verified the upgrade.
+
 ## How React works here
 
 React renders the interface from the current state instead of updating individual elements with `document.getElementById`.
@@ -58,7 +92,7 @@ React renders the interface from the current state instead of updating individua
 2. **State:** `const [state, setState] = useState(readState)` stores today's count, volume, and settings. `setState` changes that data and asks React to update the screen.
 3. **Events:** `onClick={addBottle}` connects the add button to a function. The function updates state; React updates the total, bottles, and progress bar.
 4. **Derived values:** The percentage is calculated from the total and goal during rendering. It doesn't need separate state.
-5. **Effects:** `useEffect` saves state to `localStorage` after a change. Another effect checks for a new day and cleans up its timer when the component is removed.
+5. **Effects:** `useEffect` saves hydration state to SQLite and IndexedDB after a change. Another effect checks for a new day and cleans up its timer when the component is removed.
 6. **Controlled inputs:** Each input's `value` comes from React state; `onChange` updates it. Inside the settings dialog, invalid values show a message and disable saving.
 7. **Props:** `ResetDialog` receives `onConfirm` and `onClose` from `App`. Props let a parent component pass data or behavior to a child.
 
@@ -66,10 +100,10 @@ For example, clicking **Adicionar garrafa** follows this flow:
 
 ```text
 click → addBottle() → setState(...) → React renders updated JSX
-                                      → useEffect saves the new state
+                                      → useEffect saves to SQLite and IndexedDB
 ```
 
-`src/main.jsx` mounts the app inside `<div id="root">` in `index.html`. `src/styles.css` controls its appearance. `src/state.js` loads and validates saved data, including progress from the original app when served on the same browser origin. `StrictMode` runs extra development checks, so effect setup must be safe to repeat.
+`src/main.jsx` mounts the app inside `<div id="root">` in `index.html`. `src/styles.css` controls its appearance. `src/state.js` loads and validates hydration data; `src/database.js` handles SQLite, IndexedDB persistence, and the upgrade from localStorage on the same browser origin. `StrictMode` runs extra development checks, so effect setup must be safe to repeat.
 
 ## Behavior
 
@@ -80,8 +114,8 @@ click → addBottle() → setState(...) → React renders updated JSX
 
 - The prototype starts on a login page. **Cadastre-se** asks only for username, test password, and password confirmation. The first login opens a separate setup page explaining why age and weight are needed. **Descobrir minha meta** then reveals the estimated liters with an animated filling bottle and number counter. **Revisar idade e peso** returns to the inputs; **Começar meu dia** saves setup and opens the existing counter. Reduced-motion preferences disable the animation. Setup resumes after logging out or refreshing until it is completed; completed profiles go directly to the counter on later logins, including profiles created before this setup flow was added.
 - The initial goal uses the supplied formula: up to 17 years, 40 ml/kg; 18–55, 35 ml/kg; 56–65, 30 ml/kg; 66+, 25 ml/kg. Age 55 belongs to the 35 ml/kg band. For example, age 30 and 70 kg produce 2.45 L/day. Settings can override the initial goal. The setup's expandable reference links to the [Food and Nutrition Board publication](https://www.nationalacademies.org/publications/10925), distinguishing its total-water guidance (food and beverages included) from the prototype's weight-based formula; the latter is not attributed to that publication.
-- **Sair** returns to login; entering again restores that profile's saved progress and goal. Profiles and counters are local to this browser and origin; the active profile survives a refresh in the same tab. Existing pre-login progress is preserved under its original storage key, separate from the new profiles. Theme, language, and reminder preferences remain browser-wide.
-- Login is a demonstration, with no server authentication, account recovery, or cross-device accounts. Use test credentials. Passwords are saved as salted SHA-256 hashes rather than plain text; this is not production authentication. Clearing browser storage removes profiles and progress. Malformed saved profile data falls back safely to the login screen.
+- **Sair** returns to login; entering again restores that profile's saved progress and goal. Profiles and counters are local to this browser and origin; the active profile survives a refresh in the same tab. Existing pre-login progress is migrated into its own SQLite progress row under its original key, separate from the new profiles. Theme, language, and reminder preferences remain browser-wide.
+- Login is a demonstration, with no server authentication, account recovery, or cross-device accounts. Use test credentials. Passwords are saved as salted SHA-256 hashes rather than plain text; this is not production authentication. Clearing browser site data removes profiles and progress. Malformed saved profile data falls back safely to the login screen.
 
 - The web dashboard uses a responsive two-column layout with a circular daily goal, goal and bottle-size cards, bottle log, remaining water, and reminder status. On phones it stacks into one column. All labels, number formatting, and the date follow the selected language.
 

@@ -1,3 +1,5 @@
+import { readProgress } from './database.js';
+
 export const STORAGE_KEY = 'aguaApp';
 export const POINTS_PER_DAY = 10;
 
@@ -56,10 +58,10 @@ export function currentDay(state) {
     : { ...rewarded, garrafas: 0, totalMl: 0, data: today() };
 }
 
-export function readState(storageKey = STORAGE_KEY, initialGoal = 2) {
+export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = readProgress) {
   const defaults = { ...newState(), metaLitros: initialGoal };
   try {
-    const saved = JSON.parse(localStorage.getItem(storageKey));
+    const saved = JSON.parse(load(storageKey));
     if (!saved || typeof saved !== 'object') return defaults;
     const completedDays = Array.isArray(saved.completedDays) ? [...new Set(saved.completedDays.filter(validDay))].sort() : [];
     const savedDate = new Date(typeof saved.data === 'string' ? saved.data : NaN);

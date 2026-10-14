@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sql.js": "^1.14.2"
   },
   "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
     "vite": "^7.0.0"
   }
 }

@@ -1,3 +1,4 @@
+import { saveProgress } from './database.js';
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { achievements, currentDay, POINTS_PER_DAY, positiveNumber, readState, rewardGoal, STORAGE_KEY, today } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY, appColors } from './theme.js';
@@ -341,12 +342,12 @@ export default function App({ profile, onLogout }) {
 
   // Effects synchronize React state with things outside React, such as storage.
   useEffect(() => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(state));
-      setStorageError(false);
-    } catch {
-      setStorageError(true);
-    }
+    let active = true;
+    saveProgress(storageKey, state).then(
+      () => { if (active) setStorageError(false); },
+      () => { if (active) setStorageError(true); },
+    );
+    return () => { active = false; };
   }, [state, storageKey]);
 
   useEffect(() => {
