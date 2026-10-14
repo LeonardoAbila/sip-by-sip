@@ -11,9 +11,9 @@ import WaterBenefits, { benefitsCopy } from './WaterBenefits.jsx';
 import { playReminderSound, prepareReminderSound, stopReminderSound } from './reminderSound.js';
 
 // A component is a function that returns the interface for one part of the app.
-function Bottle({ animated = false }) {
+function Bottle({ animated = false, ghost = false }) {
   return (
-    <svg className={animated ? 'bottle bottle-filling' : 'bottle'} viewBox="0 0 40 80" aria-hidden="true">
+    <svg className={`bottle${animated ? ' bottle-filling' : ''}${ghost ? ' bottle-ghost' : ''}`} viewBox="0 0 40 80" aria-hidden="true">
       <rect x="14" y="2" width="12" height="10" rx="2" fill="#9cb4cd" />
       <rect x="10" y="12" width="20" height="60" rx="6" fill="#d9efff" stroke="#1e88e5" strokeWidth="2" />
       <rect className="bottle-water" x="12" y="20" width="16" height="48" rx="4" fill="#64b5f6" />
@@ -366,6 +366,7 @@ export default function App({ profile, onLogout }) {
   const total = state.totalMl >= 1000 ? `${format.format(state.totalMl / 1000)} L` : `${format.format(state.totalMl)} ml`;
 
   const remainingMl = Math.max(state.metaLitros * 1000 - state.totalMl, 0);
+  const remainingBottles = Math.ceil(remainingMl / state.mlGarrafa);
   const rewards = achievements(currentDay(state));
   const dateLabel = new Intl.DateTimeFormat(language, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
@@ -465,10 +466,12 @@ export default function App({ profile, onLogout }) {
             <section className="bottle-card" aria-labelledby="bottle-log-title">
               <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2><span className="count-badge">{format.format(state.garrafas)}</span></div>
               <p className="section-description">{t.bottles(state.garrafas)}</p>
+              <p className="section-description">{t.remainingBottles(remainingBottles)}</p>
               <div className="bottles" aria-hidden="true">
                 {Array.from({ length: Math.min(state.garrafas, 24) }, (_, index) => <Bottle key={index} />)}
                 {state.garrafas > 24 && <span className="overflow-count">+{state.garrafas - 24}</span>}
-                {state.garrafas === 0 && <div className="empty-bottles"><Icon name="bottle" /><p>{t.empty}</p></div>}
+                {Array.from({ length: Math.min(remainingBottles, 24) }, (_, index) => <Bottle ghost key={`remaining-${index}`} />)}
+                {remainingBottles > 24 && <span className="overflow-count ghost-count">+{format.format(remainingBottles - 24)}</span>}
               </div>
               <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
               <progress value={percentage} max="100" aria-label={t.progressLabel} />

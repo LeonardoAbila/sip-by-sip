@@ -288,6 +288,10 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .section-description { color: var(--muted); font-size: 11px; margin: 5px 0 0; }
 .bottles { justify-content: center; min-height: 94px; gap: 8px; padding: 16px 0; margin: 4px 0 12px; border-bottom: 1px solid var(--border); }
 .bottle { width: 25px; height: 50px; }
+.bottle-ghost { opacity: .4; }
+.bottle-ghost rect { fill: none; stroke: var(--muted); stroke-width: 2; stroke-dasharray: 3 3; }
+.bottle-ghost .bottle-water, .bottle-ghost path { display: none; }
+.ghost-count { opacity: .5; }
 .empty-bottles { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 10px; background: var(--input); color: var(--muted); }
 .empty-bottles > .icon { width: 25px; height: 32px; color: var(--accent-text); }
 .empty-bottles p { margin: 0; font-size: 12px; }
