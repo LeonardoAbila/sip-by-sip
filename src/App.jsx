@@ -431,6 +431,16 @@ export default function App({ profile, onLogout }) {
           </div>
           <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
         </header>
+        <div className="daily-summary">
+        <section className="achievement-panel" aria-label={t.streak}>
+          <div><span className="achievement-symbol" aria-hidden="true">🔥</span><p>{t.streak}</p><strong>{t.streakDays(rewards.streak)}</strong></div>
+        </section>
+        <section className="reminder-card" aria-labelledby="reminder-card-title">
+          <span className="reminder-card-icon"><Icon name="bell" /></span>
+          <div><h2 id="reminder-card-title">{t.reminders}</h2><p>{reminders.enabled ? t.everyMinutes(reminders.minutes) : t.remindersOff}</p></div>
+          <button className="icon-button" onClick={() => setRemindersOpen(true)} aria-label={t.reminders} aria-haspopup="dialog"><Icon name="arrow" /></button>
+        </section>
+        </div>
         <div className="dashboard-grid">
           <section className="hydration-card" aria-label={t.consumption}>
             <div className="card-heading">
@@ -468,14 +478,6 @@ export default function App({ profile, onLogout }) {
               </div>
               <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
               <progress value={percentage} max="100" aria-label={t.progressLabel} />
-            </section>
-            <section className="achievement-panel" aria-label={t.streak}>
-              <div><span className="achievement-symbol" aria-hidden="true">🔥</span><p>{t.streak}</p><strong>{t.streakDays(rewards.streak)}</strong></div>
-            </section>
-            <section className="reminder-card" aria-labelledby="reminder-card-title">
-              <span className="reminder-card-icon"><Icon name="bell" /></span>
-              <div><h2 id="reminder-card-title">{t.reminders}</h2><p>{reminders.enabled ? t.everyMinutes(reminders.minutes) : t.remindersOff}</p></div>
-              <button className="icon-button" onClick={() => setRemindersOpen(true)} aria-label={t.reminders} aria-haspopup="dialog"><Icon name="arrow" /></button>
             </section>
           </div>
         </div>

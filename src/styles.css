@@ -479,11 +479,20 @@ progress::-moz-progress-bar { background: var(--accent); }
 .bottle-settings dt { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
 .bottle-settings dd { margin: 0; font-size: 22px; font-weight: 650; }
 .bottle-settings small { color: var(--muted); font-size: 13px; font-weight: 400; }
-.daily-panel .reminder-card { gap: 8px; padding: 16px; background: var(--surface); border-radius: 16px; }
-.daily-panel .reminder-card-icon { width: 28px; height: 28px; background: transparent; }
+.daily-summary .reminder-card { gap: 8px; padding: 16px; background: var(--surface); border-radius: 16px; }
+.daily-summary .reminder-card-icon { width: 28px; height: 28px; background: transparent; }
 #home .hydration-card .add-button { margin-top: 0; box-shadow: none; }
 #home .percentage-pill { background: transparent; padding-inline: 0; font-size: 12px; }
 @media (max-width: 720px) {
   .daily-panel { gap: 14px; }
   .bottle-settings dd { font-size: 20px; }
+}
+
+.daily-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+.daily-summary > * { min-width: 0; }
+.daily-summary .achievement-panel > div { height: 100%; border-radius: 16px; justify-content: center; }
+.daily-summary .reminder-card { justify-content: center; overflow-wrap: anywhere; }
+@media (max-width: 420px) {
+  .daily-summary { gap: 10px; margin-bottom: 16px; }
+  .daily-summary .achievement-panel > div, .daily-summary .reminder-card { padding: 14px 10px; }
 }
