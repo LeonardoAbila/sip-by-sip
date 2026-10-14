@@ -95,6 +95,44 @@ function ResetDialog({ onConfirm, onClose, t, fadingOut }) {
   );
 }
 
+function BottleSizeEditor({ size, t, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [input, setInput] = useState(String(size));
+  const inputId = useId();
+  const valid = positiveNumber(input);
+
+  function cancel() {
+    setEditing(false);
+    setInput(String(size));
+  }
+
+  function save(event) {
+    event.preventDefault();
+    if (!valid) return;
+    onSave(Number(input));
+    setEditing(false);
+  }
+
+  if (!editing) return <button type="button" className="bottle-edit-button" onClick={() => { setInput(String(size)); setEditing(true); }}>
+    <Icon name="settings" /> {t.changeBottleSize}
+  </button>;
+
+  return <form className="bottle-size-editor" onSubmit={save} onKeyDown={event => {
+    if (event.key === 'Escape') { event.preventDefault(); cancel(); }
+  }}>
+    <label htmlFor={inputId}>{t.bottleSize}</label>
+    <input autoFocus required id={inputId} type="number" inputMode="decimal" min="0" step="any"
+      value={input} aria-invalid={!valid} aria-describedby={`${inputId}-help${valid ? '' : ` ${inputId}-error`}`}
+      onChange={event => setInput(event.target.value)} />
+    {!valid && <p id={`${inputId}-error`} className="notice" role="alert">{t.invalid}</p>}
+    <p id={`${inputId}-help`} className="settings-help">{t.settingsHelp}</p>
+    <div className="dialog-actions">
+      <button type="button" className="secondary" onClick={cancel}>{t.cancel}</button>
+      <button type="submit" className="save-button" disabled={!valid}>{t.save}</button>
+    </div>
+  </form>;
+}
+
 // Keep edits local to this dialog until the user chooses Save.
 function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave, onClose, fadingOut }) {
   const dialog = useRef(null);
@@ -453,6 +491,7 @@ export default function App({ profile, onLogout }) {
                   strokeDasharray={2 * Math.PI * 112} strokeDashoffset={2 * Math.PI * 112 * (1 - percentage / 100)} />
               </svg>
               <div className="ring-content" aria-live="polite">
+                <span className="ring-drop"><Icon name="drop" /></span>
                 <strong className="total">{total}</strong>
                 <span className="goal-caption">{t.goalToday(format.format(state.metaLitros))}</span>
                 <span className="percentage-pill">{Math.floor(percentage)}% · {t.progress}</span>
@@ -460,14 +499,17 @@ export default function App({ profile, onLogout }) {
             </div>
             <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
             <button className="add-button" onClick={addBottle}><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml <Icon name="plus" /></span></button>
+            <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
           <div className="daily-panel">
             <section className="bottle-card" aria-labelledby="bottle-log-title">
               <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2></div>
               <dl className="bottle-settings">
-                <div><dt>{t.dailyGoal}</dt><dd>{format.format(state.metaLitros)} <small>L</small></dd></div>
-                <div><dt>{t.bottle}</dt><dd>{format.format(state.mlGarrafa)} <small>ml</small></dd></div>
+                <div><dt><span className="stat-icon"><Icon name="target" /></span>{t.dailyGoal}</dt><dd>{format.format(state.metaLitros)} <small>L</small></dd></div>
+                <div><dt><span className="stat-icon warm"><Icon name="bottle" /></span>{t.bottle}</dt><dd>{format.format(state.mlGarrafa)} <small>ml</small></dd></div>
               </dl>
+              <BottleSizeEditor size={state.mlGarrafa} t={t}
+                onSave={mlGarrafa => setState(previous => rewardGoal({ ...currentDay(previous), mlGarrafa }))} />
               <p className="section-description">{t.bottles(state.garrafas)}</p>
               <p className="section-description">{t.remainingBottles(remainingBottles)}</p>
               <div className="bottles" aria-hidden="true">

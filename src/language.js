@@ -32,7 +32,7 @@ export const translations = {
     storageError: 'O navegador não permitiu salvar. Seu progresso ficará disponível apenas enquanto o app estiver aberto.',
     resetTitle: 'Recomeçar o dia?', resetHelp: 'O total de água e a contagem de garrafas serão zerados. Suas configurações e conquistas já obtidas serão mantidas.',
     cancel: 'Cancelar', save: 'Salvar', settingsIntro: 'Escolha o tamanho da sua garrafa e sua meta diária.',
-    bottleSize: 'Sua garrafa (ml)', dailyGoal: 'Meta diária (L)', invalid: 'Use valores maiores que zero.',
+    changeBottleSize: 'Alterar tamanho', bottleSize: 'Sua garrafa (ml)', dailyGoal: 'Meta diária (L)', invalid: 'Use valores maiores que zero.',
     settingsHelp: 'O novo tamanho vale para as próximas garrafas. A água já registrada será mantida.',
   },
   en: {
@@ -55,7 +55,7 @@ export const translations = {
     storageError: 'Your browser could not save your progress. It will only be available while the app is open.',
     resetTitle: 'Start the day over?', resetHelp: 'Your water total and bottle count will be reset. Your settings and earned achievements will be kept.',
     cancel: 'Cancel', save: 'Save', settingsIntro: 'Choose your bottle size and daily goal.',
-    bottleSize: 'Your bottle (ml)', dailyGoal: 'Daily goal (L)', invalid: 'Use values greater than zero.',
+    changeBottleSize: 'Change size', bottleSize: 'Your bottle (ml)', dailyGoal: 'Daily goal (L)', invalid: 'Use values greater than zero.',
     settingsHelp: 'The new size applies to future bottles. Water already recorded will be kept.',
   },
   es: {
@@ -77,7 +77,7 @@ export const translations = {
     storageError: 'El navegador no pudo guardar tu progreso. Solo estará disponible mientras la aplicación esté abierta.',
     resetTitle: '¿Empezar el día de nuevo?', resetHelp: 'El total de agua y el número de botellas se reiniciarán. Se conservarán tu configuración y los logros obtenidos.',
     cancel: 'Cancelar', save: 'Guardar', settingsIntro: 'Elige el tamaño de tu botella y tu meta diaria.',
-    bottleSize: 'Tu botella (ml)', dailyGoal: 'Meta diaria (L)', invalid: 'Usa valores mayores que cero.',
+    changeBottleSize: 'Cambiar tamaño', bottleSize: 'Tu botella (ml)', dailyGoal: 'Meta diaria (L)', invalid: 'Usa valores mayores que cero.',
     settingsHelp: 'El nuevo tamaño se aplica a las próximas botellas. Se conservará el agua ya registrada.',
   },
 };
