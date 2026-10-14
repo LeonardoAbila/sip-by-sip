@@ -1,53 +1,59 @@
+import soundUrl from './assets/water-pour.mp3?url';
+
 let context;
-let voices = [];
+let bufferPromise;
+let playback;
 let playRequest = 0;
 
-// Prepare audio during a user gesture for both mobile and desktop browsers.
+// Prepare and cache the water recording during a user gesture.
 export async function prepareReminderSound() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return false;
+    if (!AudioContext) return null;
     context ||= new AudioContext();
     if (context.state !== 'running') await context.resume();
-    return context.state === 'running';
+    bufferPromise ||= fetch(soundUrl)
+      .then(response => {
+        if (!response.ok) throw new Error('Sound unavailable');
+        return response.arrayBuffer();
+      })
+      .then(data => context.decodeAudioData(data))
+      .catch(() => { bufferPromise = undefined; return null; });
+    return await bufferPromise;
   } catch {
-    return false;
+    return null;
   }
 }
 
 export function stopReminderSound() {
   playRequest += 1;
-  for (const voice of voices.splice(0)) {
-    try { voice.stop(); } catch { /* A completed note is already stopped. */ }
-  }
+  if (!playback) return;
+  const active = playback;
+  playback = undefined;
+  try { active.source.stop(); } catch { /* Playback may have already ended. */ }
+  active.source.disconnect();
+  active.volume.disconnect();
 }
 
-// A brief two-note chime avoids downloads and sounds like a notification.
 export async function playReminderSound() {
   stopReminderSound();
   const request = playRequest;
-  if (!await prepareReminderSound() || request !== playRequest) return false;
+  const buffer = await prepareReminderSound();
+  if (!buffer || request !== playRequest || context.state !== 'running') return false;
   try {
-    [880, 1174.66].forEach((frequency, index) => {
-      const voice = context.createOscillator();
-      const volume = context.createGain();
-      const start = context.currentTime + 0.01 + index * 0.18;
-      voice.type = 'sine';
-      voice.frequency.value = frequency;
-      volume.gain.setValueAtTime(0, start);
-      volume.gain.linearRampToValueAtTime(0.18, start + 0.015);
-      volume.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
-      voice.connect(volume);
-      volume.connect(context.destination);
-      voice.onended = () => {
-        voice.disconnect();
-        volume.disconnect();
-        voices = voices.filter(item => item !== voice);
-      };
-      voices.push(voice);
-      voice.start(start);
-      voice.stop(start + 0.23);
-    });
+    const source = context.createBufferSource();
+    const volume = context.createGain();
+    source.buffer = buffer;
+    volume.gain.value = 0.65;
+    source.connect(volume);
+    volume.connect(context.destination);
+    playback = { source, volume };
+    source.onended = () => {
+      source.disconnect();
+      volume.disconnect();
+      if (playback?.source === source) playback = undefined;
+    };
+    source.start();
     return true;
   } catch {
     stopReminderSound();
