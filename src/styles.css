@@ -56,7 +56,7 @@ body { margin: 0; min-width: 280px; }
 .auth-switch button { border: 0; background: none; color: var(--accent-text); font-weight: 700; padding: 6px; }
 .profile-name { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; max-width: 180px; }
 .achievement-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; text-align: center; }
-.achievement-panel > div { display: flex; flex-direction: column; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px 24px; }
+.achievement-panel > div { display: flex; flex-direction: column; align-items: center; padding: 20px 24px; }
 .achievement-symbol { margin-bottom: 8px; font-size: 26px; color: #dc9a31; }
 .achievement-panel p { margin: 0 0 8px; color: var(--muted); font-size: 14px; }
 .achievement-panel strong { font-size: 30px; color: var(--accent-text); }
