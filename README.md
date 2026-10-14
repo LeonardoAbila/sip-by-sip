@@ -16,8 +16,12 @@ Open the local URL printed by Vite. You must use the development server; opening
 ```bash
 npm run build    # Create the production app in dist/
 npm run preview  # Preview that production build locally
-node --test tests/achievements.test.mjs  # Check points and streak rules
+npm test         # Check points, streak, and calendar rules
 ```
+
+Tests also run automatically on every push and pull request through
+`.github/workflows/test.yml`, using Node.js 22 and `npm ci`. Check the
+**Actions** tab for results.
 
 ## Publish on GitHub Pages
 
