@@ -90,7 +90,7 @@ React renders the interface from the current state instead of updating individua
 
 1. **Components:** `src/App.jsx` contains `App`, `Bottle`, and `ResetDialog`. Each is a JavaScript function returning JSX, which looks like HTML inside JavaScript. `<Bottle />` reuses the bottle illustration.
 2. **State:** `const [state, setState] = useState(readState)` stores today's count, volume, and settings. `setState` changes that data and asks React to update the screen.
-3. **Events:** `onClick={addBottle}` connects the add button to a function. The function updates state; React updates the total, bottles, and progress bar.
+3. **Events:** `onClick={addBottle}` connects the add button to a function. The function updates state; React updates the total, bottles, and progress ring.
 4. **Derived values:** The percentage is calculated from the total and goal during rendering. It doesn't need separate state.
 5. **Effects:** `useEffect` saves hydration state to SQLite and IndexedDB after a change. Another effect checks for a new day and cleans up its timer when the component is removed.
 6. **Controlled inputs:** Each input's `value` comes from React state; `onChange` updates it. Inside the settings dialog, invalid values show a message and disable saving.

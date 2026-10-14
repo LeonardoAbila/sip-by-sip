@@ -533,7 +533,6 @@ export default function App({ profile, onLogout }) {
                 {remainingBottles > 24 && <span className="overflow-count ghost-count">+{format.format(remainingBottles - 24)}</span>}
               </div>
               <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
-              <progress value={percentage} max="100" aria-label={t.progressLabel} />
             </section>
           </div>
         </div>
