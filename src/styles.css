@@ -62,12 +62,12 @@ body { margin: 0; min-width: 280px; }
 .achievement-panel strong { font-size: 30px; color: var(--accent-text); }
 .achievement-panel .achievement-status { grid-column: 1 / -1; margin: 0; line-height: 1.5; padding: 14px 20px; border-radius: 14px; background: var(--secondary); }
 .achievement-panel .earned { color: var(--success); }
-.hydration-calendar { margin-top: 24px; padding: 28px; border: 1px solid var(--border); border-radius: 24px; background: var(--surface); text-align: left; }
-.calendar-heading { display: flex; gap: 16px; justify-content: space-between; align-items: center; }
+.hydration-calendar { margin-top: 24px; padding: 28px; border: 1px solid var(--border); border-radius: 24px; background: var(--surface); text-align: center; }
+.calendar-heading { display: flex; flex-direction: column; gap: 16px; align-items: center; }
 .calendar-heading h2 { margin: 8px 0; font-size: 22px; }
 .calendar-streak { padding: 10px 14px; border-radius: 12px; background: var(--secondary); white-space: nowrap; color: var(--accent-text); font-weight: 700; }
 .calendar-description, .calendar-summary { color: var(--muted); font-size: 14px; line-height: 1.6; }
-.calendar-navigation { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 16px; gap: 12px; }
+.calendar-navigation { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; margin: 24px 0 16px; gap: 12px; }
 .calendar-navigation h3 { margin: 0; font-size: 18px; text-transform: capitalize; }
 .calendar-navigation button { font-size: 26px; padding: 4px 14px; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
@@ -80,11 +80,11 @@ body { margin: 0; min-width: 280px; }
 .calendar-future, .calendar-untracked { color: var(--muted); background: var(--input); }
 .calendar-future { opacity: .55; }
 .calendar-today { outline: 2px solid var(--accent-text); outline-offset: 1px; }
-.calendar-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 20px 0 14px; font-size: 12px; color: var(--muted); }
+.calendar-legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin: 20px 0 14px; font-size: 12px; color: var(--muted); }
 .calendar-legend > span { display: inline-flex; gap: 6px; align-items: center; }
 .calendar-legend i { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-style: normal; }
 .calendar-summary { margin-bottom: 0; }
-@media (max-width: 480px) { .hydration-calendar { padding: 18px 12px; } .calendar-heading { align-items: flex-start; } .calendar-heading h2 { font-size: 18px; } .calendar-grid { gap: 5px; } .calendar-day { min-height: 48px; font-size: 13px; } .calendar-streak { padding: 8px; font-size: 13px; } }
+@media (max-width: 480px) { .hydration-calendar { padding: 18px 12px; } .calendar-heading h2 { font-size: 18px; } .calendar-grid { gap: 5px; } .calendar-day { min-height: 48px; font-size: 13px; } .calendar-streak { padding: 8px; font-size: 13px; } }
 @media (max-width: 420px) { .achievement-panel > div { padding: 16px; } .achievement-panel strong { font-size: 25px; } }
 .onboarding-page { width: 100%; max-width: 960px; padding: 28px 0 48px; }
 .onboarding-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
@@ -256,7 +256,7 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 .dashboard-grid { display: grid; grid-template-columns: 1.13fr 1fr; gap: 24px; align-items: stretch; }
 .hydration-card, .bottle-card, .stat-card { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 20px; }
-.hydration-card { padding: 28px; display: flex; flex-direction: column; align-items: center; }
+.hydration-card { text-align: center; padding: 28px; display: flex; flex-direction: column; align-items: center; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
 .card-heading h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; font-weight: 650; }
 .card-heading .icon { color: var(--accent-text); }
@@ -286,7 +286,7 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .stat-card strong { font-size: 28px; font-weight: 650; letter-spacing: -.9px; overflow-wrap: anywhere; }
 .stat-card small { font-size: 13px; font-weight: 500; color: var(--muted); }
 .bottle-card { padding: 24px; flex: 1; text-align: center; }
-.hydration-card .card-heading, .bottle-card .card-heading { justify-content: center; flex-wrap: wrap; }
+.hydration-card .card-heading, .bottle-card .card-heading { flex-direction: column; justify-content: center; text-align: center; }
 .section-description { color: var(--muted); font-size: 11px; margin: 5px 0 0; }
 .bottles { justify-content: center; min-height: 94px; gap: 8px; padding: 16px 0; margin: 4px 0 12px; border-bottom: 1px solid var(--border); }
 .bottle { width: 25px; height: 50px; }
@@ -294,14 +294,17 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .empty-bottles > .icon { width: 25px; height: 32px; color: var(--accent-text); }
 .empty-bottles p { margin: 0; font-size: 12px; }
 .overflow-count { color: var(--accent-text); font-size: 12px; }
-.remaining-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 11px; margin-bottom: 10px; color: var(--muted); }
+.remaining-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; font-size: 11px; margin-bottom: 10px; color: var(--muted); }
 .remaining-row strong { color: var(--text); font-size: 13px; }
 progress { height: 6px; display: block; }
 progress::-webkit-progress-value { background: var(--accent); }
 progress::-moz-progress-bar { background: var(--accent); }
-.reminder-card { display: flex; align-items: center; gap: 14px; background: var(--accent-soft); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+.reminder-card { display: flex; flex-direction: column; text-align: center; align-items: center; gap: 14px; background: var(--accent-soft); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
 .reminder-card-icon { flex-shrink: 0; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--surface); color: var(--accent-text); }
-.reminder-card > div { flex: 1; text-align: center; }
+.reminder-card > div { text-align: center; }
+.reminder-card .icon-button { margin-left: 0; }
+.app .reminder-notice { text-align: center; }
+#home .add-button { justify-content: center; }
 .reminder-card h2 { margin: 0 0 4px; font-size: 13px; }
 .reminder-card p { margin: 0; color: var(--muted); font-size: 11px; }
 .icon-button { flex-shrink: 0; margin-left: auto; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent; color: var(--accent-text); }
