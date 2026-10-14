@@ -1,6 +1,6 @@
 import { saveProgress } from './database.js';
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { achievements, currentDay, POINTS_PER_DAY, positiveNumber, readState, rewardGoal, STORAGE_KEY, today } from './state.js';
+import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, today } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY, appColors } from './theme.js';
 import { languages, LANGUAGE_KEY, readLanguage, translations } from './language.js';
 import { readReminders, reminderIntervals, REMINDER_KEY } from './reminders.js';
@@ -431,10 +431,8 @@ export default function App({ profile, onLogout }) {
           </div>
           <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
         </header>
-        <section className="achievement-panel" aria-label={t.achievements}>
-          <div><span className="achievement-symbol" aria-hidden="true">★</span><p>{t.points}</p><strong>{format.format(rewards.points)}</strong></div>
+        <section className="achievement-panel" aria-label={t.streak}>
           <div><span className="achievement-symbol" aria-hidden="true">🔥</span><p>{t.streak}</p><strong>{t.streakDays(rewards.streak)}</strong></div>
-          <p className={rewards.earnedToday ? 'achievement-status earned' : 'achievement-status'} role="status">{rewards.earnedToday ? t.pointsEarned(POINTS_PER_DAY) : t.pointsPending(POINTS_PER_DAY)}</p>
         </section>
         <div className="dashboard-grid">
           <section className="hydration-card" aria-label={t.consumption}>
