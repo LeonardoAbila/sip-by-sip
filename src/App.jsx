@@ -426,20 +426,15 @@ export default function App({ profile, onLogout }) {
         <div id="home" hidden={screen !== 'home'}>
         <header className="page-heading">
           <div>
-            <p className="eyebrow">{t.dailyOverview}</p>
             <h1 ref={homeHeading} tabIndex={-1}>{t.dashboardTitle}</h1>
             <p className="subtitle">{t.subtitle}</p>
           </div>
           <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
         </header>
-        <section className="achievement-panel" aria-label={t.streak}>
-          <div><span className="achievement-symbol" aria-hidden="true">🔥</span><p>{t.streak}</p><strong>{t.streakDays(rewards.streak)}</strong></div>
-        </section>
         <div className="dashboard-grid">
           <section className="hydration-card" aria-label={t.consumption}>
             <div className="card-heading">
               <h2><Icon name="drop" />{t.consumption}</h2>
-              <span className="today-badge">{t.todayLabel}</span>
             </div>
             <div className="goal-ring">
               <svg className="ring-svg" viewBox="0 0 260 260" aria-hidden="true">
@@ -448,7 +443,6 @@ export default function App({ profile, onLogout }) {
                   strokeDasharray={2 * Math.PI * 112} strokeDashoffset={2 * Math.PI * 112 * (1 - percentage / 100)} />
               </svg>
               <div className="ring-content" aria-live="polite">
-                <span className="ring-drop"><Icon name="drop" /></span>
                 <strong className="total">{total}</strong>
                 <span className="goal-caption">{t.goalToday(format.format(state.metaLitros))}</span>
                 <span className="percentage-pill">{Math.floor(percentage)}% · {t.progress}</span>
@@ -456,15 +450,14 @@ export default function App({ profile, onLogout }) {
             </div>
             <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
             <button className="add-button" onClick={addBottle}><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml <Icon name="plus" /></span></button>
-            <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
           <div className="daily-panel">
-            <section className="stats-grid" aria-label={t.dailyOverview}>
-              <div className="stat-card"><span className="stat-icon"><Icon name="target" /></span><p>{t.dailyGoal}</p><strong>{format.format(state.metaLitros)} <small>L</small></strong></div>
-              <div className="stat-card"><span className="stat-icon warm"><Icon name="bottle" /></span><p>{t.bottle}</p><strong>{format.format(state.mlGarrafa)} <small>ml</small></strong></div>
-            </section>
             <section className="bottle-card" aria-labelledby="bottle-log-title">
-              <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2><span className="count-badge">{format.format(state.garrafas)}</span></div>
+              <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2></div>
+              <dl className="bottle-settings">
+                <div><dt>{t.dailyGoal}</dt><dd>{format.format(state.metaLitros)} <small>L</small></dd></div>
+                <div><dt>{t.bottle}</dt><dd>{format.format(state.mlGarrafa)} <small>ml</small></dd></div>
+              </dl>
               <p className="section-description">{t.bottles(state.garrafas)}</p>
               <p className="section-description">{t.remainingBottles(remainingBottles)}</p>
               <div className="bottles" aria-hidden="true">
@@ -475,6 +468,9 @@ export default function App({ profile, onLogout }) {
               </div>
               <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
               <progress value={percentage} max="100" aria-label={t.progressLabel} />
+            </section>
+            <section className="achievement-panel" aria-label={t.streak}>
+              <div><span className="achievement-symbol" aria-hidden="true">🔥</span><p>{t.streak}</p><strong>{t.streakDays(rewards.streak)}</strong></div>
             </section>
             <section className="reminder-card" aria-labelledby="reminder-card-title">
               <span className="reminder-card-icon"><Icon name="bell" /></span>
