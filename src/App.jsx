@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, today } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY, appColors } from './theme.js';
 import { languages, LANGUAGE_KEY, readLanguage, translations } from './language.js';
-import { readReminders, reminderIntervals, REMINDER_KEY } from './reminders.js';
+import { readReminders, reminderIntervals, validReminderMinutes, REMINDER_KEY } from './reminders.js';
 import Fade from './Fade.jsx';
 import Icon from './Icon.jsx';
 import HydrationCalendar from './HydrationCalendar.jsx';
@@ -220,6 +220,7 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
   const dialog = useRef(null);
   const [reminderInput, setReminderInput] = useState(reminders);
   const [reminderPreview, setReminderPreview] = useState(false);
+  const validInterval = validReminderMinutes(Number(reminderInput.minutes));
   const t = translations[language];
 
   useEffect(() => {
@@ -230,7 +231,7 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
 
   return (
     <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); onClose(); }} aria-labelledby="reminders-title">
-      <form onSubmit={event => { event.preventDefault(); onSave(reminderInput); }}>
+      <form onSubmit={event => { event.preventDefault(); if (validInterval) onSave({ ...reminderInput, minutes: Number(reminderInput.minutes) }); }}>
         <h2 id="reminders-title">{t.reminders}</h2>
         <fieldset className="reminder-settings">
           <legend>{t.reminders}</legend>
@@ -240,10 +241,17 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
             {t.enableReminders}
           </label>
           <label htmlFor="reminder-interval">{t.reminderInterval}</label>
-          <select id="reminder-interval" value={reminderInput.minutes} disabled={!reminderInput.enabled}
-            onChange={event => setReminderInput(previous => ({ ...previous, minutes: Number(event.target.value) }))}>
-            {reminderIntervals.map(minutes => <option key={minutes} value={minutes}>{t.everyMinutes(minutes)}</option>)}
-          </select>
+          <input id="reminder-interval" type="number" inputMode="numeric" min="1" step="1" required
+            value={reminderInput.minutes} disabled={!reminderInput.enabled} aria-invalid={!validInterval}
+            aria-describedby={`reminder-interval-help${validInterval ? '' : ' reminder-interval-error'}`}
+            onChange={event => setReminderInput(previous => ({ ...previous, minutes: event.target.value }))} />
+          <p id="reminder-interval-help" className="settings-help">{t.customReminderHelp}</p>
+          <div className="reminder-presets" role="group" aria-label={t.reminderInterval}>
+            {reminderIntervals.map(minutes => <button key={minutes} type="button" disabled={!reminderInput.enabled}
+              aria-pressed={Number(reminderInput.minutes) === minutes}
+              onClick={() => setReminderInput(previous => ({ ...previous, minutes }))}>{t.everyMinutes(minutes)}</button>)}
+          </div>
+          {!validInterval && <p id="reminder-interval-error" className="notice" role="alert">{t.invalidReminderInterval}</p>}
           <label className="reminder-switch">
             <input type="checkbox" checked={reminderInput.sound}
               onChange={event => setReminderInput(previous => ({ ...previous, sound: event.target.checked }))} />
@@ -264,7 +272,7 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
         </fieldset>
         <div className="dialog-actions">
           <button type="button" onClick={onClose} className="secondary">{t.cancel}</button>
-          <button type="submit" className="save-button">{t.save}</button>
+          <button type="submit" className="save-button" disabled={!validInterval}>{t.save}</button>
         </div>
       </form>
     </dialog>
@@ -341,14 +349,20 @@ export default function App({ profile, onLogout }) {
     if (!reminders.enabled) return;
     const deadline = Date.now() + reminders.minutes * 60_000;
     let shown = false;
+    let timer;
     const checkReminder = () => {
-      if (!shown && document.visibilityState === 'visible' && Date.now() >= deadline) {
+      const remaining = deadline - Date.now();
+      if (remaining > 0) {
+        clearTimeout(timer);
+        timer = setTimeout(checkReminder, Math.min(remaining, 2_147_483_647));
+      }
+      if (!shown && document.visibilityState === 'visible' && remaining <= 0) {
         shown = true;
         setReminderVisible(true);
         if (reminders.sound) void playReminderSound();
       }
     };
-    const timer = setTimeout(checkReminder, reminders.minutes * 60_000);
+    timer = setTimeout(checkReminder, Math.min(reminders.minutes * 60_000, 2_147_483_647));
     document.addEventListener('visibilitychange', checkReminder);
     window.addEventListener('focus', checkReminder);
     return () => {

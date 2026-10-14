@@ -252,7 +252,7 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1.4px;
 .subtitle { margin: 0; font-size: 14px; }
 .date-chip { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 0; color: var(--muted); font-size: 12px; text-transform: capitalize; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-.dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
 .hydration-card, .bottle-card, .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
 .hydration-card { text-align: center; padding: 28px; display: flex; flex-direction: column; align-items: center; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
@@ -488,7 +488,7 @@ progress::-moz-progress-bar { background: var(--accent); }
   .bottle-settings dd { font-size: 20px; }
 }
 
-.daily-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+.daily-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 20px; }
 .daily-summary > * { min-width: 0; }
 .daily-summary .achievement-panel > div { height: 100%; border-radius: 16px; justify-content: center; }
 .daily-summary .reminder-card { justify-content: center; overflow-wrap: anywhere; }
@@ -504,3 +504,7 @@ progress::-moz-progress-bar { background: var(--accent); }
 .bottle-size-editor label { font-size: 13px; font-weight: 600; }
 .bottle-size-editor .dialog-actions { justify-content: center; }
 .bottle-size-editor .dialog-actions button { min-height: 44px; }
+
+.reminder-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0 18px; }
+.reminder-presets button { min-height: 44px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--input); color: var(--text); font-size: 13px; }
+.reminder-presets button[aria-pressed='true'] { border-color: var(--accent-text); background: var(--accent-soft); color: var(--accent-text); }
