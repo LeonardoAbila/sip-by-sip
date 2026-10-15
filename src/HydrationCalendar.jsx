@@ -1,5 +1,5 @@
 import React, { useId, useState } from 'react';
-import { achievements, calendarKey } from './state.js';
+import { calendarKey } from './state.js';
 import { calendarStatus, monthDays } from './calendar.js';
 
 export default function HydrationCalendar({ state, language, t }) {
@@ -15,7 +15,6 @@ export default function HydrationCalendar({ state, language, t }) {
   const fullDate = new Intl.DateTimeFormat(language, { day: 'numeric', month: 'long', year: 'numeric' });
   const weekday = new Intl.DateTimeFormat(language, { weekday: 'short' });
   const weekdayLong = new Intl.DateTimeFormat(language, { weekday: 'long' });
-  const streak = achievements(state).streak;
   const completedCount = days.filter(({ key }) => calendarStatus(key, state, current) === 'completed').length;
   const missedCount = days.filter(({ key }) => calendarStatus(key, state, current) === 'missed').length;
 
@@ -25,8 +24,7 @@ export default function HydrationCalendar({ state, language, t }) {
   }
 
   return <section className="hydration-calendar" aria-labelledby={titleId}>
-    <div className="calendar-heading"><div><p className="eyebrow">{t.calendarEyebrow}</p><h2 id={titleId}>{t.calendarTitle}</h2></div><span className="calendar-streak">🔥 {t.streakDays(streak)}</span></div>
-    <p className="calendar-description">{t.calendarStreakHelp(streak)}</p>
+    <div className="calendar-heading"><h2 id={titleId}>{t.calendarTitle}</h2></div>
     <div className="calendar-navigation">
       <button type="button" className="theme-toggle" disabled={displayedMonth <= startMonth} onClick={() => changeMonth(-1)} aria-label={t.previousMonth}>‹</button>
       <h3 aria-live="polite">{monthLabel}</h3>
@@ -46,9 +44,10 @@ export default function HydrationCalendar({ state, language, t }) {
         </div>;
       })}
     </div>
-    <div className="calendar-legend">
+    <details className="quiet-details"><summary>{t.calendarLegend}</summary><div className="calendar-legend">
       {['completed', 'missed', 'pending', 'untracked'].map(status => <span key={status}><i className={`calendar-${status}`} aria-hidden="true">{status === 'completed' ? '✓' : status === 'missed' ? '×' : status === 'pending' ? '·' : '—'}</i>{t.calendarStatuses[status]}</span>)}
     </div>
+    </details>
     <p className="calendar-summary">{t.calendarSummary(completedCount, missedCount)}</p>
   </section>;
 }

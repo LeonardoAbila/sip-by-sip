@@ -107,7 +107,7 @@ click → recordWater() → setState(...) → React renders updated JSX
 
 ## Behavior
 
-- The hydration calendar shows each local day as goal achieved (check), missed (cross), today still pending (dot), or no history (dash). Future days stay neutral. A missed day is marked only after it ends, including days when the app was closed. Dates before tracking began are not counted as misses. Existing profiles keep their completion history; the earliest valid saved progress date or completion date becomes the tracking start when migrating old data. Month navigation runs from that start month through the current month. The calendar shows the current streak and monthly completion/miss totals, follows the selected language, supports dark mode, and uses text/symbols alongside colors.
+- The hydration calendar shows each local day as goal achieved (check), missed (cross), today still pending (dot), or no history (dash). Future days stay neutral. A missed day is marked only after it ends, including days when the app was closed. Dates before tracking began are not counted as misses. Existing profiles keep their completion history; the earliest valid saved progress date or completion date becomes the tracking start when migrating old data. Month navigation runs from that start month through the current month. The dashboard shows the current streak; the calendar shows monthly completion/miss totals, follows the selected language, supports dark mode, and uses text/symbols alongside colors.
 
 - The dashboard shows consecutive completed days in a centered streak card above the daily intake and bottle log; accumulated points are not displayed. Completing the daily goal earns **10 points**, once per local calendar day, and adds that day to the profile's streak. More water earns no additional points. The streak counts consecutive completed days, preserving yesterday's streak while today's goal is pending; a missed calendar day breaks the streak, even if the app was closed. Points stay accumulated after a broken streak. Rewards are saved with each profile's progress. Previously saved state is supported, and duplicate, invalid, and future completion dates are discarded when loading.
 - A completed day's reward stays earned if the user resets the water counter or later raises the goal. Resetting and reaching the goal again cannot earn a second reward. Lowering today's goal can complete it using water already recorded. The reset affects water and bottle counts only. Achievements are shown in the selected language.
@@ -142,7 +142,7 @@ The theme is another `useState` example: saving the appearance settings changes 
 
 ## Try a small React exercise
 
-Change the subtitle inside `App.jsx`, then save the file while the dev server is running. Vite updates the page. Next, change the button text or the bottle colors. These edits let you explore JSX and CSS before changing state logic.
+Change the heading inside `App.jsx`, then save the file while the dev server is running. Vite updates the page. Next, change the button text or the bottle colors. These edits let you explore JSX and CSS before changing state logic.
 
 `SettingsDialog` holds temporary input state. Saving passes both values to `App` through the `onSave` prop; cancelling removes the dialog and discards that temporary state.
 
@@ -159,8 +159,10 @@ A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` o
 ## Water entries and undo
 
 In **Consumo de hoje**, use the separate **Adicionar garrafa** and **Adicionar copo**
-compact buttons side by side, each showing its saved volume. The rectangular
-undo button spans both columns below them. Bottles start at 500 ml and glasses at
+compact buttons side by side, labeled **Garrafa** and **Copo**. Both saved
+volumes appear in **Suas garrafas**; button accessible names include their
+action and volume. The rectangular
+**Desfazer** button spans both columns below them. Bottles start at 500 ml and glasses at
 250 ml. In **Suas garrafas**, open **Alterar ml** and choose the bottle or glass icon to edit
 that container. You can edit both sizes before saving; Cancel or Escape discards
 all pending edits. Sizes are saved per profile, and changing them preserves
@@ -217,3 +219,13 @@ the app is closed, use a device alarm or a reminder app.
 Browser references: [background timer limits](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API),
 [audio playback restrictions](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices),
 and [server-sent web push](https://developer.mozilla.org/en-US/docs/Web/API/Push_API).
+
+## Minimal interface
+
+The dashboard emphasizes today's total, goal, recording actions, and remaining
+bottles or glasses. Decorative subtitles and duplicate goal/count summaries
+are omitted. Undo has a short visible label and a descriptive accessible name.
+Calendar legends, detailed settings explanations, benefit descriptions, and
+onboarding calculation details expand on demand. Browser reminder limits and
+the local-profile notice remain visible. All recording, editing, reset, theme,
+language, and reminder features remain available.

@@ -71,21 +71,14 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
       <button className="theme-toggle" disabled={busy} onClick={onLogout}>Sair</button>
     </header>
     <section className="auth-card onboarding-card" aria-labelledby="onboarding-title">
-      <p className="eyebrow">PRIMEIRO ACESSO · {result ? 'SUA META' : 'VAMOS CONHECER VOCÊ'}</p>
-      <h1 ref={heading} tabIndex={-1} id="onboarding-title">{result ? 'Cada gole conta.' : `Olá, ${profile.username}, tudo bem?`}</h1>
+      <h1 ref={heading} tabIndex={-1} id="onboarding-title">{result ? 'Sua meta' : `Olá, ${profile.username}`}</h1>
       {result ? <>
-        <p className="auth-description">Pronto! Com seus dados, calculamos uma meta inicial para acompanhar seus dias.</p>
         <AnimatedGoal liters={result.liters} />
-        <p className="onboarding-equation">{result.age} anos · {format.format(result.weight)} kg × {result.mlPerKg} ml/kg = <strong>{format.format(result.liters * 1000)} ml</strong></p>
         <p className="auth-description">Essa é uma estimativa. Você pode ajustar a meta a qualquer momento nas configurações.</p>
         <button className="add-button" onClick={finish} disabled={busy}>{busy ? 'Salvando…' : 'Começar meu dia'}</button>
         <button className="onboarding-back" disabled={busy} onClick={() => { setResult(null); setError(''); }}>Revisar idade e peso</button>
       </> : <>
-        <p className="auth-description">Antes de começarmos, precisamos saber sua idade e seu peso! Com essas informações, vamos estimar quanta água você precisa beber por dia.</p>
-        <div className="onboarding-reasons">
-          <div><Icon name="target" /><h2>Idade</h2><p>Define a faixa do cálculo e a quantidade de mililitros por quilo usada pelo app.</p></div>
-          <div><Icon name="drop" /><h2>Peso</h2><p>Multiplicamos seu peso por esse valor para apresentar sua meta em litros por dia.</p></div>
-        </div>
+        <p className="auth-description">Informe sua idade e peso para estimar a meta diária.</p>
         <form onSubmit={calculate}>
           <fieldset>
             <div className="auth-measurements">
@@ -98,7 +91,8 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
       </>}
       {error && <p className="notice" role="alert">{error}</p>}
       <details className="onboarding-source">
-        <summary>Entenda o cálculo e a referência</summary>
+        <summary>Sobre a estimativa</summary>
+        {result && <p className="onboarding-equation">{result.age} anos · {format.format(result.weight)} kg × {result.mlPerKg} ml/kg = <strong>{format.format(result.liters * 1000)} ml</strong></p>}
         <p>O protótipo usa: até 17 anos, 40 ml/kg; 18–55, 35 ml/kg; 56–65, 30 ml/kg; 66+, 25 ml/kg.</p>
         <p>O Food and Nutrition Board publica referências para água total, incluindo alimentos e bebidas. A tabela por peso deste app é uma estimativa do protótipo; não é a fórmula oficial dessa publicação.</p>
         <a href="https://www.nationalacademies.org/publications/10925" target="_blank" rel="noreferrer">Consultar Dietary Reference Intakes for Water (2005)</a>

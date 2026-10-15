@@ -50,7 +50,7 @@ function PourDialog({ t, amount, container, onClose, fadingOut }) {
     <dialog inert={fadingOut} ref={dialog} className="pour-dialog" aria-labelledby="pour-title" onCancel={event => { event.preventDefault(); onClose(); }}>
       <button autoFocus className="pour-close" onClick={onClose} aria-label={t.close}>×</button>
       <h2 id="pour-title">{t.waterAdded}</h2>
-      <p className="pour-amount">+{amount} ml{container === 'glass' ? ` · ${t.glassChoice}` : container === 'bottle' ? ` · ${t.bottleChoice}` : ''}</p>
+      <p className="pour-amount">+{amount} ml</p>
       <svg className="pour-scene" viewBox="0 0 320 300" aria-hidden="true">
         <ellipse cx="186" cy="278" rx="66" ry="10" fill="currentColor" opacity=".08" />
         <g className="pour-jug">
@@ -151,7 +151,7 @@ function BottleSizeEditor({ bottleSize, glassSize, t, onSave }) {
       value={inputs[container]} aria-invalid={!validSelected} aria-describedby={`${inputId}-help${valid ? '' : ` ${inputId}-error`}`}
       onChange={event => setInputs(previous => ({ ...previous, [container]: event.target.value }))} />
     {!valid && <p id={`${inputId}-error`} className="notice" role="alert">{t.volumeHelp}</p>}
-    <p id={`${inputId}-help`} className="settings-help">{t.containerSettingsHelp} {t.volumeHelp}</p>
+    <p id={`${inputId}-help`} className="settings-help">{t.containerSettingsHelp}</p>
     <div className="dialog-actions">
       <button type="button" className="secondary" onClick={cancel}>{t.cancel}</button>
       <button type="submit" className="save-button" disabled={!valid}>{t.save}</button>
@@ -187,7 +187,6 @@ function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave,
     <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); onClose(); }} aria-labelledby="settings-title">
       <form onSubmit={save}>
         <h2 id="settings-title">{t.settings}</h2>
-        <p>{t.settingsIntro}</p>
       <div className="settings">
         <label htmlFor="bottle-size">{t.bottleSize}
           <input autoFocus required id="bottle-size" type="number" min="0.01" max="1000000" step="0.01" value={bottleInput}
@@ -201,7 +200,7 @@ function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave,
         </label>
       </div>
       {(!validBottle || !validGoal) && <p id="settings-error" className="notice" role="alert">{t.invalid}</p>}
-        <p className="settings-help">{t.settingsHelp} {t.volumeHelp}</p>
+        <details className="quiet-details"><summary>{t.moreInfo}</summary><p className="settings-help">{t.settingsHelp} {t.volumeHelp}</p></details>
         <div className="language-control">
           <button type="button" className="language-button" aria-expanded={languagesOpen}
             aria-controls="language-options" onClick={() => setLanguagesOpen(previous => !previous)}>
@@ -231,7 +230,6 @@ function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave,
               </button>
             ))}
           </div>
-          <p className="settings-help">{t.appearanceHelp}</p>
         </fieldset>
         <div className="dialog-actions">
           <button type="button" onClick={onClose} className="secondary">{t.cancel}</button>
@@ -259,8 +257,8 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
     <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); onClose(); }} aria-labelledby="reminders-title">
       <form onSubmit={event => { event.preventDefault(); if (validInterval) onSave({ ...reminderInput, minutes: Number(reminderInput.minutes) }); }}>
         <h2 id="reminders-title">{t.reminders}</h2>
-        <fieldset className="reminder-settings" aria-describedby="reminder-availability-help">
-          <legend>{t.reminders}</legend>
+        <fieldset className="reminder-settings">
+          <legend className="sr-only">{t.reminders}</legend>
           <label className="reminder-switch">
             <input type="checkbox" checked={reminderInput.enabled}
               onChange={event => setReminderInput(previous => ({ ...previous, enabled: event.target.checked }))} />
@@ -283,7 +281,8 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
               onChange={event => setReminderInput(previous => ({ ...previous, sound: event.target.checked }))} />
             {t.reminderSound}
           </label>
-          <p id="reminder-availability-help" className="settings-help">{t.reminderHelp}</p>
+          <p className="settings-help">{t.reminderAvailability}</p>
+          <details className="quiet-details"><summary>{t.moreInfo}</summary><p id="reminder-availability-help" className="settings-help">{t.reminderHelp}</p></details>
           <button type="button" className="language-button" onClick={() => {
             setReminderPreview(true);
             if (reminderInput.sound) void playReminderSound();
@@ -535,7 +534,6 @@ export default function App({ profile, onLogout }) {
         <header className="page-heading">
           <div>
             <h1 ref={homeHeading} tabIndex={-1}>{t.dashboardTitle}</h1>
-            <p className="subtitle">{t.subtitle}</p>
           </div>
           <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
         </header>
@@ -566,36 +564,33 @@ export default function App({ profile, onLogout }) {
                   strokeDasharray={2 * Math.PI * 112} strokeDashoffset={2 * Math.PI * 112 * (1 - percentage / 100)} />
               </svg>
               <div className="ring-content" aria-live="polite">
-                <span className="ring-drop"><Icon name="drop" /></span>
                 <strong className="total">{total}</strong>
                 <span className="goal-caption">{t.goalToday(format.format(state.metaLitros))}</span>
-                <span className="percentage-pill">{Math.floor(percentage)}% · {t.progress}</span>
+                <span className="percentage-pill">{Math.floor(percentage)}%</span>
               </div>
             </div>
             <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
             <div className="record-container-actions">
-              <button className="add-button" onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
-                <Icon name="bottle" /><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml</span>
+              <button className="add-button" aria-label={`${t.add} · ${format.format(state.mlGarrafa)} ml`} onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
+                <Icon name="bottle" /><span>{t.bottleChoice}</span>
               </button>
-              <button className="add-button add-glass-button" onClick={() => recordWater(state.mlCopo, 'glass')}>
-                <Icon name="glass" /><span>{t.addGlass}</span><span className="button-volume">{format.format(state.mlCopo)} ml</span>
+              <button className="add-button add-glass-button" aria-label={`${t.addGlass} · ${format.format(state.mlCopo)} ml`} onClick={() => recordWater(state.mlCopo, 'glass')}>
+                <Icon name="glass" /><span>{t.glassChoice}</span>
               </button>
-              <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
-                <Icon name="reset" />{t.undoDrink}
+              <button className="undo-water" type="button" aria-label={t.undoDrink} disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
+                <Icon name="reset" />{t.undoShort}
               </button>
             </div>
-            <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
           <div className="daily-panel">
             <section className="bottle-card" aria-labelledby="bottle-log-title">
               <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2></div>
-              <dl className="bottle-settings">
-                <div><dt><span className="stat-icon"><Icon name="target" /></span>{t.dailyGoal}</dt><dd>{format.format(state.metaLitros)} <small>L</small></dd></div>
-                <div><dt><span className="stat-icon warm"><Icon name={state.container} /></span>{isGlass ? t.glass : t.bottle}</dt><dd>{format.format(containerVolume)} <small>ml</small></dd></div>
+              <dl className="container-volumes">
+                <div><dt><Icon name="bottle" />{t.bottleChoice}</dt><dd>{format.format(state.mlGarrafa)} ml</dd></div>
+                <div><dt><Icon name="glass" />{t.glassChoice}</dt><dd>{format.format(state.mlCopo)} ml</dd></div>
               </dl>
               <BottleSizeEditor bottleSize={state.mlGarrafa} glassSize={state.mlCopo} t={t}
                 onSave={(mlGarrafa, mlCopo) => setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo }))} />
-              <p className="section-description">{t.bottles(state.garrafas)}</p>
               <p className="section-description" aria-live="polite">{t.containerCounts(bottleCount, glassCount, otherCount)}</p>
               <div className="bottles" aria-hidden="true">
                 {recordedContainers.map((container, index) => <WaterContainer container={container} key={index} />)}
@@ -603,7 +598,7 @@ export default function App({ profile, onLogout }) {
               </div>
               <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
               <section className="remaining-containers" aria-label={t.remaining}>
-                {remainingMl === 0 ? <p className="success" role="status">{t.success}</p> : <>
+                {remainingMl > 0 && <>
                   <p className="section-description">{t.remainingOptionsHelp}</p>
                   <div className="remaining-options">
                     {['bottle', 'glass'].map((container, index) => {
@@ -629,7 +624,6 @@ export default function App({ profile, onLogout }) {
         </div>
         <HydrationCalendar state={currentDay(state)} language={language} t={t} />
         <footer className="dashboard-footer">
-          <p className="footnote"><Icon name="reset" />{t.footnote}</p>
           <button className="reset-button" onClick={() => setResetOpen(true)} disabled={state.garrafas === 0 && state.totalMl === 0}><Icon name="reset" />{t.reset}</button>
         </footer>
         <Fade visible={storageError}><p className="notice" role="alert">{t.storageError}</p></Fade>

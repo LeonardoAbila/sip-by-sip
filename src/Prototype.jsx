@@ -84,16 +84,12 @@ export default function Prototype() {
     <main className="auth-page">
       <section className="auth-intro">
         <div className="auth-brand"><span className="brand-mark"><Icon name="drop" /></span> Sip by Sip</div>
-        <p className="eyebrow">UM HÁBITO, UM GOLE DE CADA VEZ</p>
-        <h1>Seu dia começa<br />com mais água.</h1>
-        <p>Acompanhe suas garrafas e tenha uma meta diária calculada com sua idade e seu peso.</p>
-        <div className="auth-steps"><span>01 · Entre ou cadastre-se</span><span>02 · Descubra sua meta</span><span>03 · Acompanhe seu dia</span></div>
+        <h1>Um gole de cada vez.</h1>
+        <p>Registre sua água e acompanhe sua meta.</p>
         <p className="auth-prototype">Protótipo de teste · Os perfis ficam apenas neste navegador. Use uma senha de teste.</p>
       </section>
       <section className="auth-card" aria-labelledby="auth-title">
-        <p className="eyebrow">{registering ? 'VAMOS COMEÇAR' : 'BEM-VINDO DE VOLTA'}</p>
         <h2 id="auth-title">{registering ? 'Crie seu perfil' : 'Entre no seu perfil'}</h2>
-        <p className="auth-description">{registering ? 'Escolha seu usuário e senha. No próximo passo, vamos descobrir sua meta.' : 'Seu próximo gole está a um passo.'}</p>
         <form onSubmit={submit}>
           <fieldset disabled={busy}>
             <label htmlFor="auth-username">Usuário<input id="auth-username" autoComplete="username" required maxLength={40} value={username} onChange={event => setUsername(event.target.value)} /></label>
@@ -102,7 +98,7 @@ export default function Prototype() {
               <PasswordField label="Confirme a senha" id="auth-confirmation" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
             </>}
             {error && <p className="notice" role="alert">{error}</p>}
-            <button className="add-button" type="submit">{busy ? 'Aguarde…' : registering ? 'Criar perfil e continuar' : 'Entrar'}</button>
+            <button className="add-button" type="submit">{busy ? 'Aguarde…' : registering ? 'Criar perfil' : 'Entrar'}</button>
             <p className="auth-switch">{registering ? 'Já tem um perfil?' : 'Ainda não tem um perfil?'} <button type="button" onClick={() => changePage(registering ? 'login' : 'register')}>{registering ? 'Entrar' : 'Cadastre-se'}</button></p>
           </fieldset>
         </form>

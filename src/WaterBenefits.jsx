@@ -58,10 +58,10 @@ export default function WaterBenefits({ language }) {
       </header>
       <div className="benefits-grid">
         {copy.cards.map(([icon, title, body]) => (
-          <article className="benefit-card" key={icon}>
+          <details className="benefit-card" key={icon}><summary>
             <span className="benefit-icon"><Icon name={icon} /></span>
-            <h2>{title}</h2><p>{body}</p>
-          </article>
+            <h2>{title}</h2></summary><p>{body}</p>
+          </details>
         ))}
       </div>
       <section className="benefits-tips" aria-labelledby="benefits-tips-title">
