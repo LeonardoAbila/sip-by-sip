@@ -615,15 +615,9 @@ progress::-moz-progress-bar { background: var(--accent); }
 .container-volumes > div { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .container-volumes dt { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
 .container-volumes dd { margin: 0; color: var(--text); font-size: 15px; font-weight: 600; }
-.daily-summary .achievement-panel > div { flex-direction: row; gap: 8px; padding: 14px; }
-.daily-summary .achievement-panel p { margin: 0; font-size: 12px; }
-.daily-summary .achievement-panel strong { font-size: 18px; }
-.daily-summary .achievement-symbol { font-size: 16px; }
 .quiet-details { margin-top: 14px; color: var(--muted); text-align: left; font-size: 12px; }
 .quiet-details summary { min-height: 44px; padding-block: 12px; cursor: pointer; }
 .quiet-details summary:focus-visible, .benefit-card summary:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
-.calendar-heading { gap: 0; }
-.calendar-heading h2 { font-size: 18px; margin: 0 0 12px; }
 .dashboard-footer { justify-content: flex-end; }
 .benefit-card summary { cursor: pointer; }
 .benefit-card summary h2 { display: inline; margin-left: 10px; font-size: 16px; }

@@ -107,7 +107,7 @@ click → recordWater() → setState(...) → React renders updated JSX
 
 ## Behavior
 
-- The hydration calendar shows each local day as goal achieved (check), missed (cross), today still pending (dot), or no history (dash). Future days stay neutral. A missed day is marked only after it ends, including days when the app was closed. Dates before tracking began are not counted as misses. Existing profiles keep their completion history; the earliest valid saved progress date or completion date becomes the tracking start when migrating old data. Month navigation runs from that start month through the current month. The dashboard shows the current streak; the calendar shows monthly completion/miss totals, follows the selected language, supports dark mode, and uses text/symbols alongside colors.
+- The hydration calendar shows each local day as goal achieved (check), missed (cross), today still pending (dot), or no history (dash). Future days stay neutral. A missed day is marked only after it ends, including days when the app was closed. Dates before tracking began are not counted as misses. Existing profiles keep their completion history; the earliest valid saved progress date or completion date becomes the tracking start when migrating old data. Month navigation runs from that start month through the current month. The calendar shows the current streak and monthly completion/miss totals, follows the selected language, supports dark mode, and uses text/symbols alongside colors.
 
 - The dashboard shows consecutive completed days in a centered streak card above the daily intake and bottle log; accumulated points are not displayed. Completing the daily goal earns **10 points**, once per local calendar day, and adds that day to the profile's streak. More water earns no additional points. The streak counts consecutive completed days, preserving yesterday's streak while today's goal is pending; a missed calendar day breaks the streak, even if the app was closed. Points stay accumulated after a broken streak. Rewards are saved with each profile's progress. Previously saved state is supported, and duplicate, invalid, and future completion dates are discarded when loading.
 - A completed day's reward stays earned if the user resets the water counter or later raises the goal. Resetting and reaching the goal again cannot earn a second reward. Lowering today's goal can complete it using water already recorded. The reset affects water and bottle counts only. Achievements are shown in the selected language.
@@ -229,3 +229,6 @@ Calendar legends, detailed settings explanations, benefit descriptions, and
 onboarding calculation details expand on demand. Browser reminder limits and
 the local-profile notice remain visible. All recording, editing, reset, theme,
 language, and reminder features remain available.
+
+The streak keeps its original dashboard card and calendar badge, with the
+message explaining the current run of consecutive completed days.
