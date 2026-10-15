@@ -582,7 +582,7 @@ progress::-moz-progress-bar { background: var(--accent); }
 .hydration-card .card-note { margin-top: 20px; }
 .other-water-entry { display: inline-flex; align-items: center; justify-content: center; width: 25px; height: 50px; color: var(--accent-text); }
 .glass.bottle-ghost .glass-water { display: none; }
-.glass.bottle-ghost path { fill: none; stroke: var(--accent-text); stroke-dasharray: 3 3; }
+.glass.bottle-ghost path:first-child { display: block; fill: none; stroke: var(--muted); stroke-width: 2; stroke-dasharray: 3 3; }
 @media (max-width: 720px) {
   .hydration-card .goal-ring { margin-block: 20px; }
 }
