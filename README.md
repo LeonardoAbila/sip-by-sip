@@ -122,7 +122,7 @@ click → addBottle() → setState(...) → React renders updated JSX
 
 - Dialogs, reminder notices, language options and reminder previews fade in and out over 240 ms. Theme colors and button states transition smoothly. Reduced-motion preferences disable these effects; Escape still closes dialogs.
 
-- Enable water reminders by opening the **Lembretes de água** dashboard card and enter a custom interval in whole minutes or choose 15, 30, 60, or 120 minutes, then save. Custom intervals persist after reloading; empty, zero, negative, and fractional intervals cannot be saved. Preferences persist in this browser. A subtle countdown appears in the reminder card. Its per-profile deadline is saved, so reloading preserves the remaining time. The **Som de água enchendo um copo** checkbox enables a recording of water being poured into a cup, with two final drips, played with Web Audio; the visual reminder appears as a floating notice on both mobile and desktop. Saving enabled reminders prepares browser audio; playback may require a user interaction after reloading. The visual reminder always remains available. **Testar aviso** displays the same reminder inside the Reminders dialog immediately, even when reminders are disabled. Preview buttons dismiss the test without recording water or changing settings. Reminders are off by default and appear inside the open app; an overdue reminder appears when you return to the tab. **Adicionar garrafa** records water and restarts the interval; **Agora não** dismisses it and restarts the interval. No system notification permission is needed. Reopening restores the saved deadline; expired reminders appear when the app is visible. Mobile browsers may suspend background pages, so sound while the screen is locked or the app is closed is not guaranteed.
+- Enable water reminders by opening the **Lembretes de água** dashboard card and enter a custom interval in whole minutes or choose 15, 30, 60, or 120 minutes, then save. Custom intervals persist after reloading; empty, zero, negative, and fractional intervals cannot be saved. Preferences persist in this browser. A subtle countdown appears in the reminder card. Its per-profile deadline is saved, so reloading preserves the remaining time. The **Som de água enchendo um copo** checkbox enables a recording of water being poured into a cup, with two final drips, played with Web Audio; the visual reminder appears as a floating notice on both mobile and desktop. Saving enabled reminders prepares browser audio; playback may require a user interaction after reloading. The visual reminder always remains available. **Testar aviso** displays the same reminder inside the Reminders dialog immediately, even when reminders are disabled. Preview buttons dismiss the test without recording water or changing settings. Reminders are off by default and appear inside the open app; an overdue reminder appears when you return to the tab. **Adicionar garrafa** records water and restarts the interval; **Agora não** dismisses it and restarts the interval. No system notification permission is needed. Reopening restores the saved deadline; expired reminders appear when the app is visible. Alerts and sounds are delivered only while the page is visible. See the browser reminder limits below.
 
 - The responsive top navigation includes the app name, **Início**, **Benefícios**, and **Configurações**. Open the dashboard reminder card to manage **Lembretes de água**. Navigation labels follow your chosen language.
 
@@ -170,3 +170,33 @@ as with a manual reset. Older aggregate-only records retain their total and
 count; their unknown individual volumes cannot be undone. New entries on top
 of those records can be undone safely. Bottle illustrations count all water
 entries, including custom amounts; remaining bottles use the configured size.
+
+## Browser reminder limits
+
+Reminders are in-page alerts for this browser app. Their delivery depends on
+the page being visible:
+
+| Situation | What to expect |
+| --- | --- |
+| Page visible, reminder enabled | One alert appears when the interval expires and the browser runs its next timer check. Sound is attempted if enabled. |
+| Another tab or app, minimized browser, or locked screen | No new alert or sound is triggered while the page is hidden. Browsers may delay or suspend background timers. |
+| Tab or browser closed | No alert or sound can be delivered by this app while it is closed. |
+| Return or reopen, then enter the same profile | One overdue alert appears once the page is visible, if the deadline was saved. Missed intervals are not replayed as multiple alerts. |
+| Browser storage unavailable or cleared | The deadline cannot survive closing or reloading; a fresh interval starts on the next load. |
+
+The app saves an absolute deadline per profile in localStorage. Reloading does
+not normally restart the interval. Recording water or dismissing an alert starts
+a new interval. Turning reminders off removes the active profile's deadline.
+
+The water sound depends on browser playback restrictions, device volume, and
+audio availability. **Testar aviso** lets you check it while interacting with
+the page; this does not guarantee later background playback. The visual alert
+still works if sound is blocked.
+
+This version does not send operating-system notifications or use a push service.
+Installing a shortcut does not add closed-tab scheduling. For reminders while
+the app is closed, use a device alarm or a reminder app.
+
+Browser references: [background timer limits](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API),
+[audio playback restrictions](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices),
+and [server-sent web push](https://developer.mozilla.org/en-US/docs/Web/API/Push_API).

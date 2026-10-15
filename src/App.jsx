@@ -233,7 +233,7 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
     <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); onClose(); }} aria-labelledby="reminders-title">
       <form onSubmit={event => { event.preventDefault(); if (validInterval) onSave({ ...reminderInput, minutes: Number(reminderInput.minutes) }); }}>
         <h2 id="reminders-title">{t.reminders}</h2>
-        <fieldset className="reminder-settings">
+        <fieldset className="reminder-settings" aria-describedby="reminder-availability-help">
           <legend>{t.reminders}</legend>
           <label className="reminder-switch">
             <input type="checkbox" checked={reminderInput.enabled}
@@ -257,7 +257,7 @@ function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
               onChange={event => setReminderInput(previous => ({ ...previous, sound: event.target.checked }))} />
             {t.reminderSound}
           </label>
-          <p className="settings-help">{t.reminderHelp}</p>
+          <p id="reminder-availability-help" className="settings-help">{t.reminderHelp}</p>
           <button type="button" className="language-button" onClick={() => {
             setReminderPreview(true);
             if (reminderInput.sound) void playReminderSound();
@@ -511,6 +511,7 @@ export default function App({ profile, onLogout }) {
         <section className="reminder-card" aria-labelledby="reminder-card-title">
           <span className="reminder-card-icon"><Icon name="bell" /></span>
           <div><h2 id="reminder-card-title">{t.reminders}</h2><p>{reminders.enabled ? t.everyMinutes(reminders.minutes) : t.remindersOff}</p>
+            <p className="settings-help">{t.reminderAvailability}</p>
             {reminders.enabled && <p className={reminderVisible ? 'reminder-countdown is-due' : 'reminder-countdown'} role="timer" aria-live="off">
               {reminderVisible ? t.reminderDue : <>{t.nextReminder} <span>{formatReminderCountdown(reminderSeconds)}</span></>}
             </p>}
