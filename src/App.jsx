@@ -111,37 +111,47 @@ function ResetDialog({ onConfirm, onClose, t, fadingOut }) {
   );
 }
 
-function BottleSizeEditor({ size, t, onSave }) {
+function BottleSizeEditor({ bottleSize, glassSize, t, onSave }) {
   const [editing, setEditing] = useState(false);
-  const [input, setInput] = useState(String(size));
+  const [container, setContainer] = useState('bottle');
+  const [inputs, setInputs] = useState({ bottle: String(bottleSize), glass: String(glassSize) });
   const inputId = useId();
-  const valid = validVolume(input);
+  const valid = validVolume(inputs.bottle) && validVolume(inputs.glass);
+  const validSelected = validVolume(inputs[container]);
 
   function cancel() {
     setEditing(false);
-    setInput(String(size));
+    setInputs({ bottle: String(bottleSize), glass: String(glassSize) });
   }
 
   function save(event) {
     event.preventDefault();
     if (!valid) return;
-    onSave(Number(input));
+    onSave(Number(inputs.bottle), Number(inputs.glass));
     setEditing(false);
   }
 
-  if (!editing) return <button type="button" className="bottle-edit-button" onClick={() => { setInput(String(size)); setEditing(true); }}>
+  if (!editing) return <button type="button" className="bottle-edit-button" onClick={() => {
+    setInputs({ bottle: String(bottleSize), glass: String(glassSize) });
+    setContainer('bottle');
+    setEditing(true);
+  }}>
     <Icon name="settings" /> {t.changeBottleSize}
   </button>;
 
   return <form className="bottle-size-editor" onSubmit={save} onKeyDown={event => {
     if (event.key === 'Escape') { event.preventDefault(); cancel(); }
   }}>
-    <label htmlFor={inputId}>{t.bottleSize}</label>
+    <div className="container-options" role="group" aria-label={t.changeBottleSize}>
+      {['bottle', 'glass'].map(type => <button key={type} type="button" aria-pressed={container === type}
+        onClick={() => setContainer(type)}><Icon name={type} />{type === 'glass' ? t.glassChoice : t.bottleChoice}</button>)}
+    </div>
+    <label htmlFor={inputId}>{container === 'glass' ? t.glassSize : t.bottleSize}</label>
     <input autoFocus required id={inputId} type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01"
-      value={input} aria-invalid={!valid} aria-describedby={`${inputId}-help${valid ? '' : ` ${inputId}-error`}`}
-      onChange={event => setInput(event.target.value)} />
-    {!valid && <p id={`${inputId}-error`} className="notice" role="alert">{t.invalid}</p>}
-    <p id={`${inputId}-help`} className="settings-help">{t.settingsHelp} {t.volumeHelp}</p>
+      value={inputs[container]} aria-invalid={!validSelected} aria-describedby={`${inputId}-help${valid ? '' : ` ${inputId}-error`}`}
+      onChange={event => setInputs(previous => ({ ...previous, [container]: event.target.value }))} />
+    {!valid && <p id={`${inputId}-error`} className="notice" role="alert">{t.volumeHelp}</p>}
+    <p id={`${inputId}-help`} className="settings-help">{t.containerSettingsHelp} {t.volumeHelp}</p>
     <div className="dialog-actions">
       <button type="button" className="secondary" onClick={cancel}>{t.cancel}</button>
       <button type="submit" className="save-button" disabled={!valid}>{t.save}</button>
@@ -492,7 +502,7 @@ export default function App({ profile, onLogout }) {
     setFillAnimation(previous => previous + 1);
     setPourAmount(Number(amount));
     setPourContainer(container);
-    setState(previous => addWater(previous, Number(amount), container));
+    setState(previous => addWater({ ...previous, container: container === 'custom' ? previous.container : container }, Number(amount), container));
   }
 
   function resetDay() {
@@ -569,24 +579,20 @@ export default function App({ profile, onLogout }) {
           <div className="daily-panel">
             <section className="bottle-card" aria-labelledby="bottle-log-title">
               <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2></div>
-              <fieldset className="container-picker">
-                <legend>{t.chooseContainer}</legend>
-                <div className="container-options">
-                  {['bottle', 'glass'].map(container => <label key={container}>
-                    <input type="radio" name="water-container" value={container} checked={state.container === container}
-                      onChange={() => setState(previous => ({ ...currentDay(previous), container }))} />
-                    <span><Icon name={container} />{container === 'glass' ? t.glassChoice : t.bottleChoice}</span>
-                  </label>)}
-                </div>
-              </fieldset>
               <dl className="bottle-settings">
                 <div><dt><span className="stat-icon"><Icon name="target" /></span>{t.dailyGoal}</dt><dd>{format.format(state.metaLitros)} <small>L</small></dd></div>
                 <div><dt><span className="stat-icon warm"><Icon name={state.container} /></span>{isGlass ? t.glass : t.bottle}</dt><dd>{format.format(containerVolume)} <small>ml</small></dd></div>
               </dl>
-              <BottleSizeEditor key={state.container} size={containerVolume}
-                t={{ ...t, bottleSize: isGlass ? t.glassSize : t.bottleSize, settingsHelp: t.containerSettingsHelp }}
-                onSave={volume => setState(previous => ({ ...currentDay(previous), [isGlass ? 'mlCopo' : 'mlGarrafa']: volume }))} />
-              <button className="add-button" onClick={() => recordWater()}><span>{isGlass ? t.addGlass : t.add}</span><span className="button-volume">{format.format(containerVolume)} ml <Icon name="plus" /></span></button>
+              <BottleSizeEditor bottleSize={state.mlGarrafa} glassSize={state.mlCopo} t={t}
+                onSave={(mlGarrafa, mlCopo) => setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo }))} />
+              <div className="record-container-actions">
+                <button className="add-button" onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
+                  <Icon name="bottle" /><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml</span>
+                </button>
+                <button className="add-button add-glass-button" onClick={() => recordWater(state.mlCopo, 'glass')}>
+                  <Icon name="glass" /><span>{t.addGlass}</span><span className="button-volume">{format.format(state.mlCopo)} ml</span>
+                </button>
+              </div>
               <details className="custom-water">
                 <summary><span><Icon name="drop" />{t.drinkAmount}</span><Icon name="arrow" /></summary>
                 <form className="custom-water-form" onSubmit={event => { event.preventDefault(); recordWater(Number(drinkInput), 'custom'); }}>
