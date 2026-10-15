@@ -571,8 +571,8 @@ progress::-moz-progress-bar { background: var(--accent); }
 .container-options button { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--input); color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; }
 .container-options button[aria-pressed='true'] { border-color: var(--accent-text); background: var(--accent-soft); color: var(--accent-text); }
 .container-options button:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
-.record-container-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; row-gap: 32px; width: 100%; margin-top: 8px; }
-.record-container-actions .add-button { width: min(100%, 112px); aspect-ratio: 1; min-width: 0; justify-self: end; flex-direction: column; justify-content: center; flex-wrap: nowrap; gap: 5px; padding: 8px; font-size: 13px; text-align: center; }
+.record-container-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; row-gap: 40px; width: 100%; margin-top: 0; }
+.record-container-actions .add-button { width: min(100%, 136px); height: 112px; aspect-ratio: auto; min-width: 0; justify-self: end; flex-direction: column; justify-content: center; flex-wrap: nowrap; gap: 5px; padding: 8px; font-size: 13px; text-align: center; }
 .record-container-actions .add-button > .icon { width: 22px; height: 22px; flex-shrink: 0; }
 .record-container-actions .add-button > span:not(.button-volume) { line-height: 1.4; }
 .record-container-actions .button-volume { padding-left: 0; border-left: 0; font-size: 13px; }

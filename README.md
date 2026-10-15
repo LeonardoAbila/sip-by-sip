@@ -159,7 +159,7 @@ A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` o
 ## Water entries and undo
 
 In **Consumo de hoje**, use the separate **Adicionar garrafa** and **Adicionar copo**
-square buttons side by side, each showing its saved volume. The rectangular
+compact buttons side by side, each showing its saved volume. The rectangular
 undo button spans both columns below them. Bottles start at 500 ml and glasses at
 250 ml. In **Suas garrafas**, open **Alterar ml** and choose the bottle or glass icon to edit
 that container. You can edit both sizes before saving; Cancel or Escape discards
