@@ -1,6 +1,6 @@
 import React, { useId, useState } from 'react';
 import { achievements, calendarKey } from './state.js';
-import { calendarStatus, monthDays } from './calendar.js';
+import { calendarStatus, monthDays, calendarVolume, formatCalendarVolume } from './calendar.js';
 
 export default function HydrationCalendar({ state, language, t }) {
   const [month, setMonth] = useState(() => { const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() }; });
@@ -40,9 +40,12 @@ export default function HydrationCalendar({ state, language, t }) {
       {Array.from({ length: offset }, (_, index) => <span key={`blank-${index}`} aria-hidden="true" />)}
       {days.map(({ day, key, date }) => {
         const status = calendarStatus(key, state, current);
-        const label = `${fullDate.format(date)}: ${t.calendarStatuses[status]}`;
+        const total = calendarVolume(key, state, current);
+        const volume = key > current ? '' : total === null ? t.calendarNoData : formatCalendarVolume(total, language);
+        const label = `${fullDate.format(date)}: ${t.calendarStatuses[status]}${volume ? ` · ${volume}` : ''}`;
         return <div key={key} className={`calendar-day calendar-${status}${key === current ? ' calendar-today' : ''}`} aria-label={label} aria-current={key === current ? 'date' : undefined} title={label}>
           <span aria-hidden="true">{day}</span><small aria-hidden="true">{status === 'completed' ? '✓' : status === 'missed' ? '×' : status === 'pending' ? '·' : '—'}</small>
+          {volume && <span className="calendar-volume" aria-hidden="true">{volume}</span>}
         </div>;
       })}
     </div>

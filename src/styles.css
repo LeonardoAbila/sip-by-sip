@@ -70,8 +70,9 @@ body { margin: 0; min-width: 280px; }
 .calendar-navigation button { font-size: 26px; padding: 4px 14px; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
 .calendar-weekday { text-align: center; color: var(--muted); font-size: 12px; padding: 8px 0; }
-.calendar-day { min-height: 60px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--border); font-weight: 600; }
+.calendar-day { min-width: 0; padding: 8px 2px; min-height: 84px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--border); font-weight: 600; }
 .calendar-day small { font-size: 14px; }
+.calendar-volume { max-width: 100%; font-size: 12px; line-height: 1.4; text-align: center; overflow-wrap: anywhere; }
 .calendar-completed { color: var(--success); background: color-mix(in srgb, var(--success) 12%, var(--surface)); }
 .calendar-missed { color: var(--error); background: color-mix(in srgb, var(--error) 9%, var(--surface)); }
 .calendar-pending { color: var(--accent-text); background: var(--secondary); }
@@ -82,7 +83,7 @@ body { margin: 0; min-width: 280px; }
 .calendar-legend > span { display: inline-flex; gap: 6px; align-items: center; }
 .calendar-legend i { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-style: normal; }
 .calendar-summary { margin-bottom: 0; }
-@media (max-width: 480px) { .hydration-calendar { padding: 18px 12px; } .calendar-heading h2 { font-size: 18px; } .calendar-grid { gap: 5px; } .calendar-day { min-height: 48px; font-size: 13px; } .calendar-streak { padding: 8px; font-size: 13px; } }
+@media (max-width: 480px) { .hydration-calendar { padding: 18px 12px; } .calendar-heading h2 { font-size: 18px; } .calendar-grid { gap: 5px; } .calendar-day { min-height: 80px; font-size: 13px; } .calendar-volume { font-size: 11px; } .calendar-streak { padding: 8px; font-size: 13px; } }
 @media (max-width: 420px) { .achievement-panel > div { padding: 16px; } .achievement-panel strong { font-size: 25px; } }
 .onboarding-page { width: 100%; max-width: 960px; padding: 28px 0 48px; }
 .onboarding-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }

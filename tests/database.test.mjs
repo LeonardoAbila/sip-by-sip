@@ -214,3 +214,25 @@ test('SQLite import errors abort migration instead of marking missing data as im
   assert.deepEqual(await storedFile(config.indexedDB), original);
   assert.equal(config.legacyStorage.getItem('aguaApp'), JSON.stringify({ totalMl: 750 }));
 });
+
+test('daily totals migrate, persist across reopening and remain isolated by profile', async () => {
+  const date = new Date(); date.setDate(date.getDate() - 3);
+  const key = calendarKey(date);
+  const config = options(legacy({
+    'aguaApp:perfil:first': JSON.stringify({ ...newState(), dailyTotals: undefined, data: date.toDateString(), totalMl: 1250 }),
+    'aguaApp:perfil:second': JSON.stringify({ ...newState(), dailyTotals: { [key]: 750.25 } }),
+  }));
+  let store = await createDatabase(config);
+  const first = readState('aguaApp:perfil:first', 2, key => store.readProgress(key));
+  const second = readState('aguaApp:perfil:second', 2, key => store.readProgress(key));
+  assert.equal(first.totalMl, 0);
+  assert.deepEqual(first.dailyTotals, { [key]: 1250 });
+  assert.deepEqual(second.dailyTotals, { [key]: 750.25 });
+  await store.saveProgress('aguaApp:perfil:first', first);
+  await store.saveProgress('aguaApp:perfil:second', second);
+  await store.close();
+  store = await createDatabase(config);
+  assert.deepEqual(readState('aguaApp:perfil:first', 2, key => store.readProgress(key)), first);
+  assert.deepEqual(readState('aguaApp:perfil:second', 2, key => store.readProgress(key)), second);
+  await store.close();
+});

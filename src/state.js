@@ -43,7 +43,7 @@ export function today() {
 }
 
 export function newState() {
-  return { entries: [], garrafas: 0, totalMl: 0, container: 'bottle', mlCopo: 250, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
+  return { dailyTotals: {}, entries: [], garrafas: 0, totalMl: 0, container: 'bottle', mlCopo: 250, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
 }
 
 // Hundredths of a milliliter are stored as integer units during arithmetic.
@@ -96,11 +96,25 @@ export function positiveNumber(value) {
   return Number.isFinite(number) && number > 0;
 }
 
+function validTotal(value) {
+  return Number.isFinite(value) && value >= 0 && Number.isSafeInteger(volumeUnits(value));
+}
+
+function savedDay(data) {
+  const date = new Date(typeof data === 'string' ? data : NaN);
+  const key = Number.isFinite(date.getTime()) ? calendarKey(date) : null;
+  return validDay(key) ? key : null;
+}
+
 export function currentDay(state) {
   const rewarded = rewardGoal(state);
-  return rewarded.data === today()
-    ? rewarded
-    : { ...rewarded, entries: [], garrafas: 0, totalMl: 0, data: today() };
+  if (rewarded.data === today()) return rewarded;
+  const key = savedDay(rewarded.data);
+  const dailyTotals = { ...rewarded.dailyTotals };
+  if (key && key < calendarKey() && validTotal(rewarded.totalMl)) {
+    dailyTotals[key] = volumeUnits(rewarded.totalMl) / 100;
+  }
+  return { ...rewarded, dailyTotals, entries: [], garrafas: 0, totalMl: 0, data: today() };
 }
 
 export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = readProgress) {
@@ -109,18 +123,30 @@ export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = read
     const saved = JSON.parse(load(storageKey));
     if (!saved || typeof saved !== 'object') return defaults;
     const completedDays = Array.isArray(saved.completedDays) ? [...new Set(saved.completedDays.filter(validDay))].sort() : [];
-    const savedDate = new Date(typeof saved.data === 'string' ? saved.data : NaN);
-    const previousDay = Number.isFinite(savedDate.getTime()) ? calendarKey(savedDate) : null;
-    const knownDays = [calendarKey(), saved.startedOn, previousDay, ...completedDays].filter(validDay).sort();
-    const totalMl = Number.isFinite(saved.totalMl) && saved.totalMl >= 0
-      && Number.isSafeInteger(volumeUnits(saved.totalMl)) ? volumeUnits(saved.totalMl) / 100 : 0;
-    const garrafas = Number.isSafeInteger(saved.garrafas) && saved.garrafas >= 0 ? saved.garrafas : 0;
+    const previousDay = savedDay(saved.data);
+    const dailyTotals = {};
+    if (saved.dailyTotals && typeof saved.dailyTotals === 'object' && !Array.isArray(saved.dailyTotals)) {
+      for (const [key, value] of Object.entries(saved.dailyTotals)) {
+        if (validDay(key) && key < calendarKey() && validTotal(value)
+          && Math.abs(value * 100 - volumeUnits(value)) < 0.000001) {
+          dailyTotals[key] = volumeUnits(value) / 100;
+        }
+      }
+    }
+    const knownDays = [calendarKey(), saved.startedOn, previousDay, ...completedDays,
+      ...Object.keys(dailyTotals)].filter(validDay).sort();
+    const hasSavedTotal = previousDay && validTotal(saved.totalMl);
+    const totalMl = hasSavedTotal ? volumeUnits(saved.totalMl) / 100 : 0;
+    // Archive only a real saved total, never a zero used to recover invalid data.
+    if (hasSavedTotal && previousDay < calendarKey()) dailyTotals[previousDay] = totalMl;
+    const garrafas = hasSavedTotal && Number.isSafeInteger(saved.garrafas) && saved.garrafas >= 0 ? saved.garrafas : 0;
     const entries = Array.isArray(saved.entries) && saved.entries.length <= garrafas
       && saved.entries.every(entry => entry && validVolume(entry.amountMl))
       && saved.entries.reduce((sum, entry) => sum + volumeUnits(entry.amountMl), 0) <= volumeUnits(totalMl)
       ? saved.entries.map(entry => ({ amountMl: volumeUnits(entry.amountMl) / 100,
         container: ['bottle', 'glass'].includes(entry.container) ? entry.container : 'custom' })) : [];
     return currentDay({
+      dailyTotals,
       entries,
       garrafas,
       totalMl,
@@ -130,7 +156,7 @@ export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = read
       mlGarrafa: typeof saved.mlGarrafa === 'number' && validVolume(volumeUnits(saved.mlGarrafa) / 100)
         ? volumeUnits(saved.mlGarrafa) / 100 : defaults.mlGarrafa,
       metaLitros: positiveNumber(saved.metaLitros) ? Number(saved.metaLitros) : defaults.metaLitros,
-      data: saved.data,
+      data: hasSavedTotal ? saved.data : today(),
       completedDays,
       startedOn: knownDays[0],
     });

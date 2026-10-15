@@ -16,3 +16,18 @@ export function monthDays(year, month) {
     return { day: index + 1, key: calendarKey(date), date };
   }) };
 }
+
+// Null means unknown (or future), while zero is an observed daily total.
+export function calendarVolume(key, state, current = calendarKey()) {
+  if (key > current) return null;
+  if (key === current) return state.totalMl;
+  return state.dailyTotals?.[key] ?? null;
+}
+
+export function formatCalendarVolume(totalMl, language) {
+  const liters = totalMl >= 1000;
+  const number = new Intl.NumberFormat(language, {
+    maximumFractionDigits: liters ? 5 : 2,
+  }).format(liters ? totalMl / 1000 : totalMl);
+  return `${number} ${liters ? 'L' : 'ml'}`;
+}
