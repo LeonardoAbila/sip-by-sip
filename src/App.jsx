@@ -580,9 +580,9 @@ export default function App({ profile, onLogout }) {
               <button className="add-button add-glass-button" onClick={() => recordWater(state.mlCopo, 'glass')}>
                 <Icon name="glass" /><span>{t.addGlass}</span><span className="button-volume">{format.format(state.mlCopo)} ml</span>
               </button>
-            <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
-              <Icon name="reset" />{t.undoDrink}
-            </button>
+              <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
+                <Icon name="reset" />{t.undoDrink}
+              </button>
             </div>
             <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
