@@ -90,7 +90,7 @@ React renders the interface from the current state instead of updating individua
 
 1. **Components:** `src/App.jsx` contains `App`, `Bottle`, and `ResetDialog`. Each is a JavaScript function returning JSX, which looks like HTML inside JavaScript. `<Bottle />` reuses the bottle illustration.
 2. **State:** `const [state, setState] = useState(readState)` stores today's count, volume, and settings. `setState` changes that data and asks React to update the screen.
-3. **Events:** `onClick={addBottle}` connects the add button to a function. The function updates state; React updates the total, bottles, and progress ring.
+3. **Events:** `onClick={recordWater}` connects the add button to a function. The function updates state; React updates the total, bottles, and progress ring.
 4. **Derived values:** The percentage is calculated from the total and goal during rendering. It doesn't need separate state.
 5. **Effects:** `useEffect` saves hydration state to SQLite and IndexedDB after a change. Another effect checks for a new day and cleans up its timer when the component is removed.
 6. **Controlled inputs:** Each input's `value` comes from React state; `onChange` updates it. Inside the settings dialog, invalid values show a message and disable saving.
@@ -99,7 +99,7 @@ React renders the interface from the current state instead of updating individua
 For example, clicking **Adicionar garrafa** follows this flow:
 
 ```text
-click → addBottle() → setState(...) → React renders updated JSX
+click → recordWater() → setState(...) → React renders updated JSX
                                       → useEffect saves to SQLite and IndexedDB
 ```
 
@@ -158,19 +158,27 @@ A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` o
 
 ## Water entries and undo
 
-Use **Adicionar garrafa** for the configured size. Expand **Outra quantidade (ml)**
-to record a glass or other drink; its input and submit button stay tucked away
-until needed. The compact undo action appears below these controls. Each entry stores its own amount. Volumes accept
-0.01–1,000,000 ml with at most two decimal places; totals use integer hundredths
-of a milliliter to prevent floating-point accumulation errors.
+In **Suas garrafas**, choose **Garrafa** or **Copo** before recording water.
+Bottles start at 500 ml and glasses at 250 ml. **Alterar tamanho** edits the
+selected container only; both sizes and your selection are saved per profile.
+The add button, remaining-container estimate, and ghost illustrations follow
+your selection. Switching containers preserves all previously recorded water.
 
-**Desfazer último registro** removes the latest known entry, preserving earlier
-water and settings. It can be repeated, survives reloads, and never undoes a
-previous day. Resetting the day clears its entries. Earned achievements remain,
-as with a manual reset. Older aggregate-only records retain their total and
-count; their unknown individual volumes cannot be undone. New entries on top
-of those records can be undone safely. Bottle illustrations count all water
-entries, including custom amounts; remaining bottles use the configured size.
+Recorded entries keep their actual volume and container. The log displays
+bottle and glass illustrations together and shows separate counts. Older
+entries whose container was not recorded, and custom amounts, appear as water
+drops under other entries. Aggregate-only records also remain in that count.
+The recording popup shows a glass when recording a glass.
+
+Expand **Outra quantidade (ml)** in the same card for other amounts. Volumes
+accept 0.01–1,000,000 ml with at most two decimal places; totals use integer
+hundredths of a milliliter to prevent floating-point accumulation errors.
+
+**Desfazer último registro** removes the latest known entry with its actual
+volume, preserving earlier water and settings. Undo can be repeated and survives
+reloads. A new day or manual reset clears its history but retains both container
+sizes, selection, and earned achievements. Older aggregate-only records retain
+their total and count; their unknown individual volumes cannot be undone.
 
 ## Browser reminder limits
 

@@ -43,7 +43,7 @@ export function today() {
 }
 
 export function newState() {
-  return { entries: [], garrafas: 0, totalMl: 0, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
+  return { entries: [], garrafas: 0, totalMl: 0, container: 'bottle', mlCopo: 250, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
 }
 
 // Hundredths of a milliliter are stored as integer units during arithmetic.
@@ -58,12 +58,16 @@ export function validVolume(value) {
     && Math.abs(number * 100 - volumeUnits(number)) < 0.000001;
 }
 
-export function addWater(state, amount = state.mlGarrafa) {
+export function selectedVolume(state) {
+  return state.container === 'glass' ? state.mlCopo : state.mlGarrafa;
+}
+
+export function addWater(state, amount = selectedVolume(state), container = state.container ?? 'bottle') {
   const current = currentDay(state);
-  if (!validVolume(amount)) return current;
+  if (!validVolume(amount) || !['bottle', 'glass', 'custom'].includes(container)) return current;
   const units = volumeUnits(current.totalMl) + volumeUnits(amount);
   if (!Number.isSafeInteger(units)) return current;
-  const entry = { amountMl: volumeUnits(amount) / 100 };
+  const entry = { amountMl: volumeUnits(amount) / 100, container };
   return rewardGoal({ ...current, entries: [...(current.entries ?? []), entry],
     garrafas: current.garrafas + 1, totalMl: units / 100 });
 }
@@ -107,11 +111,15 @@ export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = read
     const entries = Array.isArray(saved.entries) && saved.entries.length <= garrafas
       && saved.entries.every(entry => entry && validVolume(entry.amountMl))
       && saved.entries.reduce((sum, entry) => sum + volumeUnits(entry.amountMl), 0) <= volumeUnits(totalMl)
-      ? saved.entries.map(entry => ({ amountMl: volumeUnits(entry.amountMl) / 100 })) : [];
+      ? saved.entries.map(entry => ({ amountMl: volumeUnits(entry.amountMl) / 100,
+        container: ['bottle', 'glass'].includes(entry.container) ? entry.container : 'custom' })) : [];
     return currentDay({
       entries,
       garrafas,
       totalMl,
+      container: saved.container === 'glass' ? 'glass' : 'bottle',
+      mlCopo: typeof saved.mlCopo === 'number' && validVolume(volumeUnits(saved.mlCopo) / 100)
+        ? volumeUnits(saved.mlCopo) / 100 : defaults.mlCopo,
       mlGarrafa: typeof saved.mlGarrafa === 'number' && validVolume(volumeUnits(saved.mlGarrafa) / 100)
         ? volumeUnits(saved.mlGarrafa) / 100 : defaults.mlGarrafa,
       metaLitros: positiveNumber(saved.metaLitros) ? Number(saved.metaLitros) : defaults.metaLitros,

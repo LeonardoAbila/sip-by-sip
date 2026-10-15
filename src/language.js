@@ -12,6 +12,7 @@ export function readLanguage() {
 
 export const translations = {
   'pt-BR': {
+    chooseContainer: 'Registrar com', bottleChoice: 'Garrafa', glassChoice: 'Copo', glass: 'Seu copo', glassSize: 'Seu copo (ml)', addGlass: '+ Adicionar copo', containerSettingsHelp: 'O novo tamanho vale para os próximos registros desse recipiente. A água já registrada será mantida.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'garrafa' : 'garrafas'} · ${glasses} ${glasses === 1 ? 'copo' : 'copos'}${other ? ` · ${other} ${other === 1 ? 'outro registro' : 'outros registros'}` : ''}`, remainingGlasses: count => count === 0 ? 'Meta cumprida! Nenhum copo faltando.' : `${count} ${count === 1 ? 'copo falta' : 'copos faltam'} para a meta.`,
     drinkAmount: 'Outra quantidade (ml)', addDrink: 'Registrar água', undoDrink: 'Desfazer último registro', volumeHelp: 'De 0,01 a 1.000.000 ml, com até duas casas decimais.',
     appearance: 'Aparência', favoriteColor: 'Sua cor favorita', appearanceHelp: 'Salve para aplicar o modo e a cor escolhidos.', exit: 'Sair', colors: { green: 'Verde', blue: 'Azul', purple: 'Roxo', rose: 'Rosa', orange: 'Laranja' },
     calendarEyebrow: 'UM DIA DE CADA VEZ', calendarTitle: 'Seu calendário de hidratação', previousMonth: 'Mês anterior', nextMonth: 'Próximo mês',
@@ -38,6 +39,7 @@ export const translations = {
     settingsHelp: 'O novo tamanho vale para as próximas garrafas. A água já registrada será mantida.',
   },
   en: {
+    chooseContainer: 'Record using', bottleChoice: 'Bottle', glassChoice: 'Glass', glass: 'Your glass', glassSize: 'Your glass (ml)', addGlass: '+ Add glass', containerSettingsHelp: 'The new size applies to future entries for this container. Water already recorded will be kept.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'bottle' : 'bottles'} · ${glasses} ${glasses === 1 ? 'glass' : 'glasses'}${other ? ` · ${other} ${other === 1 ? 'other entry' : 'other entries'}` : ''}`, remainingGlasses: count => count === 0 ? 'Goal reached! No glasses remaining.' : `${count} ${count === 1 ? 'glass' : 'glasses'} left to your goal.`,
     drinkAmount: 'Another amount (ml)', addDrink: 'Record water', undoDrink: 'Undo last entry', volumeHelp: 'From 0.01 to 1,000,000 ml, with up to two decimal places.',
     appearance: 'Appearance', favoriteColor: 'Your favorite color', appearanceHelp: 'Save to apply your chosen mode and color.', exit: 'Exit', colors: { green: 'Green', blue: 'Blue', purple: 'Purple', rose: 'Pink', orange: 'Orange' },
     calendarEyebrow: 'ONE DAY AT A TIME', calendarTitle: 'Your hydration calendar', previousMonth: 'Previous month', nextMonth: 'Next month',
@@ -63,6 +65,7 @@ export const translations = {
     settingsHelp: 'The new size applies to future bottles. Water already recorded will be kept.',
   },
   es: {
+    chooseContainer: 'Registrar con', bottleChoice: 'Botella', glassChoice: 'Vaso', glass: 'Tu vaso', glassSize: 'Tu vaso (ml)', addGlass: '+ Añadir vaso', containerSettingsHelp: 'El nuevo tamaño se aplica a futuros registros de este recipiente. El agua ya registrada se conserva.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'botella' : 'botellas'} · ${glasses} ${glasses === 1 ? 'vaso' : 'vasos'}${other ? ` · ${other} ${other === 1 ? 'otro registro' : 'otros registros'}` : ''}`, remainingGlasses: count => count === 0 ? '¡Meta cumplida! No faltan vasos.' : `${count} ${count === 1 ? 'vaso restante' : 'vasos restantes'} para la meta.`,
     drinkAmount: 'Otra cantidad (ml)', addDrink: 'Registrar agua', undoDrink: 'Deshacer último registro', volumeHelp: 'De 0,01 a 1.000.000 ml, con hasta dos decimales.',
     calendarEyebrow: 'UN DÍA A LA VEZ', calendarTitle: 'Tu calendario de hidratación', previousMonth: 'Mes anterior', nextMonth: 'Próximo mes',
     calendarStatuses: { completed: 'Meta cumplida', missed: 'Meta no cumplida', pending: 'Hoy en curso', untracked: 'Sin historial', future: 'Día futuro' },

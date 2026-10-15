@@ -11,6 +11,7 @@ export default function Icon({ name, className = '' }) {
     settings: <><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" /><path d="m9 3-.5 3-2 1-3-.8-2 3 2.3 2v2l-2.3 2 2 3 3-.8 2 1 .5 3h4l.5-3 2-1 3 .8 2-3-2.3-2v-2l2.3-2-2-3-3 .8-2-1L13 3Z" /></>,
     moon: <path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z" />,
     sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></>,
+    glass: <><path d="M5 3h14l-2 18H7L5 3Z" /><path d="M6 10h12" /></>,
     bottle: <><path d="M9 3h6v4l3 4v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-8l3-4Z" /><path d="M9 7h6M6 13h12M9 3h6" /></>,
     target: <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></>,
     bell: <><path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9Z" /><path d="M10 21h4" /></>,

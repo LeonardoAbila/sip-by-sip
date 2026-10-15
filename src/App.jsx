@@ -1,6 +1,6 @@
 import { saveProgress } from './database.js';
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume } from './state.js';
+import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume, selectedVolume } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY, appColors } from './theme.js';
 import { languages, LANGUAGE_KEY, readLanguage, translations } from './language.js';
 import { readReminders, reminderIntervals, validReminderMinutes, readReminderDeadline, remainingReminderSeconds, formatReminderCountdown, REMINDER_KEY } from './reminders.js';
@@ -22,7 +22,21 @@ function Bottle({ animated = false, ghost = false }) {
   );
 }
 
-function PourDialog({ t, amount, onClose, fadingOut }) {
+function Glass({ ghost = false }) {
+  return <svg className={`bottle glass${ghost ? ' bottle-ghost' : ''}`} viewBox="0 0 40 80" aria-hidden="true">
+    <path d="M7 16 H33 L29 72 H11 Z" fill="#d9efff" stroke="#1e88e5" strokeWidth="2" />
+    <path className="glass-water" d="M10 34 H30 L27 69 H13 Z" fill="#64b5f6" />
+    <path d="M14 23 L16 62" stroke="white" strokeWidth="2" opacity=".55" strokeLinecap="round" />
+  </svg>;
+}
+
+function WaterContainer({ container, ghost = false }) {
+  if (container === 'glass') return <Glass ghost={ghost} />;
+  if (container === 'custom') return <span className="other-water-entry"><Icon name="drop" /></span>;
+  return <Bottle ghost={ghost} />;
+}
+
+function PourDialog({ t, amount, container, onClose, fadingOut }) {
   const dialog = useRef(null);
 
   useEffect(() => {
@@ -36,7 +50,7 @@ function PourDialog({ t, amount, onClose, fadingOut }) {
     <dialog inert={fadingOut} ref={dialog} className="pour-dialog" aria-labelledby="pour-title" onCancel={event => { event.preventDefault(); onClose(); }}>
       <button autoFocus className="pour-close" onClick={onClose} aria-label={t.close}>×</button>
       <h2 id="pour-title">{t.waterAdded}</h2>
-      <p className="pour-amount">+{amount} ml</p>
+      <p className="pour-amount">+{amount} ml{container === 'glass' ? ` · ${t.glassChoice}` : container === 'bottle' ? ` · ${t.bottleChoice}` : ''}</p>
       <svg className="pour-scene" viewBox="0 0 320 300" aria-hidden="true">
         <ellipse cx="186" cy="278" rx="66" ry="10" fill="currentColor" opacity=".08" />
         <g className="pour-jug">
@@ -47,9 +61,11 @@ function PourDialog({ t, amount, onClose, fadingOut }) {
           <path d="M86 67 L92 130" stroke="white" strokeWidth="5" opacity=".65" strokeLinecap="round" />
         </g>
         <path className="pour-stream" d="M176 64 Q188 86 188 135" fill="none" stroke="#64b5f6" strokeWidth="9" strokeLinecap="round" />
-        <path d="M173 126 H203 V150 Q222 160 222 178 V255 Q222 270 208 270 H168 Q154 270 154 255 V178 Q154 160 173 150 Z"
+        <path d={container === 'glass' ? 'M150 126 H226 L214 270 H162 Z' : 'M173 126 H203 V150 Q222 160 222 178 V255 Q222 270 208 270 H168 Q154 270 154 255 V178 Q154 160 173 150 Z'}
           fill="#d9efff" stroke="#399de5" strokeWidth="4" />
-        <rect className="pour-water" x="160" y="174" width="56" height="90" rx="10" fill="#42a5f5" />
+        {container === 'glass'
+          ? <path className="pour-water" d="M161 174 H215 L207 264 H169 Z" fill="#42a5f5" />
+          : <rect className="pour-water" x="160" y="174" width="56" height="90" rx="10" fill="#42a5f5" />}
         <path d="M167 181 V250" stroke="white" strokeWidth="5" opacity=".65" strokeLinecap="round" />
         <rect x="163" y="200" width="50" height="30" rx="8" fill="#fff" opacity=".85" />
         <path d="M188 205 Q177 216 188 224 Q199 216 188 205" fill="#399de5" />
@@ -299,6 +315,7 @@ export default function App({ profile, onLogout }) {
   const [state, setState] = useState(() => readState(storageKey, profile?.goalLiters ?? 2));
   const [fillAnimation, setFillAnimation] = useState(0);
   const [pourAmount, setPourAmount] = useState(null);
+  const [pourContainer, setPourContainer] = useState('bottle');
   const [drinkInput, setDrinkInput] = useState('250');
   const closePour = useCallback(() => setPourAmount(null), []);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -441,7 +458,15 @@ export default function App({ profile, onLogout }) {
   const total = state.totalMl >= 1000 ? `${format.format(state.totalMl / 1000)} L` : `${format.format(state.totalMl)} ml`;
 
   const remainingMl = Math.max(state.metaLitros * 1000 - state.totalMl, 0);
-  const remainingBottles = Math.ceil(remainingMl / state.mlGarrafa);
+  const containerVolume = selectedVolume(state);
+  const isGlass = state.container === 'glass';
+  const remainingContainers = Math.ceil(remainingMl / containerVolume);
+  const bottleCount = state.entries.filter(entry => entry.container === 'bottle').length;
+  const glassCount = state.entries.filter(entry => entry.container === 'glass').length;
+  const otherCount = state.garrafas - bottleCount - glassCount;
+  const legacyCount = state.garrafas - state.entries.length;
+  const recordedContainers = Array.from({ length: Math.min(state.garrafas, 24) }, (_, index) =>
+    index < legacyCount ? 'custom' : state.entries[index - legacyCount].container);
   const rewards = achievements(currentDay(state));
   const dateLabel = new Intl.DateTimeFormat(language, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
@@ -460,13 +485,14 @@ export default function App({ profile, onLogout }) {
     setSettingsOpen(false);
   }
 
-  function addBottle(amount = state.mlGarrafa) {
+  function recordWater(amount = containerVolume, container = state.container) {
     if (!validVolume(amount)) return;
     dismissReminder();
     // A fresh key restarts the animation on every click, even after 24 bottles.
     setFillAnimation(previous => previous + 1);
     setPourAmount(Number(amount));
-    setState(previous => addWater(previous, Number(amount)));
+    setPourContainer(container);
+    setState(previous => addWater(previous, Number(amount), container));
   }
 
   function resetDay() {
@@ -494,7 +520,7 @@ export default function App({ profile, onLogout }) {
         </nav>
       </header>
       <main className="app">
-        <Fade visible={reminderVisible}><ReminderNotice floating t={t} onAdd={() => addBottle()} onDismiss={dismissReminder} /></Fade>
+        <Fade visible={reminderVisible}><ReminderNotice floating t={{ ...t, add: isGlass ? t.addGlass : t.add }} onAdd={() => recordWater()} onDismiss={dismissReminder} /></Fade>
         {screen === 'benefits' && <WaterBenefits language={language} />}
         <div id="home" hidden={screen !== 'home'}>
         <header className="page-heading">
@@ -538,41 +564,54 @@ export default function App({ profile, onLogout }) {
               </div>
             </div>
             <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
-            <button className="add-button" onClick={() => addBottle()}><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml <Icon name="plus" /></span></button>
-            <details className="custom-water">
-              <summary><span><Icon name="drop" />{t.drinkAmount}</span><Icon name="arrow" /></summary>
-              <form className="custom-water-form" onSubmit={event => { event.preventDefault(); addBottle(Number(drinkInput)); }}>
-                <label htmlFor="drink-amount">{t.drinkAmount}</label>
-                <div className="custom-water-controls">
-                  <input id="drink-amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required
-                    value={drinkInput} onChange={event => setDrinkInput(event.target.value)}
-                    aria-invalid={!validVolume(drinkInput)} aria-describedby="drink-amount-help" />
-                  <button className="save-button" type="submit" disabled={!validVolume(drinkInput)}>{t.addDrink}</button>
-                </div>
-                <p id="drink-amount-help" className="settings-help">{t.volumeHelp}</p>
-              </form>
-            </details>
-            <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
-              <Icon name="reset" />{t.undoDrink}
-            </button>
             <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
           <div className="daily-panel">
             <section className="bottle-card" aria-labelledby="bottle-log-title">
               <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2></div>
+              <fieldset className="container-picker">
+                <legend>{t.chooseContainer}</legend>
+                <div className="container-options">
+                  {['bottle', 'glass'].map(container => <label key={container}>
+                    <input type="radio" name="water-container" value={container} checked={state.container === container}
+                      onChange={() => setState(previous => ({ ...currentDay(previous), container }))} />
+                    <span><Icon name={container} />{container === 'glass' ? t.glassChoice : t.bottleChoice}</span>
+                  </label>)}
+                </div>
+              </fieldset>
               <dl className="bottle-settings">
                 <div><dt><span className="stat-icon"><Icon name="target" /></span>{t.dailyGoal}</dt><dd>{format.format(state.metaLitros)} <small>L</small></dd></div>
-                <div><dt><span className="stat-icon warm"><Icon name="bottle" /></span>{t.bottle}</dt><dd>{format.format(state.mlGarrafa)} <small>ml</small></dd></div>
+                <div><dt><span className="stat-icon warm"><Icon name={state.container} /></span>{isGlass ? t.glass : t.bottle}</dt><dd>{format.format(containerVolume)} <small>ml</small></dd></div>
               </dl>
-              <BottleSizeEditor size={state.mlGarrafa} t={t}
-                onSave={mlGarrafa => setState(previous => rewardGoal({ ...currentDay(previous), mlGarrafa }))} />
+              <BottleSizeEditor key={state.container} size={containerVolume}
+                t={{ ...t, bottleSize: isGlass ? t.glassSize : t.bottleSize, settingsHelp: t.containerSettingsHelp }}
+                onSave={volume => setState(previous => ({ ...currentDay(previous), [isGlass ? 'mlCopo' : 'mlGarrafa']: volume }))} />
+              <button className="add-button" onClick={() => recordWater()}><span>{isGlass ? t.addGlass : t.add}</span><span className="button-volume">{format.format(containerVolume)} ml <Icon name="plus" /></span></button>
+              <details className="custom-water">
+                <summary><span><Icon name="drop" />{t.drinkAmount}</span><Icon name="arrow" /></summary>
+                <form className="custom-water-form" onSubmit={event => { event.preventDefault(); recordWater(Number(drinkInput), 'custom'); }}>
+                  <label htmlFor="drink-amount">{t.drinkAmount}</label>
+                  <div className="custom-water-controls">
+                    <input id="drink-amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required
+                      value={drinkInput} onChange={event => setDrinkInput(event.target.value)}
+                      aria-invalid={!validVolume(drinkInput)} aria-describedby="drink-amount-help" />
+                    <button className="save-button" type="submit" disabled={!validVolume(drinkInput)}>{t.addDrink}</button>
+                  </div>
+                  <p id="drink-amount-help" className="settings-help">{t.volumeHelp}</p>
+                </form>
+              </details>
+              <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
+                <Icon name="reset" />{t.undoDrink}
+              </button>
+
               <p className="section-description">{t.bottles(state.garrafas)}</p>
-              <p className="section-description">{t.remainingBottles(remainingBottles)}</p>
+              <p className="section-description" aria-live="polite">{t.containerCounts(bottleCount, glassCount, otherCount)}</p>
+              <p className="section-description">{isGlass ? t.remainingGlasses(remainingContainers) : t.remainingBottles(remainingContainers)}</p>
               <div className="bottles" aria-hidden="true">
-                {Array.from({ length: Math.min(state.garrafas, 24) }, (_, index) => <Bottle key={index} />)}
+                {recordedContainers.map((container, index) => <WaterContainer container={container} key={index} />)}
                 {state.garrafas > 24 && <span className="overflow-count">+{state.garrafas - 24}</span>}
-                {Array.from({ length: Math.min(remainingBottles, 24) }, (_, index) => <Bottle ghost key={`remaining-${index}`} />)}
-                {remainingBottles > 24 && <span className="overflow-count ghost-count">+{format.format(remainingBottles - 24)}</span>}
+                {Array.from({ length: Math.min(remainingContainers, 24) }, (_, index) => <WaterContainer container={state.container} ghost key={`remaining-${index}`} />)}
+                {remainingContainers > 24 && <span className="overflow-count ghost-count">+{format.format(remainingContainers - 24)}</span>}
               </div>
               <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
             </section>
@@ -589,7 +628,7 @@ export default function App({ profile, onLogout }) {
         onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>
       <Fade visible={remindersOpen}><RemindersDialog reminders={reminders} language={language}
         onSave={saveReminders} onClose={() => setRemindersOpen(false)} /></Fade>
-      <Fade visible={pourAmount !== null}><PourDialog key={fillAnimation} t={t} amount={format.format(pourAmount ?? 0)} onClose={closePour} /></Fade>
+      <Fade visible={pourAmount !== null}><PourDialog key={fillAnimation} t={t} amount={format.format(pourAmount ?? 0)} container={pourContainer} onClose={closePour} /></Fade>
       <Fade visible={resetOpen}><ResetDialog t={t} onConfirm={resetDay} onClose={() => setResetOpen(false)} /></Fade>
       </main>
     </>

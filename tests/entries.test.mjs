@@ -57,3 +57,35 @@ test('invalid amounts and inconsistent saved entry history cannot change totals'
   assert.equal(saved.entries.length, 0);
   assert.equal(undoWater(saved).totalMl, 20);
 });
+
+test('switching between glasses and bottles retains separate sizes and typed history across reloads', () => {
+  let state = addWater(newState());
+  state = addWater({ ...state, container: 'glass' });
+  state = addWater({ ...state, mlCopo: 300 });
+  state = addWater({ ...state, container: 'bottle', mlGarrafa: 750 });
+  assert.equal(state.totalMl, 1800);
+  assert.deepEqual(state.entries.map(entry => entry.container), ['bottle', 'glass', 'glass', 'bottle']);
+  state = load(state);
+  assert.equal(state.container, 'bottle');
+  assert.equal(state.mlCopo, 300);
+  assert.equal(state.mlGarrafa, 750);
+  assert.equal(undoWater(state).totalMl, 1050);
+  state = load({ ...state, container: 'glass' });
+  assert.equal(state.container, 'glass');
+  assert.equal(addWater(state).totalMl, 2100);
+  assert.equal(resetWater(state).container, 'glass');
+  assert.equal(resetWater(state).mlCopo, 300);
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  assert.equal(load({ ...state, data: yesterday.toDateString() }).mlCopo, 300);
+});
+
+test('old and invalid container settings load safely without inventing history types', () => {
+  const old = load({ ...newState(), container: undefined, mlCopo: undefined, entries: [{ amountMl: 250 }], totalMl: 250, garrafas: 1 });
+  assert.equal(old.mlCopo, 250);
+  assert.equal(old.container, 'bottle');
+  assert.equal(old.entries[0].container, 'custom');
+  assert.equal(undoWater(old).totalMl, 0);
+  assert.equal(load({ ...newState(), container: 'invalid', mlCopo: -10 }).mlCopo, 250);
+  assert.equal(addWater(newState(), 250, 'invalid').totalMl, 0);
+});
