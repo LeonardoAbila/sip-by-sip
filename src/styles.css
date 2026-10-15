@@ -590,12 +590,12 @@ progress::-moz-progress-bar { background: var(--accent); }
 .container-options button { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--input); color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; }
 .container-options button[aria-pressed='true'] { border-color: var(--accent-text); background: var(--accent-soft); color: var(--accent-text); }
 .container-options button:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
-.record-container-actions { display: grid; gap: 10px; }
+.record-container-actions { display: grid; gap: 10px; width: 100%; margin-top: 20px; }
 .record-container-actions .add-button { justify-content: center; flex-wrap: wrap; }
 .record-container-actions .add-glass-button { background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-text); box-shadow: none; }
 .record-container-actions .add-glass-button:hover:enabled { background: var(--secondary); }
 .record-container-actions .add-glass-button .button-volume { border-color: var(--border); }
-.bottle-card .add-button { margin-top: 4px; }
+.record-container-actions .add-button { margin-top: 0; }
 .bottle-card .undo-water { margin-bottom: 10px; }
 .hydration-card .goal-ring { margin-block: auto; }
 .hydration-card .card-note { margin-top: 20px; }

@@ -574,6 +574,14 @@ export default function App({ profile, onLogout }) {
               </div>
             </div>
             <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
+            <div className="record-container-actions">
+              <button className="add-button" onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
+                <Icon name="bottle" /><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml</span>
+              </button>
+              <button className="add-button add-glass-button" onClick={() => recordWater(state.mlCopo, 'glass')}>
+                <Icon name="glass" /><span>{t.addGlass}</span><span className="button-volume">{format.format(state.mlCopo)} ml</span>
+              </button>
+            </div>
             <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
           <div className="daily-panel">
@@ -585,14 +593,6 @@ export default function App({ profile, onLogout }) {
               </dl>
               <BottleSizeEditor bottleSize={state.mlGarrafa} glassSize={state.mlCopo} t={t}
                 onSave={(mlGarrafa, mlCopo) => setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo }))} />
-              <div className="record-container-actions">
-                <button className="add-button" onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
-                  <Icon name="bottle" /><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml</span>
-                </button>
-                <button className="add-button add-glass-button" onClick={() => recordWater(state.mlCopo, 'glass')}>
-                  <Icon name="glass" /><span>{t.addGlass}</span><span className="button-volume">{format.format(state.mlCopo)} ml</span>
-                </button>
-              </div>
               <details className="custom-water">
                 <summary><span><Icon name="drop" />{t.drinkAmount}</span><Icon name="arrow" /></summary>
                 <form className="custom-water-form" onSubmit={event => { event.preventDefault(); recordWater(Number(drinkInput), 'custom'); }}>

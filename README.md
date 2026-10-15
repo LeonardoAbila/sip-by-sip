@@ -158,9 +158,9 @@ A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` o
 
 ## Water entries and undo
 
-In **Suas garrafas**, use the separate **Adicionar garrafa** and **Adicionar copo**
+In **Consumo de hoje**, use the separate **Adicionar garrafa** and **Adicionar copo**
 buttons, each showing its saved volume. Bottles start at 500 ml and glasses at
-250 ml. Open **Alterar tamanho** and choose the bottle or glass icon to edit
+250 ml. In **Suas garrafas**, open **Alterar tamanho** and choose the bottle or glass icon to edit
 that container. You can edit both sizes before saving; Cancel or Escape discards
 all pending edits. Sizes are saved per profile, and changing them preserves
 previously recorded water. The remaining-container estimate and ghost
@@ -172,7 +172,7 @@ entries whose container was not recorded, and custom amounts, appear as water
 drops under other entries. Aggregate-only records also remain in that count.
 The recording popup shows a glass when recording a glass.
 
-Expand **Outra quantidade (ml)** in the same card for other amounts. Volumes
+Expand **Outra quantidade (ml)** in **Suas garrafas** for other amounts. Volumes
 accept 0.01–1,000,000 ml with at most two decimal places; totals use integer
 hundredths of a milliliter to prevent floating-point accumulation errors.
 
