@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { addWater, undoWater, resetWater, newState, readState, today, validVolume } from '../src/state.js';
+import { addWater, undoWater, resetWater, newState, readState, today, validVolume, remainingWater } from '../src/state.js';
 
 const load = state => readState('test', 2, () => JSON.stringify(state));
 
@@ -88,4 +88,17 @@ test('old and invalid container settings load safely without inventing history t
   assert.equal(undoWater(old).totalMl, 0);
   assert.equal(load({ ...newState(), container: 'invalid', mlCopo: -10 }).mlCopo, 250);
   assert.equal(addWater(newState(), 250, 'invalid').totalMl, 0);
+});
+
+test('remaining bottles and glasses recalculate from the same remaining volume', () => {
+  let state = newState();
+  assert.deepEqual(remainingWater(state), { ml: 2000, bottles: 4, glasses: 8 });
+  state = addWater(state, 250, 'glass');
+  assert.deepEqual(remainingWater(state), { ml: 1750, bottles: 4, glasses: 7 });
+  state = addWater(state, 500, 'bottle');
+  assert.deepEqual(remainingWater(state), { ml: 1250, bottles: 3, glasses: 5 });
+  assert.equal(remainingWater(undoWater(state)).glasses, 7);
+  assert.deepEqual(remainingWater({ ...state, metaLitros: 1.5, mlGarrafa: 750, mlCopo: 300 }), { ml: 750, bottles: 1, glasses: 3 });
+  assert.deepEqual(remainingWater({ ...state, totalMl: 3000 }), { ml: 0, bottles: 0, glasses: 0 });
+  assert.deepEqual(remainingWater({ ...state, metaLitros: 0.0003, totalMl: 0.2, mlGarrafa: 0.1, mlCopo: 0.1 }), { ml: 0.1, bottles: 1, glasses: 1 });
 });

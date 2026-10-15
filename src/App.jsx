@@ -1,6 +1,6 @@
 import { saveProgress } from './database.js';
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume, selectedVolume } from './state.js';
+import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume, selectedVolume, remainingWater } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY, appColors } from './theme.js';
 import { languages, LANGUAGE_KEY, readLanguage, translations } from './language.js';
 import { readReminders, reminderIntervals, validReminderMinutes, readReminderDeadline, remainingReminderSeconds, formatReminderCountdown, REMINDER_KEY } from './reminders.js';
@@ -466,10 +466,10 @@ export default function App({ profile, onLogout }) {
   const format = new Intl.NumberFormat(language, { maximumFractionDigits: 2 });
   const total = state.totalMl >= 1000 ? `${format.format(state.totalMl / 1000)} L` : `${format.format(state.totalMl)} ml`;
 
-  const remainingMl = Math.max(state.metaLitros * 1000 - state.totalMl, 0);
+  const remaining = remainingWater(state);
+  const remainingMl = remaining.ml;
   const containerVolume = selectedVolume(state);
   const isGlass = state.container === 'glass';
-  const remainingContainers = Math.ceil(remainingMl / containerVolume);
   const bottleCount = state.entries.filter(entry => entry.container === 'bottle').length;
   const glassCount = state.entries.filter(entry => entry.container === 'glass').length;
   const otherCount = state.garrafas - bottleCount - glassCount;
@@ -597,14 +597,33 @@ export default function App({ profile, onLogout }) {
                 onSave={(mlGarrafa, mlCopo) => setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo }))} />
               <p className="section-description">{t.bottles(state.garrafas)}</p>
               <p className="section-description" aria-live="polite">{t.containerCounts(bottleCount, glassCount, otherCount)}</p>
-              <p className="section-description">{isGlass ? t.remainingGlasses(remainingContainers) : t.remainingBottles(remainingContainers)}</p>
               <div className="bottles" aria-hidden="true">
                 {recordedContainers.map((container, index) => <WaterContainer container={container} key={index} />)}
                 {state.garrafas > 24 && <span className="overflow-count">+{state.garrafas - 24}</span>}
-                {Array.from({ length: Math.min(remainingContainers, 24) }, (_, index) => <WaterContainer container={state.container} ghost key={`remaining-${index}`} />)}
-                {remainingContainers > 24 && <span className="overflow-count ghost-count">+{format.format(remainingContainers - 24)}</span>}
               </div>
               <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
+              <section className="remaining-containers" aria-label={t.remaining}>
+                {remainingMl === 0 ? <p className="success" role="status">{t.success}</p> : <>
+                  <p className="section-description">{t.remainingOptionsHelp}</p>
+                  <div className="remaining-options">
+                    {['bottle', 'glass'].map((container, index) => {
+                      const count = container === 'glass' ? remaining.glasses : remaining.bottles;
+                      const volume = container === 'glass' ? state.mlCopo : state.mlGarrafa;
+                      return <React.Fragment key={container}>
+                        {index === 1 && <span className="remaining-or">{t.or}</span>}
+                        <div className="remaining-option">
+                          <p className="remaining-count" aria-live="polite">{container === 'glass' ? t.glassesNeeded(count) : t.bottlesNeeded(count)}</p>
+                          <small>{format.format(volume)} ml</small>
+                          <div className="remaining-icons" aria-hidden="true">
+                            {Array.from({ length: Math.min(count, 8) }, (_, item) => <WaterContainer container={container} ghost key={item} />)}
+                            {count > 8 && <span className="overflow-count ghost-count">+{format.format(count - 8)}</span>}
+                          </div>
+                        </div>
+                      </React.Fragment>;
+                    })}
+                  </div>
+                </>}
+              </section>
             </section>
           </div>
         </div>

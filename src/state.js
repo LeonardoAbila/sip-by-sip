@@ -58,6 +58,13 @@ export function validVolume(value) {
     && Math.abs(number * 100 - volumeUnits(number)) < 0.000001;
 }
 
+export function remainingWater(state) {
+  const current = currentDay(state);
+  const units = Math.max(volumeUnits(current.metaLitros * 1000) - volumeUnits(current.totalMl), 0);
+  return { ml: units / 100, bottles: Math.ceil(units / volumeUnits(current.mlGarrafa)),
+    glasses: Math.ceil(units / volumeUnits(current.mlCopo)) };
+}
+
 export function selectedVolume(state) {
   return state.container === 'glass' ? state.mlCopo : state.mlGarrafa;
 }
