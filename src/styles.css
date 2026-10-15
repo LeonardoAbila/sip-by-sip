@@ -588,8 +588,8 @@ progress::-moz-progress-bar { background: var(--accent); }
 }
 
 .remaining-containers { margin-top: 16px; }
-.remaining-options { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; margin-top: 12px; }
-.remaining-option { align-self: stretch; min-width: 0; padding: 12px 8px; border: 1px dashed var(--border); border-radius: 12px; background: var(--input); }
+.remaining-options { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; margin-top: 12px; padding: 16px 10px; border: 1px dashed var(--border); border-radius: 12px; background: var(--input); }
+.remaining-option { align-self: start; min-width: 0; padding: 0 4px; }
 .remaining-count { margin: 0 0 4px; color: var(--accent-text); font-size: 14px; font-weight: 600; }
 .remaining-option small, .remaining-or { color: var(--muted); font-size: 12px; }
 .remaining-icons { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; margin-top: 10px; }

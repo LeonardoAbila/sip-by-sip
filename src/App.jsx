@@ -615,8 +615,8 @@ export default function App({ profile, onLogout }) {
                           <p className="remaining-count" aria-live="polite">{container === 'glass' ? t.glassesNeeded(count) : t.bottlesNeeded(count)}</p>
                           <small>{format.format(volume)} ml</small>
                           <div className="remaining-icons" aria-hidden="true">
-                            {Array.from({ length: Math.min(count, 8) }, (_, item) => <WaterContainer container={container} ghost key={item} />)}
-                            {count > 8 && <span className="overflow-count ghost-count">+{format.format(count - 8)}</span>}
+                            {Array.from({ length: Math.min(count, 24) }, (_, item) => <WaterContainer container={container} ghost key={item} />)}
+                            {count > 24 && <span className="overflow-count ghost-count">+{format.format(count - 24)}</span>}
                           </div>
                         </div>
                       </React.Fragment>;

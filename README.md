@@ -166,7 +166,8 @@ all pending edits. Sizes are saved per profile, and changing them preserves
 previously recorded water. The remaining indicators show both bottles and glasses as alternatives.
 Each count rounds up the remaining volume divided by its container size;
 recording water, undoing, changing the goal, or editing either size recalculates
-both counts. Ghost illustrations show up to eight of each, with an overflow
+both counts. Both counts and their empty container illustrations appear together in one
+shared indicator. Ghost illustrations show up to 24 of each, with an overflow
 count. Reaching the goal replaces the indicators with a success message.
 
 Recorded entries keep their actual volume and container. The log displays
