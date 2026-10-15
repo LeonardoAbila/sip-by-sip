@@ -128,7 +128,7 @@ click → recordWater() → setState(...) → React renders updated JSX
 
 - Each click on **Adicionar garrafa** opens a large popup showing a jug pouring water into a bottle and the recorded volume. It closes automatically after 3.4 seconds, or immediately with the close button or Escape. Closing the popup preserves the recorded water. The animation respects the system preference for reduced motion.
 - The bottle log shows recorded bottles filled with water and remaining bottles as faint, dashed outlines. Remaining bottles are calculated from the water still needed and the current bottle size, rounding up; each group displays at most 24 illustrations with an overflow count.
-- Use **Alterar tamanho** inside the bottle log to edit the bottle volume directly. Save applies a positive value to future bottles; Cancel or Escape discards edits. Recorded water is preserved and ghost bottles update to the new size.
+- Use **Alterar ml** inside the bottle log to edit the bottle volume directly. Save applies a positive value to future bottles; Cancel or Escape discards edits. Recorded water is preserved and ghost bottles update to the new size.
 - Add a bottle using its current size. Changing the size affects future bottles; it preserves water already recorded.
 - Open **Configurações** to edit bottle size and daily goal. **Salvar** applies and saves both values; **Cancelar** or Escape discards edits. Changing the goal updates progress after saving.
 - Open **Configurações** and click the **Idioma** button to choose **Português (BR)**, **English**, or **Español**. The dialog previews your chosen language; **Salvar** applies it to the app and number formatting, while **Cancelar** or Escape discards the change. Your selection is saved in this browser when storage is available; switching languages preserves your progress.
@@ -160,7 +160,7 @@ A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` o
 
 In **Consumo de hoje**, use the separate **Adicionar garrafa** and **Adicionar copo**
 buttons, each showing its saved volume. Bottles start at 500 ml and glasses at
-250 ml. In **Suas garrafas**, open **Alterar tamanho** and choose the bottle or glass icon to edit
+250 ml. In **Suas garrafas**, open **Alterar ml** and choose the bottle or glass icon to edit
 that container. You can edit both sizes before saving; Cancel or Escape discards
 all pending edits. Sizes are saved per profile, and changing them preserves
 previously recorded water. The remaining-container estimate and ghost
@@ -172,11 +172,12 @@ entries whose container was not recorded, and custom amounts, appear as water
 drops under other entries. Aggregate-only records also remain in that count.
 The recording popup shows a glass when recording a glass.
 
-Expand **Outra quantidade (ml)** in **Suas garrafas** for other amounts. Volumes
+Use **Alterar ml** to adjust the bottle or glass volume. Volumes
 accept 0.01–1,000,000 ml with at most two decimal places; totals use integer
 hundredths of a milliliter to prevent floating-point accumulation errors.
 
-**Desfazer último registro** removes the latest known entry with its actual
+In **Consumo de hoje**, **Desfazer último registro** appears below **Adicionar copo**
+and removes the latest known entry with its actual
 volume, preserving earlier water and settings. Undo can be repeated and survives
 reloads. A new day or manual reset clears its history but retains both container
 sizes, selection, and earned achievements. Older aggregate-only records retain

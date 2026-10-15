@@ -563,29 +563,10 @@ progress::-moz-progress-bar { background: var(--accent); }
   .reminder-toast { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); }
 }
 
-/* Keep occasional custom entries compact beneath the main bottle action. */
-.custom-water { width: 100%; min-width: 0; margin-top: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--input); text-align: left; }
-.custom-water summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 12px 14px; list-style: none; cursor: pointer; color: var(--accent-text); font-size: 13px; font-weight: 600; border-radius: 12px; }
-.custom-water summary::-webkit-details-marker { display: none; }
-.custom-water summary > span { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.custom-water summary > .icon { flex-shrink: 0; transform: rotate(90deg); }
-.custom-water[open] summary > .icon { transform: rotate(-90deg); }
-.custom-water summary:hover { background: var(--secondary); }
-.custom-water summary:focus-visible, .undo-water:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
-.custom-water-form { padding: 4px 14px 14px; }
-.custom-water-form label { display: block; margin-bottom: 8px; color: var(--text); font-size: 13px; font-weight: 600; }
-.custom-water-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: stretch; }
-.custom-water-controls input { min-width: 0; min-height: 44px; margin: 0; border-radius: 10px; font: inherit; }
-.custom-water-controls button { min-height: 44px; padding: 10px 14px; border: 0; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 600; }
-.custom-water-form .settings-help { margin: 10px 0 0; font-size: 11px; line-height: 1.5; }
+.undo-water:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
 .undo-water { display: inline-flex; align-items: center; justify-content: center; gap: 6px; max-width: 100%; min-height: 44px; margin-top: 8px; padding: 8px 12px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font: inherit; font-size: 12px; }
 .undo-water:hover:enabled { background: var(--secondary); color: var(--accent-text); }
 .undo-water .icon { width: 15px; height: 15px; flex-shrink: 0; }
-@media (max-width: 380px) {
-  .custom-water-controls { grid-template-columns: minmax(0, 1fr); }
-  .custom-water-controls button { width: 100%; }
-}
-
 .container-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
 .container-options button { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--input); color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; }
 .container-options button[aria-pressed='true'] { border-color: var(--accent-text); background: var(--accent-soft); color: var(--accent-text); }
@@ -596,7 +577,7 @@ progress::-moz-progress-bar { background: var(--accent); }
 .record-container-actions .add-glass-button:hover:enabled { background: var(--secondary); }
 .record-container-actions .add-glass-button .button-volume { border-color: var(--border); }
 .record-container-actions .add-button { margin-top: 0; }
-.bottle-card .undo-water { margin-bottom: 10px; }
+.record-container-actions .undo-water { margin-top: 0; justify-self: center; }
 .hydration-card .goal-ring { margin-block: auto; }
 .hydration-card .card-note { margin-top: 20px; }
 .other-water-entry { display: inline-flex; align-items: center; justify-content: center; width: 25px; height: 50px; color: var(--accent-text); }

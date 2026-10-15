@@ -136,7 +136,7 @@ function BottleSizeEditor({ bottleSize, glassSize, t, onSave }) {
     setContainer('bottle');
     setEditing(true);
   }}>
-    <Icon name="settings" /> {t.changeBottleSize}
+    <Icon name="drop" /> {t.changeBottleSize}
   </button>;
 
   return <form className="bottle-size-editor" onSubmit={save} onKeyDown={event => {
@@ -326,7 +326,6 @@ export default function App({ profile, onLogout }) {
   const [fillAnimation, setFillAnimation] = useState(0);
   const [pourAmount, setPourAmount] = useState(null);
   const [pourContainer, setPourContainer] = useState('bottle');
-  const [drinkInput, setDrinkInput] = useState('250');
   const closePour = useCallback(() => setPourAmount(null), []);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [remindersOpen, setRemindersOpen] = useState(false);
@@ -581,6 +580,9 @@ export default function App({ profile, onLogout }) {
               <button className="add-button add-glass-button" onClick={() => recordWater(state.mlCopo, 'glass')}>
                 <Icon name="glass" /><span>{t.addGlass}</span><span className="button-volume">{format.format(state.mlCopo)} ml</span>
               </button>
+            <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
+              <Icon name="reset" />{t.undoDrink}
+            </button>
             </div>
             <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
@@ -593,23 +595,6 @@ export default function App({ profile, onLogout }) {
               </dl>
               <BottleSizeEditor bottleSize={state.mlGarrafa} glassSize={state.mlCopo} t={t}
                 onSave={(mlGarrafa, mlCopo) => setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo }))} />
-              <details className="custom-water">
-                <summary><span><Icon name="drop" />{t.drinkAmount}</span><Icon name="arrow" /></summary>
-                <form className="custom-water-form" onSubmit={event => { event.preventDefault(); recordWater(Number(drinkInput), 'custom'); }}>
-                  <label htmlFor="drink-amount">{t.drinkAmount}</label>
-                  <div className="custom-water-controls">
-                    <input id="drink-amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required
-                      value={drinkInput} onChange={event => setDrinkInput(event.target.value)}
-                      aria-invalid={!validVolume(drinkInput)} aria-describedby="drink-amount-help" />
-                    <button className="save-button" type="submit" disabled={!validVolume(drinkInput)}>{t.addDrink}</button>
-                  </div>
-                  <p id="drink-amount-help" className="settings-help">{t.volumeHelp}</p>
-                </form>
-              </details>
-              <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
-                <Icon name="reset" />{t.undoDrink}
-              </button>
-
               <p className="section-description">{t.bottles(state.garrafas)}</p>
               <p className="section-description" aria-live="polite">{t.containerCounts(bottleCount, glassCount, otherCount)}</p>
               <p className="section-description">{isGlass ? t.remainingGlasses(remainingContainers) : t.remainingBottles(remainingContainers)}</p>
