@@ -232,3 +232,12 @@ language, and reminder features remain available.
 
 The streak keeps its original dashboard card and calendar badge, with the
 message explaining the current run of consecutive completed days.
+
+## OpenSpec
+
+O projeto está configurado com OpenSpec para planejar mudanças com o Codex.
+Instale a ferramenta com `npm install -g @fission-ai/openspec@latest`.
+No Codex, use `$openspec-propose` seguido da ideia para criar uma proposta,
+`$openspec-apply-change` para implementar e `$openspec-archive-change` para arquivar.
+No aplicativo desktop, selecione a habilidade correspondente na barra lateral.
+Os requisitos e as propostas ficam em `openspec/`; as habilidades ficam em `.agents/skills/`.
