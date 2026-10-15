@@ -158,8 +158,9 @@ A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` o
 
 ## Water entries and undo
 
-Use **Adicionar garrafa** for the configured size, or **Outra quantidade (ml)**
-for a glass or other drink. Each entry stores its own amount. Volumes accept
+Use **Adicionar garrafa** for the configured size. Expand **Outra quantidade (ml)**
+to record a glass or other drink; its input and submit button stay tucked away
+until needed. The compact undo action appears below these controls. Each entry stores its own amount. Volumes accept
 0.01–1,000,000 ml with at most two decimal places; totals use integer hundredths
 of a milliliter to prevent floating-point accumulation errors.
 

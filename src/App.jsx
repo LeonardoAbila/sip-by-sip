@@ -539,15 +539,22 @@ export default function App({ profile, onLogout }) {
             </div>
             <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
             <button className="add-button" onClick={() => addBottle()}><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml <Icon name="plus" /></span></button>
-            <form className="bottle-size-editor" onSubmit={event => { event.preventDefault(); addBottle(Number(drinkInput)); }}>
-              <label htmlFor="drink-amount">{t.drinkAmount}</label>
-              <input id="drink-amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required
-                value={drinkInput} onChange={event => setDrinkInput(event.target.value)}
-                aria-invalid={!validVolume(drinkInput)} aria-describedby="drink-amount-help" />
-              <p id="drink-amount-help" className="settings-help">{t.volumeHelp}</p>
-              <button className="save-button" type="submit" disabled={!validVolume(drinkInput)}>{t.addDrink}</button>
-            </form>
-            <button className="secondary" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>{t.undoDrink}</button>
+            <details className="custom-water">
+              <summary><span><Icon name="drop" />{t.drinkAmount}</span><Icon name="arrow" /></summary>
+              <form className="custom-water-form" onSubmit={event => { event.preventDefault(); addBottle(Number(drinkInput)); }}>
+                <label htmlFor="drink-amount">{t.drinkAmount}</label>
+                <div className="custom-water-controls">
+                  <input id="drink-amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required
+                    value={drinkInput} onChange={event => setDrinkInput(event.target.value)}
+                    aria-invalid={!validVolume(drinkInput)} aria-describedby="drink-amount-help" />
+                  <button className="save-button" type="submit" disabled={!validVolume(drinkInput)}>{t.addDrink}</button>
+                </div>
+                <p id="drink-amount-help" className="settings-help">{t.volumeHelp}</p>
+              </form>
+            </details>
+            <button className="undo-water" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>
+              <Icon name="reset" />{t.undoDrink}
+            </button>
             <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
           <div className="daily-panel">
