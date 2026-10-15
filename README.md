@@ -155,3 +155,18 @@ A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` o
 - Open **Benefícios** in the navigation to read about hydration, everyday tips, and the CDC source. **Voltar e registrar água** returns to your dashboard; progress and reminders stay active while reading. The screen supports Portuguese, English, Spanish, and direct access through `#benefits`.
 
 - **Configurações** contains **Modo escuro** and a favorite-color selector (green, blue, purple, pink, or orange). **Salvar** applies and remembers appearance choices in this browser; **Cancelar** or Escape discards edits. **Sair** is in the navbar and signs out immediately.
+
+## Water entries and undo
+
+Use **Adicionar garrafa** for the configured size, or **Outra quantidade (ml)**
+for a glass or other drink. Each entry stores its own amount. Volumes accept
+0.01–1,000,000 ml with at most two decimal places; totals use integer hundredths
+of a milliliter to prevent floating-point accumulation errors.
+
+**Desfazer último registro** removes the latest known entry, preserving earlier
+water and settings. It can be repeated, survives reloads, and never undoes a
+previous day. Resetting the day clears its entries. Earned achievements remain,
+as with a manual reset. Older aggregate-only records retain their total and
+count; their unknown individual volumes cannot be undone. New entries on top
+of those records can be undone safely. Bottle illustrations count all water
+entries, including custom amounts; remaining bottles use the configured size.

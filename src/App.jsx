@@ -1,6 +1,6 @@
 import { saveProgress } from './database.js';
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, today } from './state.js';
+import { achievements, currentDay, positiveNumber, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY, appColors } from './theme.js';
 import { languages, LANGUAGE_KEY, readLanguage, translations } from './language.js';
 import { readReminders, reminderIntervals, validReminderMinutes, readReminderDeadline, remainingReminderSeconds, formatReminderCountdown, REMINDER_KEY } from './reminders.js';
@@ -99,7 +99,7 @@ function BottleSizeEditor({ size, t, onSave }) {
   const [editing, setEditing] = useState(false);
   const [input, setInput] = useState(String(size));
   const inputId = useId();
-  const valid = positiveNumber(input);
+  const valid = validVolume(input);
 
   function cancel() {
     setEditing(false);
@@ -121,11 +121,11 @@ function BottleSizeEditor({ size, t, onSave }) {
     if (event.key === 'Escape') { event.preventDefault(); cancel(); }
   }}>
     <label htmlFor={inputId}>{t.bottleSize}</label>
-    <input autoFocus required id={inputId} type="number" inputMode="decimal" min="0" step="any"
+    <input autoFocus required id={inputId} type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01"
       value={input} aria-invalid={!valid} aria-describedby={`${inputId}-help${valid ? '' : ` ${inputId}-error`}`}
       onChange={event => setInput(event.target.value)} />
     {!valid && <p id={`${inputId}-error`} className="notice" role="alert">{t.invalid}</p>}
-    <p id={`${inputId}-help`} className="settings-help">{t.settingsHelp}</p>
+    <p id={`${inputId}-help`} className="settings-help">{t.settingsHelp} {t.volumeHelp}</p>
     <div className="dialog-actions">
       <button type="button" className="secondary" onClick={cancel}>{t.cancel}</button>
       <button type="submit" className="save-button" disabled={!valid}>{t.save}</button>
@@ -143,7 +143,7 @@ function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave,
   const [selectedTheme, setSelectedTheme] = useState(theme);
   const [selectedColor, setSelectedColor] = useState(color);
   const t = translations[selectedLanguage];
-  const validBottle = positiveNumber(bottleInput);
+  const validBottle = validVolume(bottleInput);
   const validGoal = positiveNumber(goalInput);
 
   useEffect(() => {
@@ -164,7 +164,7 @@ function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave,
         <p>{t.settingsIntro}</p>
       <div className="settings">
         <label htmlFor="bottle-size">{t.bottleSize}
-          <input autoFocus required id="bottle-size" type="number" min="0" step="any" value={bottleInput}
+          <input autoFocus required id="bottle-size" type="number" min="0.01" max="1000000" step="0.01" value={bottleInput}
             aria-invalid={!validBottle} aria-describedby={!validBottle ? 'settings-error' : undefined}
             onChange={event => setBottleInput(event.target.value)} />
         </label>
@@ -175,7 +175,7 @@ function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave,
         </label>
       </div>
       {(!validBottle || !validGoal) && <p id="settings-error" className="notice" role="alert">{t.invalid}</p>}
-        <p className="settings-help">{t.settingsHelp}</p>
+        <p className="settings-help">{t.settingsHelp} {t.volumeHelp}</p>
         <div className="language-control">
           <button type="button" className="language-button" aria-expanded={languagesOpen}
             aria-controls="language-options" onClick={() => setLanguagesOpen(previous => !previous)}>
@@ -299,6 +299,7 @@ export default function App({ profile, onLogout }) {
   const [state, setState] = useState(() => readState(storageKey, profile?.goalLiters ?? 2));
   const [fillAnimation, setFillAnimation] = useState(0);
   const [pourAmount, setPourAmount] = useState(null);
+  const [drinkInput, setDrinkInput] = useState('250');
   const closePour = useCallback(() => setPourAmount(null), []);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [remindersOpen, setRemindersOpen] = useState(false);
@@ -459,21 +460,19 @@ export default function App({ profile, onLogout }) {
     setSettingsOpen(false);
   }
 
-  function addBottle() {
+  function addBottle(amount = state.mlGarrafa) {
+    if (!validVolume(amount)) return;
     dismissReminder();
     // A fresh key restarts the animation on every click, even after 24 bottles.
     setFillAnimation(previous => previous + 1);
-    setPourAmount(state.mlGarrafa);
-    setState(previous => {
-      const current = currentDay(previous);
-      return rewardGoal({ ...current, garrafas: current.garrafas + 1, totalMl: current.totalMl + current.mlGarrafa });
-    });
+    setPourAmount(Number(amount));
+    setState(previous => addWater(previous, Number(amount)));
   }
 
   function resetDay() {
     setFillAnimation(0);
     setPourAmount(null);
-    setState(previous => ({ ...currentDay(previous), garrafas: 0, totalMl: 0, data: today() }));
+    setState(resetWater);
     setResetOpen(false);
   }
 
@@ -495,7 +494,7 @@ export default function App({ profile, onLogout }) {
         </nav>
       </header>
       <main className="app">
-        <Fade visible={reminderVisible}><ReminderNotice floating t={t} onAdd={addBottle} onDismiss={dismissReminder} /></Fade>
+        <Fade visible={reminderVisible}><ReminderNotice floating t={t} onAdd={() => addBottle()} onDismiss={dismissReminder} /></Fade>
         {screen === 'benefits' && <WaterBenefits language={language} />}
         <div id="home" hidden={screen !== 'home'}>
         <header className="page-heading">
@@ -538,7 +537,16 @@ export default function App({ profile, onLogout }) {
               </div>
             </div>
             <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
-            <button className="add-button" onClick={addBottle}><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml <Icon name="plus" /></span></button>
+            <button className="add-button" onClick={() => addBottle()}><span>{t.add}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml <Icon name="plus" /></span></button>
+            <form className="bottle-size-editor" onSubmit={event => { event.preventDefault(); addBottle(Number(drinkInput)); }}>
+              <label htmlFor="drink-amount">{t.drinkAmount}</label>
+              <input id="drink-amount" type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" required
+                value={drinkInput} onChange={event => setDrinkInput(event.target.value)}
+                aria-invalid={!validVolume(drinkInput)} aria-describedby="drink-amount-help" />
+              <p id="drink-amount-help" className="settings-help">{t.volumeHelp}</p>
+              <button className="save-button" type="submit" disabled={!validVolume(drinkInput)}>{t.addDrink}</button>
+            </form>
+            <button className="secondary" type="button" disabled={!state.entries.length} onClick={() => { closePour(); setState(undoWater); }}>{t.undoDrink}</button>
             <p className="card-note"><Icon name="check" />{t.smallSteps}</p>
           </section>
           <div className="daily-panel">

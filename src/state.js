@@ -43,7 +43,41 @@ export function today() {
 }
 
 export function newState() {
-  return { garrafas: 0, totalMl: 0, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
+  return { entries: [], garrafas: 0, totalMl: 0, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
+}
+
+// Hundredths of a milliliter are stored as integer units during arithmetic.
+export function volumeUnits(value) {
+  return Math.round(Number(value) * 100);
+}
+
+export function validVolume(value) {
+  if (typeof value !== 'number' && typeof value !== 'string') return false;
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0.01 && number <= 1_000_000
+    && Math.abs(number * 100 - volumeUnits(number)) < 0.000001;
+}
+
+export function addWater(state, amount = state.mlGarrafa) {
+  const current = currentDay(state);
+  if (!validVolume(amount)) return current;
+  const units = volumeUnits(current.totalMl) + volumeUnits(amount);
+  if (!Number.isSafeInteger(units)) return current;
+  const entry = { amountMl: volumeUnits(amount) / 100 };
+  return rewardGoal({ ...current, entries: [...(current.entries ?? []), entry],
+    garrafas: current.garrafas + 1, totalMl: units / 100 });
+}
+
+export function undoWater(state) {
+  const current = currentDay(state);
+  const entries = current.entries ?? [];
+  if (!entries.length) return current;
+  return { ...current, entries: entries.slice(0, -1), garrafas: current.garrafas - 1,
+    totalMl: (volumeUnits(current.totalMl) - volumeUnits(entries.at(-1).amountMl)) / 100 };
+}
+
+export function resetWater(state) {
+  return { ...currentDay(state), entries: [], garrafas: 0, totalMl: 0, data: today() };
 }
 
 export function positiveNumber(value) {
@@ -55,7 +89,7 @@ export function currentDay(state) {
   const rewarded = rewardGoal(state);
   return rewarded.data === today()
     ? rewarded
-    : { ...rewarded, garrafas: 0, totalMl: 0, data: today() };
+    : { ...rewarded, entries: [], garrafas: 0, totalMl: 0, data: today() };
 }
 
 export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = readProgress) {
@@ -67,10 +101,19 @@ export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = read
     const savedDate = new Date(typeof saved.data === 'string' ? saved.data : NaN);
     const previousDay = Number.isFinite(savedDate.getTime()) ? calendarKey(savedDate) : null;
     const knownDays = [calendarKey(), saved.startedOn, previousDay, ...completedDays].filter(validDay).sort();
+    const totalMl = Number.isFinite(saved.totalMl) && saved.totalMl >= 0
+      && Number.isSafeInteger(volumeUnits(saved.totalMl)) ? volumeUnits(saved.totalMl) / 100 : 0;
+    const garrafas = Number.isSafeInteger(saved.garrafas) && saved.garrafas >= 0 ? saved.garrafas : 0;
+    const entries = Array.isArray(saved.entries) && saved.entries.length <= garrafas
+      && saved.entries.every(entry => entry && validVolume(entry.amountMl))
+      && saved.entries.reduce((sum, entry) => sum + volumeUnits(entry.amountMl), 0) <= volumeUnits(totalMl)
+      ? saved.entries.map(entry => ({ amountMl: volumeUnits(entry.amountMl) / 100 })) : [];
     return currentDay({
-      garrafas: Number.isSafeInteger(saved.garrafas) && saved.garrafas >= 0 ? saved.garrafas : 0,
-      totalMl: Number.isFinite(saved.totalMl) && saved.totalMl >= 0 ? saved.totalMl : 0,
-      mlGarrafa: positiveNumber(saved.mlGarrafa) ? Number(saved.mlGarrafa) : defaults.mlGarrafa,
+      entries,
+      garrafas,
+      totalMl,
+      mlGarrafa: typeof saved.mlGarrafa === 'number' && validVolume(volumeUnits(saved.mlGarrafa) / 100)
+        ? volumeUnits(saved.mlGarrafa) / 100 : defaults.mlGarrafa,
       metaLitros: positiveNumber(saved.metaLitros) ? Number(saved.metaLitros) : defaults.metaLitros,
       data: saved.data,
       completedDays,

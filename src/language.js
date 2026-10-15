@@ -12,6 +12,7 @@ export function readLanguage() {
 
 export const translations = {
   'pt-BR': {
+    drinkAmount: 'Outra quantidade (ml)', addDrink: 'Registrar água', undoDrink: 'Desfazer último registro', volumeHelp: 'De 0,01 a 1.000.000 ml, com até duas casas decimais.',
     appearance: 'Aparência', favoriteColor: 'Sua cor favorita', appearanceHelp: 'Salve para aplicar o modo e a cor escolhidos.', exit: 'Sair', colors: { green: 'Verde', blue: 'Azul', purple: 'Roxo', rose: 'Rosa', orange: 'Laranja' },
     calendarEyebrow: 'UM DIA DE CADA VEZ', calendarTitle: 'Seu calendário de hidratação', previousMonth: 'Mês anterior', nextMonth: 'Próximo mês',
     calendarStatuses: {
@@ -24,7 +25,7 @@ export const translations = {
     close: 'Fechar', waterAdded: 'Água registrada! 💙', home: 'Início', navigation: 'Navegação principal', language: 'Idioma', title: 'Sip by Sip', subtitle: 'Uma garrafa de cada vez.',
     settings: 'Configurações', darkMode: 'Modo escuro', bottle: 'Sua garrafa',
     consumption: 'Consumo de hoje', goalToday: goal => `de ${goal} L hoje`,
-    bottles: count => `${count} ${count === 1 ? 'garrafa registrada' : 'garrafas registradas'}`,
+    bottles: count => `${count} ${count === 1 ? 'registro de água' : 'registros de água'}`,
     remainingBottles: count => count === 0 ? 'Meta cumprida! Nenhuma garrafa faltando.' : `${count} ${count === 1 ? 'garrafa fantasma falta' : 'garrafas fantasmas faltam'} para a meta.`,
     progress: 'Seu progresso', progressLabel: 'Progresso da meta diária', success: 'Meta alcançada! 💙',
     empty: 'Registre sua primeira garrafa do dia.', add: '+ Adicionar garrafa', reset: 'Zerar dia',
@@ -37,6 +38,7 @@ export const translations = {
     settingsHelp: 'O novo tamanho vale para as próximas garrafas. A água já registrada será mantida.',
   },
   en: {
+    drinkAmount: 'Another amount (ml)', addDrink: 'Record water', undoDrink: 'Undo last entry', volumeHelp: 'From 0.01 to 1,000,000 ml, with up to two decimal places.',
     appearance: 'Appearance', favoriteColor: 'Your favorite color', appearanceHelp: 'Save to apply your chosen mode and color.', exit: 'Exit', colors: { green: 'Green', blue: 'Blue', purple: 'Purple', rose: 'Pink', orange: 'Orange' },
     calendarEyebrow: 'ONE DAY AT A TIME', calendarTitle: 'Your hydration calendar', previousMonth: 'Previous month', nextMonth: 'Next month',
     calendarStatuses: { completed: 'Goal achieved', missed: 'Goal not achieved', pending: 'Today in progress', untracked: 'No history', future: 'Future day' },
@@ -48,7 +50,7 @@ export const translations = {
     close: 'Close', waterAdded: 'Water recorded! 💙', home: 'Home', navigation: 'Main navigation', language: 'Language', title: 'Sip by Sip', subtitle: 'One bottle at a time.',
     settings: 'Settings', darkMode: 'Dark mode', bottle: 'Your bottle',
     consumption: "Today's water intake", goalToday: goal => `of ${goal} L today`,
-    bottles: count => `${count} ${count === 1 ? 'bottle recorded' : 'bottles recorded'}`,
+    bottles: count => `${count} ${count === 1 ? 'water entry' : 'water entries'}`,
     remainingBottles: count => count === 0 ? 'Goal reached! No bottles remaining.' : `${count} ghost ${count === 1 ? 'bottle' : 'bottles'} left to your goal.`,
     progress: 'Your progress', progressLabel: 'Daily goal progress', success: 'Goal reached! 💙',
     empty: 'Record your first bottle of the day.', add: '+ Add bottle', reset: 'Reset day',
@@ -61,6 +63,7 @@ export const translations = {
     settingsHelp: 'The new size applies to future bottles. Water already recorded will be kept.',
   },
   es: {
+    drinkAmount: 'Otra cantidad (ml)', addDrink: 'Registrar agua', undoDrink: 'Deshacer último registro', volumeHelp: 'De 0,01 a 1.000.000 ml, con hasta dos decimales.',
     calendarEyebrow: 'UN DÍA A LA VEZ', calendarTitle: 'Tu calendario de hidratación', previousMonth: 'Mes anterior', nextMonth: 'Próximo mes',
     calendarStatuses: { completed: 'Meta cumplida', missed: 'Meta no cumplida', pending: 'Hoy en curso', untracked: 'Sin historial', future: 'Día futuro' },
     calendarStreakHelp: days => days > 0 ? `Tu racha actual es de ${days} ${days === 1 ? 'día' : 'días'}. ¡Sigue cumpliendo tu meta diaria!` : 'Cumple la meta de hoy para empezar una nueva racha.',
@@ -71,7 +74,7 @@ export const translations = {
     close: 'Cerrar', waterAdded: '¡Agua registrada! 💙', home: 'Inicio', navigation: 'Navegación principal', language: 'Idioma', title: 'Sip by Sip', subtitle: 'Una botella a la vez.',
     settings: 'Configuración', darkMode: 'Modo oscuro', bottle: 'Tu botella',
     consumption: 'Consumo de hoy', goalToday: goal => `de ${goal} L hoy`,
-    bottles: count => `${count} ${count === 1 ? 'botella registrada' : 'botellas registradas'}`,
+    bottles: count => `${count} ${count === 1 ? 'registro de agua' : 'registros de agua'}`,
     remainingBottles: count => count === 0 ? '¡Meta cumplida! No faltan botellas.' : `${count} ${count === 1 ? 'botella fantasma restante' : 'botellas fantasma restantes'} para la meta.`,
     progress: 'Tu progreso', progressLabel: 'Progreso de la meta diaria', success: '¡Meta alcanzada! 💙',
     empty: 'Registra tu primera botella del día.', add: '+ Añadir botella', reset: 'Reiniciar día',
