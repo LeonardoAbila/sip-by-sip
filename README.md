@@ -107,11 +107,24 @@ click → recordWater() → setState(...) → React renders updated JSX
 
 ## Behavior
 
+Saved progress remains compatible with older profiles: the current dated counter
+and known daily totals are retained, and newly saved dates also retain their
+recorded entries. A legacy day with only an aggregate volume restores that
+volume with no guessed entries or bottle count, so undo applies only to entries
+actually recorded. Resetting a restored day saves a known zero when leaving it.
+Invalid dates and numeric data are still rejected; valid dates ahead of today's
+local date remain stored because travel can make them temporarily future-looking.
+
+Before rolling back to an older app version, export or back up the browser's
+stored database. Older loaders discard future-looking history and ignore the
+new per-date entry snapshots, so opening the data with an older version can
+lose travel history and undo information.
+
 - Daily recorded totals are retained by local calendar date and profile when the day changes, including after closing and reopening the app. Adding water, undoing an entry, and confirming a reset update today's volume; resetting today preserves previous days and existing rewards. Changing container sizes or the goal preserves recorded volumes. Older saved data can recover only the dated total still present in the counter: previous completion symbols cannot reconstruct volumes. Days without a known total, including gaps while the app was closed, remain unknown rather than becoming zero.
 - Calendar cells display recorded volumes directly beside the goal symbol, without clicking: for example, **1,5 L**, **250,25 ml**, or **0 ml** in Portuguese. Past days with unknown volumes show **Sem dados** (localized in other languages); future days show no volume. Day accessible names include the volume or lack of data. A preserved goal check can coexist with zero after resetting today's counter, because earned rewards remain unchanged.
 - The hydration calendar shows each local day as goal achieved (check), missed (cross), today still pending (dot), or no history (dash). Future days stay neutral. A missed day is marked only after it ends, including days when the app was closed. Dates before tracking began are not counted as misses. Existing profiles keep their completion history; the earliest valid saved progress date or completion date becomes the tracking start when migrating old data. Month navigation runs from that start month through the current month. The calendar shows the current streak and monthly completion/miss totals, follows the selected language, supports dark mode, and uses text/symbols alongside colors.
 
-- The dashboard shows consecutive completed days in a centered streak card above the daily intake and bottle log; accumulated points are not displayed. Completing the daily goal earns **10 points**, once per local calendar day, and adds that day to the profile's streak. More water earns no additional points. The streak counts consecutive completed days, preserving yesterday's streak while today's goal is pending; a missed calendar day breaks the streak, even if the app was closed. Points stay accumulated after a broken streak. Rewards are saved with each profile's progress. Previously saved state is supported, and duplicate, invalid, and future completion dates are discarded when loading.
+- The dashboard shows consecutive completed days in a centered streak card above the daily intake and bottle log; accumulated points are not displayed. Completing the daily goal earns **10 points**, once per local calendar day, and adds that day to the profile's streak. More water earns no additional points. The streak counts consecutive completed days, preserving yesterday's streak while today's goal is pending; a missed calendar day breaks the streak, even if the app was closed. Points stay accumulated after a broken streak. Rewards are saved with each profile's progress. Previously saved state is supported, and duplicate and invalid completion dates are discarded when loading. Valid completion dates temporarily ahead of the local date after travel remain saved, while future calendar cells stay neutral.
 - A completed day's reward stays earned if the user resets the water counter or later raises the goal. Resetting and reaching the goal again cannot earn a second reward. Lowering today's goal can complete it using water already recorded. The reset affects water and bottle counts only. Achievements are shown in the selected language.
 
 - Password fields include an eye button to show or hide each password independently. Passwords start hidden when switching between login and registration.
@@ -135,7 +148,7 @@ click → recordWater() → setState(...) → React renders updated JSX
 - Open **Configurações** to edit bottle size and daily goal. **Salvar** applies and saves both values; **Cancelar** or Escape discards edits. Changing the goal updates progress after saving.
 - Open **Configurações** and click the **Idioma** button to choose **Português (BR)**, **English**, or **Español**. The dialog previews your chosen language; **Salvar** applies it to the app and number formatting, while **Cancelar** or Escape discards the change. Your selection is saved in this browser when storage is available; switching languages preserves your progress.
 - Refresh to restore progress when browser storage is available.
-- Start a new calendar day to reset the count and volume, keeping settings.
+- Hydration days follow the device's local calendar date. At local midnight, or when travel changes that date, the departing date's progress is saved and the destination date's progress is restored; a previously unrecorded date starts at zero. Changing time zones within the same date preserves progress. Returning to a date restores its volume and recorded entries, including undo; settings remain current. For example, travelling from London on October 15 to São Paulo on October 14 saves October 15 and restores October 14. Returning to October 15 restores that day's saved progress. Unknown skipped days remain unknown, distinct from a known zero.
 - Confirm **Zerar dia** to reset today's progress manually. The original two reset actions had the same effect and are combined here.
 - Saved data stays in this browser, with no account or backend.
 - Open **Configurações**, change **Modo escuro**, and choose **Salvar** to switch themes. The app initially follows your system theme and saves your selection when browser storage is available.

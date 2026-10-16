@@ -236,3 +236,58 @@ test('daily totals migrate, persist across reopening and remain isolated by prof
   assert.deepEqual(readState('aguaApp:perfil:second', 2, key => store.readProgress(key)), second);
   await store.close();
 });
+
+test('travel snapshots survive SQLite import, profile switching, save and reopening', async () => {
+  const NativeDate = Date;
+  const oldZone = process.env.TZ;
+  let store;
+  try {
+    const instant = NativeDate.parse('2026-10-15T01:30:00Z');
+    globalThis.Date = class extends NativeDate {
+      constructor(...args) { super(...(args.length ? args : [instant])); }
+      static now() { return instant; }
+    };
+    process.env.TZ = 'Europe/London';
+    const { addWater, currentDay, undoWater } = await import('../src/state.js');
+    const first = addWater(newState(), 750);
+    const second = addWater({ ...newState(), mlGarrafa: 300 }, 300, 'glass');
+    const config = options(legacy({
+      'aguaApp:perfil:travel-first': JSON.stringify(first),
+      'aguaApp:perfil:travel-second': JSON.stringify(second),
+    }));
+    store = await createDatabase(config);
+    process.env.TZ = 'America/Sao_Paulo';
+    for (const name of ['travel-first', 'travel-second']) {
+      const key = 'aguaApp:perfil:' + name;
+      const loaded = readState(key, 2, key => store.readProgress(key));
+      assert.equal(loaded.totalMl, 0);
+      const updated = addWater(loaded, name === 'travel-first' ? 500 : 250);
+      await store.saveProgress(key, updated);
+    }
+    await store.close();
+    store = await createDatabase(config);
+    process.env.TZ = 'Europe/London';
+    for (const [name, total, previous, container] of [
+      ['travel-first', 750, 500, 'bottle'], ['travel-second', 300, 250, 'glass'],
+    ]) {
+      const key = 'aguaApp:perfil:' + name;
+      const loaded = readState(key, 2, key => store.readProgress(key));
+      assert.equal(loaded.totalMl, total);
+      assert.equal(loaded.entries[0].container, container);
+      assert.equal(loaded.dailyTotals['2026-10-14'], previous);
+      assert.equal(undoWater(loaded).totalMl, 0);
+      assert.strictEqual(currentDay(loaded), loaded);
+      await store.saveProgress(key, loaded);
+    }
+    await store.close();
+    store = await createDatabase(config);
+    process.env.TZ = 'America/Sao_Paulo';
+    assert.equal(readState('aguaApp:perfil:travel-first', 2, key => store.readProgress(key)).totalMl, 500);
+    assert.equal(readState('aguaApp:perfil:travel-second', 2, key => store.readProgress(key)).totalMl, 250);
+  } finally {
+    await store?.close();
+    globalThis.Date = NativeDate;
+    if (oldZone === undefined) delete process.env.TZ;
+    else process.env.TZ = oldZone;
+  }
+});

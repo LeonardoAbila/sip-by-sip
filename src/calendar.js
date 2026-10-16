@@ -31,3 +31,10 @@ export function formatCalendarVolume(totalMl, language) {
   }).format(liters ? totalMl / 1000 : totalMl);
   return `${number} ${liters ? 'L' : 'ml'}`;
 }
+
+// Clamp the visible month when travel moves the current date across a month.
+export function calendarMonth(selected, startedOn, current = calendarKey()) {
+  const last = current.slice(0, 7);
+  const first = startedOn.slice(0, 7) < last ? startedOn.slice(0, 7) : last;
+  return selected < first ? first : selected > last ? last : selected;
+}

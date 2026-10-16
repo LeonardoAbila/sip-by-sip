@@ -53,7 +53,7 @@ test('goal changes grant a pending reward, but cannot revoke an earned one', () 
 
 test('saved history loads safely, migrates older progress, and isolates profiles', () => {
   saved.set('a', JSON.stringify({ ...newState(), completedDays: ['2026-10-11', '2026-10-11', 'invalid', null, '2026-02-30', '2026-10-13'] }));
-  assert.deepEqual(readState('a').completedDays, ['2026-10-11']);
+  assert.deepEqual(readState('a').completedDays, ['2026-10-11', '2026-10-13']);
   assert.equal(achievements(readState('b')).points, 0);
   saved.set('a', JSON.stringify({ ...newState(), totalMl: 2000, completedDays: undefined }));
   assert.deepEqual(readState('a').completedDays, [calendarKey()]);

@@ -1,15 +1,19 @@
 import React, { useId, useState } from 'react';
 import { achievements, calendarKey } from './state.js';
-import { calendarStatus, monthDays, calendarVolume, formatCalendarVolume } from './calendar.js';
+import { calendarStatus, monthDays, calendarVolume, formatCalendarVolume, calendarMonth } from './calendar.js';
 
 export default function HydrationCalendar({ state, language, t }) {
-  const [month, setMonth] = useState(() => { const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() }; });
+  const [selectedMonth, setMonth] = useState(() => { const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() }; });
   const titleId = useId();
   const current = calendarKey();
   const currentMonth = current.slice(0, 7);
+  const selectedKey = calendarKey(new Date(selectedMonth.year, selectedMonth.month, 1, 12)).slice(0, 7);
+  const visibleMonth = calendarMonth(selectedKey, state.startedOn, current);
+  const [year, monthNumber] = visibleMonth.split('-').map(Number);
+  const month = { year, month: monthNumber - 1 };
   const displayed = new Date(month.year, month.month, 1, 12);
   const displayedMonth = calendarKey(displayed).slice(0, 7);
-  const startMonth = state.startedOn.slice(0, 7);
+  const startMonth = calendarMonth(state.startedOn.slice(0, 7), state.startedOn, current);
   const { offset, days } = monthDays(month.year, month.month);
   const monthLabel = new Intl.DateTimeFormat(language, { month: 'long', year: 'numeric' }).format(displayed);
   const fullDate = new Intl.DateTimeFormat(language, { day: 'numeric', month: 'long', year: 'numeric' });

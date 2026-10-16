@@ -10,7 +10,7 @@ test('migration retains only valid known totals and is idempotent', () => {
   const loaded = load({ ...newState(), data: yesterday.toDateString(), totalMl: 250.25,
     dailyTotals: { [older]: 0, '2025-02-30': 2, '9999-01-01': 2, '2020-01-01': -1,
       '2020-01-02': '500', '2020-01-03': 0.001 } });
-  assert.deepEqual(loaded.dailyTotals, { [older]: 0, [calendarKey(yesterday)]: 250.25 });
+  assert.deepEqual(loaded.dailyTotals, { [older]: 0, '9999-01-01': 2, [calendarKey(yesterday)]: 250.25 });
   assert.equal(loaded.totalMl, 0);
   assert.deepEqual(load(loaded), loaded);
   assert.equal(loaded.dailyTotals[calendarKey(past(2))], undefined);

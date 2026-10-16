@@ -14,15 +14,13 @@ function dayNumber(key) {
 
 function validDay(key) {
   if (typeof key !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return false;
-  const date = new Date(`${key}T12:00:00`);
-  return Number.isFinite(date.getTime()) && calendarKey(date) === key && key <= calendarKey();
+  const date = new Date(`${key}T12:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === key;
 }
 
 export function rewardGoal(state) {
   if (state.totalMl < state.metaLitros * 1000) return state;
-  const date = new Date(state.data);
-  if (!Number.isFinite(date.getTime())) return state;
-  const key = calendarKey(date);
+  const key = savedDay(state.data);
   if (!validDay(key) || state.completedDays.includes(key)) return state;
   return { ...state, completedDays: [...state.completedDays, key].sort() };
 }
@@ -43,7 +41,7 @@ export function today() {
 }
 
 export function newState() {
-  return { dailyTotals: {}, entries: [], garrafas: 0, totalMl: 0, container: 'bottle', mlCopo: 250, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
+  return { dailyTotals: {}, dailyProgress: {}, entries: [], garrafas: 0, totalMl: 0, container: 'bottle', mlCopo: 250, mlGarrafa: 500, metaLitros: 2, data: today(), completedDays: [], startedOn: calendarKey() };
 }
 
 // Hundredths of a milliliter are stored as integer units during arithmetic.
@@ -100,63 +98,100 @@ function validTotal(value) {
   return Number.isFinite(value) && value >= 0 && Number.isSafeInteger(volumeUnits(value));
 }
 
+// Saved date labels identify a calendar day, independently of the current zone.
 function savedDay(data) {
-  const date = new Date(typeof data === 'string' ? data : NaN);
-  const key = Number.isFinite(date.getTime()) ? calendarKey(date) : null;
+  if (validDay(data)) return data;
+  if (typeof data !== 'string') return null;
+  const match = /^[A-Za-z]{3} ([A-Za-z]{3}) (\d{1,2}) (\d{4})$/.exec(data);
+  if (!match) return null;
+  const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(match[1]) + 1;
+  const key = `${match[3]}-${String(month).padStart(2, '0')}-${match[2].padStart(2, '0')}`;
   return validDay(key) ? key : null;
+}
+
+function readCounter(saved) {
+  if (!saved || !validTotal(saved.totalMl)) return null;
+  const totalMl = volumeUnits(saved.totalMl) / 100;
+  const garrafas = Number.isSafeInteger(saved.garrafas) && saved.garrafas >= 0 ? saved.garrafas : 0;
+  const entries = Array.isArray(saved.entries) && saved.entries.length <= garrafas
+    && saved.entries.every(entry => entry && validVolume(entry.amountMl))
+    && saved.entries.reduce((sum, entry) => sum + volumeUnits(entry.amountMl), 0) <= volumeUnits(totalMl)
+    ? saved.entries.map(entry => ({ amountMl: volumeUnits(entry.amountMl) / 100,
+      container: ['bottle', 'glass'].includes(entry.container) ? entry.container : 'custom' })) : [];
+  return { totalMl, garrafas, entries };
+}
+
+function counterForDay(key, dailyProgress, dailyTotals) {
+  return dailyProgress[key] ?? { totalMl: dailyTotals[key] ?? 0, garrafas: 0, entries: [] };
 }
 
 export function currentDay(state) {
   const rewarded = rewardGoal(state);
-  if (rewarded.data === today()) return rewarded;
+  const current = calendarKey();
   const key = savedDay(rewarded.data);
+  const startedOn = validDay(rewarded.startedOn) && rewarded.startedOn < current ? rewarded.startedOn : current;
+  // Keep the same object on ordinary checks so React does not save every 30s.
+  if (key === current && rewarded.data === today() && rewarded.startedOn === startedOn
+    && !Object.hasOwn(rewarded.dailyTotals ?? {}, current)
+    && !Object.hasOwn(rewarded.dailyProgress ?? {}, current)) return rewarded;
   const dailyTotals = { ...rewarded.dailyTotals };
-  if (key && key < calendarKey() && validTotal(rewarded.totalMl)) {
-    dailyTotals[key] = volumeUnits(rewarded.totalMl) / 100;
+  const dailyProgress = { ...rewarded.dailyProgress };
+  const outgoing = key && readCounter(rewarded);
+  if (key && key !== current && outgoing) {
+    dailyTotals[key] = outgoing.totalMl;
+    dailyProgress[key] = outgoing;
   }
-  return { ...rewarded, dailyTotals, entries: [], garrafas: 0, totalMl: 0, data: today() };
+  const active = key === current && outgoing ? outgoing : counterForDay(current, dailyProgress, dailyTotals);
+  delete dailyTotals[current];
+  delete dailyProgress[current];
+  return { ...rewarded, ...active, dailyTotals, dailyProgress, startedOn, data: today() };
 }
 
 export function readState(storageKey = STORAGE_KEY, initialGoal = 2, load = readProgress) {
   const defaults = { ...newState(), metaLitros: initialGoal };
   try {
     const saved = JSON.parse(load(storageKey));
-    if (!saved || typeof saved !== 'object') return defaults;
+    if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return defaults;
     const completedDays = Array.isArray(saved.completedDays) ? [...new Set(saved.completedDays.filter(validDay))].sort() : [];
     const previousDay = savedDay(saved.data);
     const dailyTotals = {};
     if (saved.dailyTotals && typeof saved.dailyTotals === 'object' && !Array.isArray(saved.dailyTotals)) {
       for (const [key, value] of Object.entries(saved.dailyTotals)) {
-        if (validDay(key) && key < calendarKey() && validTotal(value)
+        if (validDay(key) && validTotal(value)
           && Math.abs(value * 100 - volumeUnits(value)) < 0.000001) {
           dailyTotals[key] = volumeUnits(value) / 100;
         }
       }
     }
+    const dailyProgress = {};
+    if (saved.dailyProgress && typeof saved.dailyProgress === 'object' && !Array.isArray(saved.dailyProgress)) {
+      for (const [key, value] of Object.entries(saved.dailyProgress)) {
+        const counter = validDay(key) && readCounter(value);
+        if (counter && Math.abs(value.totalMl * 100 - volumeUnits(value.totalMl)) < 0.000001) {
+          dailyProgress[key] = counter;
+          dailyTotals[key] = counter.totalMl;
+        }
+      }
+    }
     const knownDays = [calendarKey(), saved.startedOn, previousDay, ...completedDays,
       ...Object.keys(dailyTotals)].filter(validDay).sort();
-    const hasSavedTotal = previousDay && validTotal(saved.totalMl);
-    const totalMl = hasSavedTotal ? volumeUnits(saved.totalMl) / 100 : 0;
-    // Archive only a real saved total, never a zero used to recover invalid data.
-    if (hasSavedTotal && previousDay < calendarKey()) dailyTotals[previousDay] = totalMl;
-    const garrafas = hasSavedTotal && Number.isSafeInteger(saved.garrafas) && saved.garrafas >= 0 ? saved.garrafas : 0;
-    const entries = Array.isArray(saved.entries) && saved.entries.length <= garrafas
-      && saved.entries.every(entry => entry && validVolume(entry.amountMl))
-      && saved.entries.reduce((sum, entry) => sum + volumeUnits(entry.amountMl), 0) <= volumeUnits(totalMl)
-      ? saved.entries.map(entry => ({ amountMl: volumeUnits(entry.amountMl) / 100,
-        container: ['bottle', 'glass'].includes(entry.container) ? entry.container : 'custom' })) : [];
+    // Invalid active data must never replace a good historical total with zero.
+    const savedCounter = previousDay && readCounter(saved);
+    const active = savedCounter || counterForDay(calendarKey(), dailyProgress, dailyTotals);
+    const activeKey = savedCounter ? previousDay : calendarKey();
+    delete dailyTotals[activeKey];
+    delete dailyProgress[activeKey];
     return currentDay({
       dailyTotals,
-      entries,
-      garrafas,
-      totalMl,
+      dailyProgress,
+      ...active,
       container: saved.container === 'glass' ? 'glass' : 'bottle',
       mlCopo: typeof saved.mlCopo === 'number' && validVolume(volumeUnits(saved.mlCopo) / 100)
         ? volumeUnits(saved.mlCopo) / 100 : defaults.mlCopo,
       mlGarrafa: typeof saved.mlGarrafa === 'number' && validVolume(volumeUnits(saved.mlGarrafa) / 100)
         ? volumeUnits(saved.mlGarrafa) / 100 : defaults.mlGarrafa,
       metaLitros: positiveNumber(saved.metaLitros) ? Number(saved.metaLitros) : defaults.metaLitros,
-      data: hasSavedTotal ? saved.data : today(),
+      data: savedCounter ? saved.data : today(),
       completedDays,
       startedOn: knownDays[0],
     });
