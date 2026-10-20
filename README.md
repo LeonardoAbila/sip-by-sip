@@ -90,8 +90,8 @@ old localStorage entries until you have verified the upgrade.
 
 React renders the interface from the current state instead of updating individual elements with `document.getElementById`.
 
-1. **Components:** `src/App.jsx` contains `App`, `Bottle`, and `ResetDialog`. Each is a JavaScript function returning JSX, which looks like HTML inside JavaScript. `<Bottle />` reuses the bottle illustration.
-2. **State:** `const [state, setState] = useState(readState)` stores today's count, volume, and settings. `setState` changes that data and asks React to update the screen.
+1. **Components:** `src/App.jsx` connects the dashboard components in `src/dashboard/`, including the water cards, container illustrations, and dialogs. Each is a JavaScript function returning JSX, which looks like HTML inside JavaScript. `<WaterContainer />` selects the illustration for each recorded container.
+2. **State:** `const [state, setState] = useState(() => readState(storageKey, profile?.goalLiters ?? 2))` stores today's count, volume, and settings. `setState` changes that data and asks React to update the screen.
 3. **Events:** `onClick={recordWater}` connects the add button to a function. The function updates state; React updates the total, bottles, and progress ring.
 4. **Derived values:** The percentage is calculated from the total and goal during rendering. It doesn't need separate state.
 5. **Effects:** `useEffect` saves hydration state to SQLite and IndexedDB after a change. Another effect checks for a new day and cleans up its timer when the component is removed.
@@ -159,7 +159,7 @@ The theme is another `useState` example: saving the appearance settings changes 
 
 ## Try a small React exercise
 
-Change the heading inside `App.jsx`, then save the file while the dev server is running. Vite updates the page. Next, change the button text or the bottle colors. These edits let you explore JSX and CSS before changing state logic.
+Change the dashboard heading inside `App.jsx`, then save the file while the dev server is running. Vite updates the page. Next, change the button text or the bottle colors. These edits let you explore JSX and CSS before changing state logic.
 
 `SettingsDialog` holds temporary input state. Saving passes both values to `App` through the `onSave` prop; cancelling removes the dialog and discards that temporary state.
 
@@ -267,3 +267,20 @@ quotes, semicolons, comma/key spacing, and clean line endings. Generated `dist/`
 and dependencies are excluded. Run `npm run lint` before committing; CI rejects
 errors and warnings. Use `npm run lint:fix` for automatic style fixes, then review
 the diff. Swift and CSS are outside this JavaScript lint configuration.
+
+## Dashboard file guide
+
+`src/App.jsx` connects navigation, hydration state, preferences, and dialogs.
+Find individual features in `src/dashboard/`:
+
+- `HydrationCard.jsx`: daily progress ring and add/undo actions.
+- `WaterLog.jsx`: recorded containers and remaining water; `WaterContainer.jsx` draws the icons.
+- `BottleSizeEditor.jsx`: inline bottle/glass size form.
+- `SettingsDialog.jsx`: goal, language, theme, and color edits.
+- `RemindersDialog.jsx` and `ReminderNotice.jsx`: reminder settings, preview, and alert.
+- `useWaterReminders.js`: saved preferences, per-profile deadlines, visibility checks, audio, and timer cleanup.
+- `PourDialog.jsx` and `ResetDialog.jsx`: recording animation and reset confirmation.
+
+Hydration rules remain in `src/state.js`, persistence in `src/database.js`, and
+calendar rendering in `src/HydrationCalendar.jsx`. Dialogs keep draft edits local;
+`App` applies confirmed changes. Keep these boundaries when adding features.
