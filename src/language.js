@@ -18,8 +18,7 @@ export const translations = {
     drinkAmount: 'Outra quantidade (ml)', addDrink: 'Registrar água', undoDrink: 'Desfazer último registro', volumeHelp: 'De 0,01 a 1.000.000 ml, com até duas casas decimais.',
     appearance: 'Aparência', favoriteColor: 'Sua cor favorita', appearanceHelp: 'Salve para aplicar o modo e a cor escolhidos.', exit: 'Sair', colors: { green: 'Verde', blue: 'Azul', purple: 'Roxo', rose: 'Rosa', orange: 'Laranja' },
     calendarNoData: 'Sem dados', calendarEyebrow: 'UM DIA DE CADA VEZ', calendarTitle: 'Calendário', previousMonth: 'Mês anterior', nextMonth: 'Próximo mês',
-    calendarStatuses: {
-    appearance: 'Apariencia', favoriteColor: 'Tu color favorito', appearanceHelp: 'Guarda para aplicar el modo y el color elegidos.', exit: 'Salir', colors: { green: 'Verde', blue: 'Azul', purple: 'Morado', rose: 'Rosa', orange: 'Naranja' }, completed: 'Meta cumprida', missed: 'Meta não cumprida', pending: 'Hoje em andamento', untracked: 'Sem histórico', future: 'Dia futuro' },
+    calendarStatuses: { completed: 'Meta cumprida', missed: 'Meta não cumprida', pending: 'Hoje em andamento', untracked: 'Sem histórico', future: 'Dia futuro' },
     calendarStreakHelp: days => days > 0 ? `Você está mantendo uma ofensiva de ${days} ${days === 1 ? 'dia' : 'dias'}. Continue cumprindo sua meta diária!` : 'Cumpra a meta de hoje para começar uma nova ofensiva.',
     calendarSummary: (completed, missed) => `Neste mês: ${completed} ${completed === 1 ? 'dia com meta cumprida' : 'dias com meta cumprida'} · ${missed} ${missed === 1 ? 'dia sem cumprir a meta' : 'dias sem cumprir a meta'}.`,
     achievements: 'Suas conquistas', points: 'Pontos acumulados', streak: 'Ofensiva', streakDays: days => `${days} ${days === 1 ? 'dia' : 'dias'}`, pointsEarned: points => `Meta cumprida! +${points} pontos hoje. Sua ofensiva continua!`, pointsPending: points => `Cumpra a meta de hoje para ganhar ${points} pontos e continuar sua ofensiva.`,
@@ -69,6 +68,7 @@ export const translations = {
     settingsHelp: 'The new size applies to future bottles. Water already recorded will be kept.',
   },
   es: {
+    appearance: 'Apariencia', favoriteColor: 'Tu color favorito', appearanceHelp: 'Guarda para aplicar el modo y el color elegidos.', exit: 'Salir', colors: { green: 'Verde', blue: 'Azul', purple: 'Morado', rose: 'Rosa', orange: 'Naranja' },
     undoShort: 'Deshacer', moreInfo: 'Más información', calendarLegend: 'Leyenda',
     or: 'o', remainingOptionsHelp: 'Para completar la meta', bottlesNeeded: count => `${count} ${count === 1 ? 'botella' : 'botellas'}`, glassesNeeded: count => `${count} ${count === 1 ? 'vaso' : 'vasos'}`,
     chooseContainer: 'Registrar con', bottleChoice: 'Botella', glassChoice: 'Vaso', glass: 'Tu vaso', glassSize: 'Tu vaso (ml)', addGlass: '+ Añadir vaso', containerSettingsHelp: 'El nuevo tamaño se aplica a futuros registros de este recipiente. El agua ya registrada se conserva.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'botella' : 'botellas'} · ${glasses} ${glasses === 1 ? 'vaso' : 'vasos'}${other ? ` · ${other} ${other === 1 ? 'otro registro' : 'otros registros'}` : ''}`, remainingGlasses: count => count === 0 ? '¡Meta cumplida! No faltan vasos.' : `${count} ${count === 1 ? 'vaso restante' : 'vasos restantes'} para la meta.`,
@@ -96,3 +96,38 @@ export const translations = {
     settingsHelp: 'El nuevo tamaño se aplica a las próximas botellas. Se conservará el agua ya registrada.',
   },
 };
+
+// Copy shared by the settings transfer panel and the restored dashboard.
+const transferCopy = {
+  'pt-BR': {
+    transferTitle: 'Backup do perfil', transferHelp: 'Exporte seu perfil ou importe um backup para substituir os dados deste perfil.',
+    transferPrivacy: 'O arquivo contém idade, peso e histórico de água. Não é criptografado e não inclui senhas.',
+    transferOtherTabs: 'Antes de importar, feche as outras abas deste perfil. Reabra-as depois para carregar os dados restaurados.',
+    transferExport: 'Exportar backup', transferDownloaded: 'Download do backup iniciado.', transferChoose: 'Escolher backup JSON',
+    transferPreview: 'Revisar substituição', transferSource: 'Perfil de origem', transferDestination: 'Perfil de destino', transferExported: 'Exportado em',
+    transferReplaceHelp: 'Isto substituirá idade, peso, configurações de água, histórico e conquistas deste perfil. O usuário e a senha atuais serão mantidos. Outros perfis não serão alterados. Exporte os dados atuais antes de confirmar se quiser guardá-los.',
+    transferConfirm: 'Confirmar substituição', transferBack: 'Voltar às configurações', transferWorking: 'Aguarde…', transferSuccess: 'Backup importado. Os dados deste perfil foram substituídos.',
+    transferErrors: { invalid: 'Backup inválido ou danificado. Escolha um backup completo exportado pelo app.', version: 'Versão de backup não suportada. Use uma versão compatível do app.', size: 'O backup excede o limite de 10 MiB. Escolha um arquivo menor.', failed: 'Não foi possível concluir. Verifique o arquivo e o armazenamento do navegador e tente novamente.' },
+  },
+  en: {
+    transferTitle: 'Profile backup', transferHelp: 'Export your profile or import a backup to replace this profile’s data.',
+    transferPrivacy: 'The file contains age, weight, and water history. It is not encrypted and includes no passwords.',
+    transferOtherTabs: 'Before importing, close other tabs using this profile. Reopen them afterward to load the restored data.',
+    transferExport: 'Export backup', transferDownloaded: 'Backup download started.', transferChoose: 'Choose JSON backup',
+    transferPreview: 'Review replacement', transferSource: 'Source profile', transferDestination: 'Destination profile', transferExported: 'Exported at',
+    transferReplaceHelp: 'This replaces this profile’s age, weight, hydration settings, history, and achievements. Your current username and password are kept. Other profiles are unchanged. Export your current data before confirming if you want to keep it.',
+    transferConfirm: 'Confirm replacement', transferBack: 'Back to settings', transferWorking: 'Please wait…', transferSuccess: 'Backup imported. This profile’s data was replaced.',
+    transferErrors: { invalid: 'Invalid or damaged backup. Choose a complete backup exported by the app.', version: 'Unsupported backup version. Use a compatible app version.', size: 'The backup exceeds the 10 MiB limit. Choose a smaller file.', failed: 'Could not complete the operation. Check the file and browser storage, then try again.' },
+  },
+  es: {
+    transferTitle: 'Copia del perfil', transferHelp: 'Exporta tu perfil o importa una copia para sustituir los datos de este perfil.',
+    transferPrivacy: 'El archivo contiene edad, peso e historial de agua. No está cifrado y no incluye contraseñas.',
+    transferOtherTabs: 'Antes de importar, cierra las otras pestañas de este perfil. Ábrelas después para cargar los datos restaurados.',
+    transferExport: 'Exportar copia', transferDownloaded: 'Descarga de la copia iniciada.', transferChoose: 'Elegir copia JSON',
+    transferPreview: 'Revisar sustitución', transferSource: 'Perfil de origen', transferDestination: 'Perfil de destino', transferExported: 'Exportado el',
+    transferReplaceHelp: 'Esto sustituye edad, peso, ajustes de agua, historial y logros de este perfil. Se mantienen el usuario y la contraseña actuales. Los otros perfiles no cambian. Exporta los datos actuales antes de confirmar si deseas conservarlos.',
+    transferConfirm: 'Confirmar sustitución', transferBack: 'Volver a ajustes', transferWorking: 'Espera…', transferSuccess: 'Copia importada. Se sustituyeron los datos de este perfil.',
+    transferErrors: { invalid: 'Copia inválida o dañada. Elige una copia completa exportada por la app.', version: 'Versión de copia no compatible. Usa una versión compatible de la app.', size: 'La copia supera el límite de 10 MiB. Elige un archivo más pequeño.', failed: 'No se pudo completar. Revisa el archivo y el almacenamiento del navegador e inténtalo de nuevo.' },
+  },
+};
+for (const [language, copy] of Object.entries(transferCopy)) Object.assign(translations[language], copy);

@@ -284,3 +284,90 @@ Find individual features in `src/dashboard/`:
 Hydration rules remain in `src/state.js`, persistence in `src/database.js`, and
 calendar rendering in `src/HydrationCalendar.jsx`. Dialogs keep draft edits local;
 `App` applies confirmed changes. Keep these boundaries when adding features.
+
+## Profile backup format
+
+Profile backups are UTF-8 JSON files, limited to 10 MiB, identified by
+`format: "sip-by-sip-profile"` and `version: 1`. They contain `exportedAt` (ISO
+export time), `profile` (source display name, age, weight, initial goal, completed
+setup), and `progress` (container sizes and selection, goal, active dated counter,
+entries, tracking start, daily totals/snapshots, and earned completion dates).
+The active date is exported as `YYYY-MM-DD`; unknown days remain absent.
+
+Files are **not encrypted** and contain personal age, weight, and hydration data.
+They exclude profile IDs, passwords, password hashes/salts, sessions, other
+profiles, theme/language preferences, reminders, and reminder deadlines. Import
+preserves the destination username and password. Unsupported versions and damaged
+records are rejected before any replacement; they are not silently repaired.
+
+For example, the portable envelope looks like this (the `progress` object must
+contain the complete validated hydration state, not an abbreviated counter):
+
+```json
+{
+  "format": "sip-by-sip-profile",
+  "version": 1,
+  "exportedAt": "2026-10-20T00:00:00.000Z",
+  "profile": {
+    "username": "Example",
+    "age": 30,
+    "weight": 70,
+    "goalLiters": 2.45,
+    "onboardingComplete": true
+  },
+  "progress": {
+    "totalMl": 0,
+    "garrafas": 0,
+    "entries": [],
+    "data": "2026-10-20",
+    "startedOn": "2026-10-20",
+    "dailyTotals": {},
+    "dailyProgress": {},
+    "completedDays": [],
+    "container": "bottle",
+    "mlGarrafa": 500,
+    "mlCopo": 250,
+    "metaLitros": 2.45
+  }
+}
+```
+
+## Move a profile to another browser
+
+1. Sign in to the source profile and open **Configurações → Backup do perfil**
+   (**Settings → Profile backup** in English).
+2. Choose **Exportar backup / Export backup** and keep the downloaded JSON file.
+3. In the destination browser, create or sign in to the profile you want to
+   replace. Complete its age/weight onboarding first if it is new.
+4. Close other tabs using that destination profile. Open its profile backup panel,
+   choose the JSON file, and review the source and destination names.
+5. Export the destination's current data first if you want to keep it, then choose
+   **Confirmar substituição / Confirm replacement**. This replaces age, weight,
+   water settings, progress, history, and achievements; it does not merge history.
+   The destination username/password, other profiles, language/theme, and reminder
+   preferences stay the same. The reminder countdown restarts after import.
+6. After the success message, the dashboard shows the restored data. Refresh or
+   reopen it to verify persistence. Reopen other tabs to load the restored data;
+   existing same-profile tabs use the app's last-writer-wins policy.
+
+Cancel the file picker, cancel the preview, or press Escape before confirmation
+to leave the destination unchanged. During a transfer operation, wait for it to
+finish before closing the dialog. A rejected file or failed storage write leaves
+the original profile intact and allows retry. To recover after an unwanted
+replacement, import your earlier destination backup through the same flow.
+Backups do not sync automatically, and this format does not import into the iOS app.
+
+### Transfer verification
+
+`npm test` includes strict format checks, SQLite/IndexedDB round trips using
+separate browser-storage simulations, injected write failures, and a focused
+jsdom test loading the production React components through Vite. It exercises
+file preview/cancellation, Escape, download initiation, pending-save handling,
+replacement/retry, repeated import, destination credential retention, reminder
+restart, localized controls, busy states, and reload persistence.
+
+A real browser and screen reader were unavailable during implementation. Native
+file-picker behavior, downloaded-file saving, modal focus trapping, screen-reader
+announcements, mobile/light/dark visual layout, and transfer between two real
+browser installations remain manual checks. The DOM tests simulate dialog APIs
+and file selection; they do not substitute for those browser checks.

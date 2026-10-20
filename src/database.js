@@ -1,3 +1,5 @@
+import { createBackup, validateBackup } from './profileBackup.js';
+
 // sql.js runs SQLite in memory. IndexedDB stores the exported database file.
 // Each write loads the latest file inside one IndexedDB transaction, so writes
 // from separate tabs cannot replace unrelated profiles or progress.
@@ -67,8 +69,9 @@ export async function createDatabase({ SQL, indexedDB, legacyStorage, name = DAT
   connection.onversionchange = () => connection.close();
   let database;
   let pending = Promise.resolve();
+  const failedProgress = new Set();
 
-  function transaction(change) {
+  function transaction(change, inspect) {
     return new Promise((resolve, reject) => {
       let next;
       let result;
@@ -80,6 +83,7 @@ export async function createDatabase({ SQL, indexedDB, legacyStorage, name = DAT
         try {
           // Never replace a corrupt persisted file with an empty database.
           next = new SQL.Database(request.result);
+          if (inspect) result = inspect(next);
           if (change) {
             result = change(next);
             files.put(next.export(), FILE_KEY);
@@ -104,8 +108,8 @@ export async function createDatabase({ SQL, indexedDB, legacyStorage, name = DAT
 
   // Serialize local operations as well, so reads and writes update the cache in
   // order. A failed operation does not prevent a later save from being retried.
-  function enqueue(change) {
-    const operation = pending.then(() => transaction(change));
+  function enqueue(change, inspect) {
+    const operation = pending.then(() => transaction(change, inspect));
     pending = operation.catch(() => {});
     return operation;
   }
@@ -145,8 +149,38 @@ export async function createDatabase({ SQL, indexedDB, legacyStorage, name = DAT
     saveProgress(key, state) {
       // Capture this version before the asynchronous transaction begins.
       const data = JSON.stringify(state);
-      return enqueue(database => database.run(
-        'INSERT INTO progress VALUES (?, ?) ON CONFLICT(storage_key) DO UPDATE SET data = excluded.data', [key, data]));
+      return enqueue(database => {
+        database.run('INSERT INTO progress VALUES (?, ?) ON CONFLICT(storage_key) DO UPDATE SET data = excluded.data', [key, data]);
+      }).then(result => { failedProgress.delete(key); return result; }, error => {
+        failedProgress.add(key);
+        throw error;
+      });
+    },
+    exportProfile(id) {
+      return enqueue(null, database => {
+        const key = `${PROGRESS_KEY}:perfil:${id}`;
+        if (failedProgress.has(key)) throw new Error('Unsaved progress');
+        const profile = query(database, 'SELECT data FROM profiles WHERE id = ?', [id])[0];
+        const progress = query(database, 'SELECT data FROM progress WHERE storage_key = ?', [key])[0];
+        if (!profile || !progress) throw new Error('Missing profile or progress');
+        return createBackup(JSON.parse(profile.data), JSON.parse(progress.data));
+      });
+    },
+    restoreProfile(id, input) {
+      // Revalidate at the persistence boundary and snapshot before enqueueing.
+      let backup;
+      try { backup = validateBackup(input); } catch (error) { return Promise.reject(error); }
+      return enqueue(database => {
+        const row = query(database, 'SELECT data FROM profiles WHERE id = ?', [id])[0];
+        if (!row) throw new Error('Missing destination profile');
+        const destination = JSON.parse(row.data);
+        const { age, weight, goalLiters, onboardingComplete } = backup.profile;
+        const profile = { ...destination, age, weight, goalLiters, onboardingComplete };
+        database.run('UPDATE profiles SET data = ? WHERE id = ?', [JSON.stringify(profile), id]);
+        database.run('INSERT INTO progress VALUES (?, ?) ON CONFLICT(storage_key) DO UPDATE SET data = excluded.data',
+          [`${PROGRESS_KEY}:perfil:${id}`, JSON.stringify(backup.progress)]);
+        return profile;
+      }).then(profile => { failedProgress.delete(`${PROGRESS_KEY}:perfil:${id}`); return profile; });
     },
     async close() {
       await pending;
@@ -174,3 +208,6 @@ export const readProgress = key => ready().readProgress(key);
 export const saveProfile = (profile, options) => ready().saveProfile(profile, options);
 export const saveProgress = (key, state) => ready().saveProgress(key, state);
 export const refreshDatabase = () => ready().refresh();
+
+export const exportProfile = id => ready().exportProfile(id);
+export const restoreProfile = (id, backup) => ready().restoreProfile(id, backup);

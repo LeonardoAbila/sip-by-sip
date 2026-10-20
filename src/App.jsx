@@ -6,7 +6,7 @@ import RemindersDialog from './dashboard/RemindersDialog.jsx';
 import HydrationCard from './dashboard/HydrationCard.jsx';
 import WaterLog from './dashboard/WaterLog.jsx';
 import useWaterReminders from './dashboard/useWaterReminders.js';
-import { saveProgress } from './database.js';
+import { saveProgress, exportProfile, restoreProfile } from './database.js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { achievements, currentDay, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume, selectedVolume } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY } from './theme.js';
@@ -17,7 +17,7 @@ import Icon from './Icon.jsx';
 import HydrationCalendar from './HydrationCalendar.jsx';
 import WaterBenefits, { benefitsCopy } from './WaterBenefits.jsx';
 
-export default function App({ profile, onLogout }) {
+export default function App({ profile, onLogout, onProfileRestored, importComplete = false }) {
   const [screen, setScreen] = useState(() => window.location.hash === '#benefits' ? 'benefits' : 'home');
   const homeHeading = useRef(null);
   useEffect(() => {
@@ -43,11 +43,13 @@ export default function App({ profile, onLogout }) {
   const [remindersOpen, setRemindersOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [storageError, setStorageError] = useState(false);
+  const transferBusy = useRef(false);
+  const pendingSave = useRef(Promise.resolve());
   const [theme, setTheme] = useState(readTheme);
   const [color, setColor] = useState(readColor);
   const [language, setLanguage] = useState(readLanguage);
   const t = translations[language];
-  const { reminders, reminderVisible, reminderSeconds, dismissReminder, saveReminders } = useWaterReminders(storageKey);
+  const { reminders, reminderVisible, reminderSeconds, dismissReminder, saveReminders } = useWaterReminders(storageKey, importComplete);
 
   useEffect(() => {
     document.documentElement.dataset.color = color;
@@ -78,8 +80,11 @@ export default function App({ profile, onLogout }) {
 
   // Effects synchronize React state with things outside React, such as storage.
   useEffect(() => {
+    if (transferBusy.current) return;
     let active = true;
-    saveProgress(storageKey, state).then(
+    const operation = saveProgress(storageKey, state);
+    pendingSave.current = operation;
+    operation.then(
       () => { if (active) setStorageError(false); },
       () => { if (active) setStorageError(true); },
     );
@@ -87,7 +92,7 @@ export default function App({ profile, onLogout }) {
   }, [state, storageKey]);
 
   useEffect(() => {
-    const checkDay = () => setState(currentDay);
+    const checkDay = () => { if (!transferBusy.current) setState(currentDay); };
     const interval = setInterval(checkDay, 30_000);
     window.addEventListener('focus', checkDay);
     return () => {
@@ -102,7 +107,30 @@ export default function App({ profile, onLogout }) {
   const rewards = achievements(currentDay(state));
   const dateLabel = new Intl.DateTimeFormat(language, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
+  async function downloadProfile() {
+    transferBusy.current = true;
+    try {
+      await pendingSave.current.catch(() => {});
+      // Explicitly flush the current render, including an immediate add/export.
+      await saveProgress(storageKey, currentDay(state));
+      return await exportProfile(profile.id);
+    } finally { transferBusy.current = false; }
+  }
+
+  async function importProfile(backup) {
+    transferBusy.current = true;
+    let committed = false;
+    try {
+      await pendingSave.current.catch(() => {});
+      const restored = await restoreProfile(profile.id, backup);
+      committed = true;
+      dismissReminder();
+      onProfileRestored(restored);
+    } finally { if (!committed) transferBusy.current = false; }
+  }
+
   function saveSettings(mlGarrafa, metaLitros, selectedLanguage, selectedTheme, selectedColor) {
+    if (transferBusy.current) return;
     setTheme(selectedTheme);
     setColor(selectedColor);
     setLanguage(selectedLanguage);
@@ -111,7 +139,7 @@ export default function App({ profile, onLogout }) {
   }
 
   function recordWater(amount = containerVolume, container = state.container) {
-    if (!validVolume(amount)) return;
+    if (transferBusy.current || !validVolume(amount)) return;
     dismissReminder();
     // A fresh key restarts the animation on every click, even after 24 bottles.
     setFillAnimation(previous => previous + 1);
@@ -121,6 +149,7 @@ export default function App({ profile, onLogout }) {
   }
 
   function resetDay() {
+    if (transferBusy.current) return;
     setFillAnimation(0);
     setPourAmount(null);
     setState(resetWater);
@@ -145,6 +174,7 @@ export default function App({ profile, onLogout }) {
         </nav>
       </header>
       <main className="app">
+        {importComplete && <p role="status" className="success">{t.transferSuccess}</p>}
         <Fade visible={reminderVisible}><ReminderNotice floating t={{ ...t, add: isGlass ? t.addGlass : t.add }} onAdd={() => recordWater()} onDismiss={dismissReminder} /></Fade>
         {screen === 'benefits' && <WaterBenefits language={language} />}
         <div id="home" hidden={screen !== 'home'}>
@@ -171,10 +201,10 @@ export default function App({ profile, onLogout }) {
         </div>
         <div className="dashboard-grid">
           <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
-            onUndo={() => { closePour(); setState(undoWater); }} />
+            onUndo={() => { if (!transferBusy.current) { closePour(); setState(undoWater); } }} />
           <div className="daily-panel">
             <WaterLog state={state} t={t} format={format}
-              onSaveSizes={(mlGarrafa, mlCopo) => setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo }))} />
+              onSaveSizes={(mlGarrafa, mlCopo) => { if (!transferBusy.current) setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo })); }} />
           </div>
         </div>
         <HydrationCalendar state={currentDay(state)} language={language} t={t} />
@@ -184,6 +214,7 @@ export default function App({ profile, onLogout }) {
         <Fade visible={storageError}><p className="notice" role="alert">{t.storageError}</p></Fade>
         </div>
       <Fade visible={settingsOpen}><SettingsDialog language={language} theme={theme} color={color} bottleSize={state.mlGarrafa} dailyGoal={state.metaLitros}
+        profile={profile} onExport={downloadProfile} onImport={importProfile}
         onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>
       <Fade visible={remindersOpen}><RemindersDialog reminders={reminders} language={language}
         onSave={selected => { saveReminders(selected); setRemindersOpen(false); }} onClose={() => setRemindersOpen(false)} /></Fade>

@@ -24,6 +24,7 @@ function PasswordField({ id, label, ...inputProps }) {
 
 export default function Prototype() {
   const [profile, setProfile] = useState(readSession);
+  const [profileGeneration, setProfileGeneration] = useState(0);
   const [page, setPage] = useState('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -74,11 +75,16 @@ export default function Prototype() {
   function logout() {
     setSession(null);
     setProfile(null);
+    setProfileGeneration(0);
     changePage('login');
   }
 
   if (profile?.onboardingComplete === false) return <Onboarding profile={profile} onComplete={enter} onLogout={logout} />;
-  if (profile) return <App key={profile.id} profile={profile} onLogout={logout} />;
+  if (profile) return <App key={`${profile.id}:${profileGeneration}`} profile={profile} onLogout={logout}
+    importComplete={profileGeneration > 0} onProfileRestored={restored => {
+      setProfile(restored);
+      setProfileGeneration(previous => previous + 1);
+    }} />;
 
   return (
     <main className="auth-page">

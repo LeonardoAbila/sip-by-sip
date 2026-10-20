@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { readReminders, readReminderDeadline, remainingReminderSeconds, REMINDER_KEY } from '../reminders.js';
 import { playReminderSound, prepareReminderSound, stopReminderSound } from '../reminderSound.js';
 
-export default function useWaterReminders(storageKey) {
+export default function useWaterReminders(storageKey, restart = false) {
   const [reminders, setReminders] = useState(readReminders);
   const [reminderVisible, setReminderVisible] = useState(false);
-  const [reminderCycle, setReminderCycle] = useState(0);
+  const [reminderCycle, setReminderCycle] = useState(restart ? 1 : 0);
   const [reminderSeconds, setReminderSeconds] = useState(0);
   const reminderSoundEnabled = useRef(reminders.sound);
   reminderSoundEnabled.current = reminders.sound;

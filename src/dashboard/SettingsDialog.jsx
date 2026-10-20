@@ -1,3 +1,4 @@
+import ProfileTransfer from './ProfileTransfer.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../Icon.jsx';
 import Fade from '../Fade.jsx';
@@ -5,8 +6,10 @@ import { languages, translations } from '../language.js';
 import { appColors } from '../theme.js';
 import { positiveNumber, validVolume } from '../state.js';
 
-export default function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave, onClose, fadingOut }) {
+export default function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave, onClose, fadingOut, profile, onExport, onImport }) {
   const dialog = useRef(null);
+  const transferBusy = useRef(false);
+  const [transferOpen, setTransferOpen] = useState(false);
   const [bottleInput, setBottleInput] = useState(String(bottleSize));
   const [goalInput, setGoalInput] = useState(String(dailyGoal));
   const [selectedLanguage, setSelectedLanguage] = useState(language);
@@ -29,7 +32,9 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
   }
 
   return (
-    <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); onClose(); }} aria-labelledby="settings-title">
+    <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); if (!transferBusy.current) onClose(); }} aria-labelledby={transferOpen ? 'transfer-title' : 'settings-title'}>
+      {transferOpen ? <ProfileTransfer profile={profile} t={t} onExport={onExport} onImport={onImport}
+        onBusy={value => { transferBusy.current = value; }} onBack={() => setTransferOpen(false)} /> : <>
       <form onSubmit={save}>
         <h2 id="settings-title">{t.settings}</h2>
       <div className="settings">
@@ -81,6 +86,8 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
           <button type="submit" className="save-button" disabled={!validBottle || !validGoal}>{t.save}</button>
         </div>
       </form>
+      {profile && <button type="button" className="secondary transfer-open" onClick={() => setTransferOpen(true)}>{t.transferTitle}</button>}
+      </>}
     </dialog>
   );
 }
