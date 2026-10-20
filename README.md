@@ -17,9 +17,11 @@ Open the local URL printed by Vite. You must use the development server; opening
 npm run build    # Create the production app in dist/
 npm run preview  # Preview that production build locally
 npm test         # Check hydration rules, SQLite persistence, and migration
+npm run lint     # Check JavaScript/JSX correctness and consistent style
+npm run lint:fix # Apply automatic lint fixes
 ```
 
-Tests also run automatically on every push and pull request through
+Lint checks and tests also run automatically on every push and pull request through
 `.github/workflows/test.yml`, using Node.js 22 and `npm ci`. Check the
 **Actions** tab for results.
 
@@ -256,3 +258,12 @@ No Codex, use `$openspec-propose` seguido da ideia para criar uma proposta,
 `$openspec-apply-change` para implementar e `$openspec-archive-change` para arquivar.
 No aplicativo desktop, selecione a habilidade correspondente na barra lateral.
 Os requisitos e as propostas ficam em `openspec/`; as habilidades ficam em `.agents/skills/`.
+
+## Linting
+
+ESLint checks web source, Node tests, and JavaScript configuration files using
+`eslint.config.js`. It enforces recommended JavaScript and React checks, single
+quotes, semicolons, comma/key spacing, and clean line endings. Generated `dist/`
+and dependencies are excluded. Run `npm run lint` before committing; CI rejects
+errors and warnings. Use `npm run lint:fix` for automatic style fixes, then review
+the diff. Swift and CSS are outside this JavaScript lint configuration.
