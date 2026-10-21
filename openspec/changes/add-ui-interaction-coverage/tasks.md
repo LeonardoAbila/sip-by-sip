@@ -10,7 +10,7 @@
 
 - [x] 2.1 Add isolated rendered profile-form cases for registration short/mismatched passwords, duplicate username, wrong login, password visibility, and onboarding invalid inputs/estimate/review/finish; verify visible errors, transition outcomes, and absence of unintended saves using the DOM suite.
 - [x] 2.2 Add rendered hydration/container-editor cases for bottle/glass add, undo/disabled undo, valid/invalid size edits, save/cancel/Escape, and preservation of recorded volumes after size edits; verify visible totals, selected values, and saved outcomes through App integration where persistence matters.
-- [ ] 2.3 Add settings cases for invalid inputs and disabled save, saved values, cancel/Escape discarding goal/language/theme/accent drafts, and reset cancel/Escape/confirm; verify applied and persisted results separately from uncommitted drafts.
+- [x] 2.3 Add settings cases for invalid inputs and disabled save, saved values, cancel/Escape discarding goal/language/theme/accent drafts, and reset cancel/Escape/confirm; verify applied and persisted results separately from uncommitted drafts.
 - [ ] 2.4 Add reminder-form cases for enable/disable, custom/preset intervals, invalid interval rejection, save/cancel/Escape, and preview dismissal without adding water; verify callbacks and App integration while preserving existing timer/card assertions.
 - [ ] 2.5 Extend the README coverage inventory with the actual new test files and commands; verify every matrix row has an implemented DOM owner or an explicit browser/manual owner without claiming untested behavior.
 
