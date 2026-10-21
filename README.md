@@ -391,10 +391,10 @@ applies to download anchors; ordinary navigation is left intact.
 
 | Area | DOM owner | Browser/manual owner |
 | --- | --- | --- |
-| Profile forms | Planned isolated registration/login/onboarding validation | Planned real registration, onboarding, logout/login |
-| Hydration and sizes | Planned add/undo and size-editor save/cancel/validation | Planned persistence journey |
-| Settings and reset | Planned validation, save/cancel/Escape and reset confirmation | Planned native keyboard modal behavior |
-| Reminders | `dashboardNavigationUi.test.mjs` card states; form cases planned | Planned native dialog opening; audible quality stays manual |
+| Profile forms | `profileFormsUi.test.mjs`: registration/login/onboarding validation | Planned real registration, onboarding, logout/login |
+| Hydration and sizes | `hydrationUi.test.mjs`: add/undo and size-editor save/cancel/validation | Planned persistence journey |
+| Settings and reset | `settingsUi.test.mjs`: validation, save/cancel/Escape and reset confirmation | Planned native keyboard modal behavior |
+| Reminders | `dashboardNavigationUi.test.mjs` card states; `reminderFormsUi.test.mjs` validation/save/cancel/preview | Planned native dialog opening; audible quality stays manual |
 | Navigation | `dashboardNavigationUi.test.mjs` ordinary links and home focus | Planned real-browser clicks |
 | Backup | `profileTransferUi.test.mjs` lifecycle/failure/retry; `transferControlsUi.test.mjs` localized busy controls | Planned real download/upload across isolated contexts |
 
