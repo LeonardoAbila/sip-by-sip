@@ -3,7 +3,7 @@
 ## 1. Isolated DOM coverage and ownership
 
 - [x] 1.1 Extract reusable DOM/Vite/database setup and cleanup into tests/helpers, split the broad transfer test into independently named cases, and separate navigation/localized cards; verify each case runs independently and the full existing assertion set still passes with fresh state and restored globals.
-- [ ] 1.2 Scope the DOM download mock to download anchors and restore it after each case; verify normal anchor navigation remains functional and export initiation is still asserted without globally suppressing link clicks.
+- [x] 1.2 Scope the DOM download mock to download anchors and restore it after each case; verify normal anchor navigation remains functional and export initiation is still asserted without globally suppressing link clicks.
 - [ ] 1.3 Document the design coverage matrix and DOM test isolation rules in README and correct stale test/lint descriptions in AGENTS.md; verify paths and commands match the repository and distinguish simulated APIs from browser guarantees.
 
 ## 2. Forms and dashboard interactions
