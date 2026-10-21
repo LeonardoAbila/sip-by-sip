@@ -114,3 +114,19 @@ test('refresh errors preserve saved records and typed drafts and recover on the 
   await act(async () => { h.dom.window.dispatchEvent(new h.dom.window.Event('focus')); });
   await h.until(() => !h.document.querySelector('[role="alert"]'));
 });
+
+test('login and registration visibly describe local password limits with associated help', async t => {
+  const h = await ui(t); await signedOut(h);
+  for (const registration of [false, true]) {
+    if (registration) await h.click('Cadastre-se');
+    const help = h.document.querySelector('#local-entry-help');
+    assert.ok(help); assert.equal(help.closest('details'), null);
+    assert.match(help.textContent, /apenas neste navegador/);
+    assert.match(help.textContent, /não criptografa/);
+    assert.match(help.textContent, /alguém com acesso ao navegador/);
+    assert.match(help.textContent, /Não há conta online, sincronização automática ou recuperação de senha/);
+    assert.match(help.textContent, /senha de teste/);
+    assert.equal(h.document.querySelector('form').getAttribute('aria-describedby'), help.id);
+    for (const input of h.document.querySelectorAll('form input')) assert.ok(input.getAttribute('aria-describedby').includes(help.id));
+  }
+});

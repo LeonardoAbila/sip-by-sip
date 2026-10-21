@@ -140,13 +140,19 @@ export default function Prototype() {
       </section>
       <section className="auth-card" aria-labelledby="auth-title">
         <h2 id="auth-title">{registering ? 'Crie seu perfil' : 'Entre no seu perfil'}</h2>
-        <form onSubmit={submit}>
+        <p id="local-entry-help" className="settings-help">
+          Seus perfis e históricos ficam apenas neste navegador e neste endereço do site.
+          A senha serve para entrar no perfil pelo aplicativo: ela não criptografa os dados
+          nem impede que alguém com acesso ao navegador os leia.
+          Não há conta online, sincronização automática ou recuperação de senha. Use uma senha de teste.
+        </p>
+        <form onSubmit={submit} aria-describedby="local-entry-help">
           <fieldset disabled={busy}>
             {!registering && <ProfileSelector profiles={localProfiles} selectedId={selectedId} onSelect={selectProfile} />}
-            <label htmlFor="auth-username">Usuário<input id="auth-username" autoComplete="username" required maxLength={40} value={username} onChange={event => editUsername(event.target.value)} /></label>
-            <PasswordField key={`${page}:${selectedId}`} label="Senha" id="auth-password" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
+            <label htmlFor="auth-username">Usuário<input id="auth-username" aria-describedby="local-entry-help" autoComplete="username" required maxLength={40} value={username} onChange={event => editUsername(event.target.value)} /></label>
+            <PasswordField key={`${page}:${selectedId}`} label="Senha" id="auth-password" aria-describedby="local-entry-help" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
             {registering && <>
-              <PasswordField label="Confirme a senha" id="auth-confirmation" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
+              <PasswordField label="Confirme a senha" id="auth-confirmation" aria-describedby="local-entry-help" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
             </>}
             {!registering && listError && <p className="notice" role="alert">{listError}</p>}
             {error && <p className="notice" role="alert">{error}</p>}
