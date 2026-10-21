@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import App from './App.jsx';
+import ProfileSelector from './profile/ProfileSelector.jsx';
 import Icon from './Icon.jsx';
 import { hashPassword, readProfiles, readSession, registerProfile, setSession } from './profiles.js';
 import Onboarding from './Onboarding.jsx';
@@ -26,6 +27,8 @@ export default function Prototype() {
   const [profile, setProfile] = useState(readSession);
   const [profileGeneration, setProfileGeneration] = useState(0);
   const [page, setPage] = useState('login');
+  const [localProfiles] = useState(() => readProfiles().map(({ id, username }) => ({ id, username })));
+  const [selectedId, setSelectedId] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
@@ -35,6 +38,23 @@ export default function Prototype() {
 
   function changePage(next) {
     setPage(next);
+    setSelectedId('');
+    setPassword('');
+    setConfirmation('');
+    setError('');
+  }
+
+  function selectProfile(id) {
+    setSelectedId(id);
+    setUsername(localProfiles.find(item => item.id === id)?.username ?? '');
+    setPassword('');
+    setConfirmation('');
+    setError('');
+  }
+
+  function editUsername(value) {
+    setUsername(value);
+    setSelectedId('');
     setPassword('');
     setConfirmation('');
     setError('');
@@ -60,7 +80,7 @@ export default function Prototype() {
       if (registering) {
         enter(await registerProfile(name, password));
       } else {
-        const saved = readProfiles().find(item => item.username.toLowerCase() === name.toLowerCase());
+        const saved = readProfiles().find(item => selectedId ? item.id === selectedId : item.username.toLowerCase() === name.toLowerCase());
         if (!saved || await hashPassword(password, saved.salt) !== saved.passwordHash) {
           setError('Usuário ou senha incorretos.');
         } else enter(saved);
@@ -98,8 +118,9 @@ export default function Prototype() {
         <h2 id="auth-title">{registering ? 'Crie seu perfil' : 'Entre no seu perfil'}</h2>
         <form onSubmit={submit}>
           <fieldset disabled={busy}>
-            <label htmlFor="auth-username">Usuário<input id="auth-username" autoComplete="username" required maxLength={40} value={username} onChange={event => setUsername(event.target.value)} /></label>
-            <PasswordField key={page} label="Senha" id="auth-password" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
+            {!registering && <ProfileSelector profiles={localProfiles} selectedId={selectedId} onSelect={selectProfile} />}
+            <label htmlFor="auth-username">Usuário<input id="auth-username" autoComplete="username" required maxLength={40} value={username} onChange={event => editUsername(event.target.value)} /></label>
+            <PasswordField key={`${page}:${selectedId}`} label="Senha" id="auth-password" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
             {registering && <>
               <PasswordField label="Confirme a senha" id="auth-confirmation" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
             </>}
