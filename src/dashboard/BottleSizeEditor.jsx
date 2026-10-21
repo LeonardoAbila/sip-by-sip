@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import Icon from '../Icon.jsx';
 import { validVolume } from '../state.js';
 
@@ -7,6 +7,12 @@ export default function BottleSizeEditor({ bottleSize, glassSize, t, onSave }) {
   const [container, setContainer] = useState('bottle');
   const [inputs, setInputs] = useState({ bottle: String(bottleSize), glass: String(glassSize) });
   const inputId = useId();
+  const editButton = useRef(null);
+  const wasEditing = useRef(false);
+  useEffect(() => {
+    if (wasEditing.current && !editing) editButton.current?.focus();
+    wasEditing.current = editing;
+  }, [editing]);
   const valid = validVolume(inputs.bottle) && validVolume(inputs.glass);
   const validSelected = validVolume(inputs[container]);
 
@@ -22,7 +28,7 @@ export default function BottleSizeEditor({ bottleSize, glassSize, t, onSave }) {
     setEditing(false);
   }
 
-  if (!editing) return <button type="button" className="bottle-edit-button" onClick={() => {
+  if (!editing) return <button ref={editButton} type="button" className="bottle-edit-button" onClick={() => {
     setInputs({ bottle: String(bottleSize), glass: String(glassSize) });
     setContainer('bottle');
     setEditing(true);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import App from './App.jsx';
 import ProfileSelector from './profile/ProfileSelector.jsx';
 import Icon from './Icon.jsx';
@@ -6,7 +6,7 @@ import { hashPassword, readProfiles, readSession, registerProfile, setSession } 
 import Onboarding from './Onboarding.jsx';
 import { refreshDatabase } from './database.js';
 
-function PasswordField({ id, label, ...inputProps }) {
+function PasswordField({ id, label, inputRef, ...inputProps }) {
   const [visible, setVisible] = useState(false);
   const action = visible ? 'Ocultar' : 'Mostrar';
 
@@ -14,7 +14,7 @@ function PasswordField({ id, label, ...inputProps }) {
     <div>
       <label htmlFor={id}>{label}</label>
       <div className="password-field">
-        <input {...inputProps} id={id} type={visible ? 'text' : 'password'} />
+        <input {...inputProps} ref={inputRef} id={id} type={visible ? 'text' : 'password'} />
         <button className="password-toggle" type="button" aria-label={`${action} ${label.toLowerCase()}`} aria-controls={id} onClick={() => setVisible(current => !current)} title={`${action} senha`}>
           <Icon name={visible ? 'eyeOff' : 'eye'} />
         </button>
@@ -36,6 +36,11 @@ export default function Prototype() {
   const [busy, setBusy] = useState(false);
   const [listError, setListError] = useState('');
   const registering = page === 'register';
+  const entryHeading = useRef(null);
+  const passwordInput = useRef(null);
+
+  useEffect(() => { if (!profile) entryHeading.current?.focus(); }, [profile, page]);
+  useEffect(() => { if (selectedId) passwordInput.current?.focus(); }, [selectedId]);
 
   useEffect(() => {
     if (profile || page !== 'login') return;
@@ -139,7 +144,7 @@ export default function Prototype() {
         <p className="auth-prototype">Protótipo de teste · Os perfis ficam apenas neste navegador. Use uma senha de teste.</p>
       </section>
       <section className="auth-card" aria-labelledby="auth-title">
-        <h2 id="auth-title">{registering ? 'Crie seu perfil' : 'Entre no seu perfil'}</h2>
+        <h2 id="auth-title" ref={entryHeading} tabIndex={-1}>{registering ? 'Crie seu perfil' : 'Entre no seu perfil'}</h2>
         <p id="local-entry-help" className="settings-help">
           Seus perfis e históricos ficam apenas neste navegador e neste endereço do site.
           A senha serve para entrar no perfil pelo aplicativo: ela não criptografa os dados
@@ -150,7 +155,7 @@ export default function Prototype() {
           <fieldset disabled={busy}>
             {!registering && <ProfileSelector profiles={localProfiles} selectedId={selectedId} onSelect={selectProfile} />}
             <label htmlFor="auth-username">Usuário<input id="auth-username" aria-describedby="local-entry-help" autoComplete="username" required maxLength={40} value={username} onChange={event => editUsername(event.target.value)} /></label>
-            <PasswordField key={`${page}:${selectedId}`} label="Senha" id="auth-password" aria-describedby="local-entry-help" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
+            <PasswordField key={`${page}:${selectedId}`} label="Senha" id="auth-password" inputRef={passwordInput} aria-describedby="local-entry-help" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
             {registering && <>
               <PasswordField label="Confirme a senha" id="auth-confirmation" aria-describedby="local-entry-help" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
             </>}
