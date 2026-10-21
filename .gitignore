@@ -5,3 +5,7 @@ dist/
 /*.tar.gz
 /*.tar.gz.sha256
 /*.zip
+
+# Browser test diagnostics
+playwright-report/
+test-results/

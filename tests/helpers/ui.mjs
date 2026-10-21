@@ -28,7 +28,7 @@ export async function ui(t) {
     if (this.hasAttribute('download')) downloads += 1;
     else anchorClick.call(this);
   };
-  const server = await createServer({ configFile: false, server: { middlewareMode: true, hmr: { port: 0 } }, appType: 'custom' });
+  const server = await createServer({ configFile: false, server: { middlewareMode: true, ws: false }, appType: 'custom' });
   const { createRoot } = await import('react-dom/client');
   const root = createRoot(document.getElementById('root'));
   const pause = () => new Promise(resolve => setTimeout(resolve, 15));

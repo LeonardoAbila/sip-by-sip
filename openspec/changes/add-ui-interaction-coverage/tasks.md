@@ -16,7 +16,7 @@
 
 ## 3. Real-browser infrastructure and journeys
 
-- [ ] 3.1 Add locked @playwright/test, playwright.config.js, explicit Node test discovery, test:e2e script, e2e lint scope, and generated-output ignores; configure Chromium, fixed context preferences, production build/preview on loopback /sip-by-sip/, bounded timeouts, no retries, and failure diagnostics; verify npm test excludes browser specs, Playwright lists only e2e specs, lint passes, and the production server starts on the configured URL.
+- [x] 3.1 Add locked @playwright/test, playwright.config.js, explicit Node test discovery, test:e2e script, e2e lint scope, and generated-output ignores; configure Chromium, fixed context preferences, production build/preview on loopback /sip-by-sip/, bounded timeouts, no retries, and failure diagnostics; verify npm test excludes browser specs, Playwright lists only e2e specs, lint passes, and the production server starts on the configured URL.
 - [ ] 3.2 Add UI-only browser helpers and a journey for registration/onboarding, bottle/glass add/undo, reload, settings persistence, reset confirmation, logout, wrong-password rejection, and successful login; verify it passes in real Chromium with isolated context and actual Wasm/IndexedDB startup.
 - [ ] 3.3 Add real-click home/benefits navigation and native-dialog keyboard checks for initial focus, Tab/Shift+Tab containment, Escape cancellation/focus return, and reminder opening/dismissal, plus one narrow-viewport reachability check; verify actual browser assertions without dialog or navigation mocks.
 - [ ] 3.4 Add a real backup download/file-upload journey across independent source/destination contexts, including preview cancellation, confirmed replacement, reload, retained destination login, and an untouched second profile; verify the downloaded JSON is used for import and visible restored values survive reload with no shared-context shortcuts.
@@ -26,3 +26,10 @@
 
 - [ ] 4.1 Add the required Chromium job on push/pull_request using npm ci, browser/OS dependency installation, test:e2e, and pinned failure-artifact upload with retention; preserve the lint/Node job, document CI behavior, and verify workflow structure matches the passing local command sequence with no continue-on-error or silent skips.
 - [ ] 4.2 Run lint, the full Node/DOM suite, production build, real Chromium suite, and openspec validate add-ui-interaction-coverage --strict; verify all pass, repeat the browser suite once to check case isolation, and record actual results and any unobserved hosted CI execution without substituting a browser-unavailable disclaimer for required browser execution.
+
+## Verification and current blocker
+
+- Tasks 1.1 through 2.5 passed their focused checks. The full Node/DOM suite now has 80 passing tests. Lint and diff whitespace checks pass.
+- Task 3.1: Playwright discovers only e2e specs; Node discovers only tests/*.test.mjs. The Playwright webServer successfully built and started the production preview at /sip-by-sip/ before attempting Chromium launch. Failure diagnostics were generated and are ignored by Git/lint.
+- Task 3.2 has an initial journey and UI-only helpers, but is NOT complete: real Chromium launch failed because libnspr4.so is missing. npx playwright install-deps chromium failed because sudo requires interactive authentication. No product behavior defect has been established.
+- Browser-dependent tasks and CI integration remain pending. Install Chromium OS dependencies with interactive administrator privileges before resuming. Browser execution remains required acceptance.

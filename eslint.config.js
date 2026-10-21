@@ -4,7 +4,7 @@ import react from 'eslint-plugin-react';
 import stylistic from '@stylistic/eslint-plugin';
 
 export default [
-  { ignores: ['dist/**', 'node_modules/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'playwright-report/**', 'test-results/**'] },
   {
     files: ['**/*.{js,jsx,mjs}'],
     ...js.configs.recommended,
@@ -39,7 +39,7 @@ export default [
     },
   },
   {
-    files: ['tests/**/*.mjs', '*.config.js'],
+    files: ['tests/**/*.mjs', 'e2e/**/*.js', '*.config.js'],
     languageOptions: { globals: globals.node },
   },
 ];
