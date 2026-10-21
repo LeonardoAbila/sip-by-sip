@@ -15,24 +15,24 @@ export default function WaterLog({ state, t, format, onSaveSizes }) {
     index < legacyCount ? 'custom' : state.entries[index - legacyCount].container);
   return (
     <section className="bottle-card" aria-labelledby="bottle-log-title">
-  <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2></div>
-  <dl className="container-volumes">
-    <div><dt><Icon name="bottle" />{t.bottleChoice}</dt><dd>{format.format(state.mlGarrafa)} ml</dd></div>
-    <div><dt><Icon name="glass" />{t.glassChoice}</dt><dd>{format.format(state.mlCopo)} ml</dd></div>
-  </dl>
-  <BottleSizeEditor bottleSize={state.mlGarrafa} glassSize={state.mlCopo} t={t}
-    onSave={onSaveSizes} />
-  <p className="section-description" aria-live="polite">{t.containerCounts(bottleCount, glassCount, otherCount)}</p>
-  <div className="bottles" aria-hidden="true">
-    {recordedContainers.map((container, index) => <WaterContainer container={container} key={index} />)}
-    {state.garrafas > 24 && <span className="overflow-count">+{state.garrafas - 24}</span>}
-  </div>
-  <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
-  <section className="remaining-containers" aria-label={t.remaining}>
-    {remainingMl > 0 && <>
-      <p className="section-description">{t.remainingOptionsHelp}</p>
-      <div className="remaining-options">
-        {['bottle', 'glass'].map((container, index) => {
+      <div className="card-heading"><h2 id="bottle-log-title">{t.bottleLog}</h2></div>
+      <dl className="container-volumes">
+        <div><dt><Icon name="bottle" />{t.bottleChoice}</dt><dd>{format.format(state.mlGarrafa)} ml</dd></div>
+        <div><dt><Icon name="glass" />{t.glassChoice}</dt><dd>{format.format(state.mlCopo)} ml</dd></div>
+      </dl>
+      <BottleSizeEditor bottleSize={state.mlGarrafa} glassSize={state.mlCopo} t={t}
+        onSave={onSaveSizes} />
+      <p className="section-description" aria-live="polite">{t.containerCounts(bottleCount, glassCount, otherCount)}</p>
+      <div className="bottles" aria-hidden="true">
+        {recordedContainers.map((container, index) => <WaterContainer container={container} key={index} />)}
+        {state.garrafas > 24 && <span className="overflow-count">+{state.garrafas - 24}</span>}
+      </div>
+      <div className="remaining-row"><span>{t.remaining}</span><strong>{format.format(remainingMl / 1000)} L</strong></div>
+      <section className="remaining-containers" aria-label={t.remaining}>
+        {remainingMl > 0 && <>
+          <p className="section-description">{t.remainingOptionsHelp}</p>
+          <div className="remaining-options">
+            {['bottle', 'glass'].map((container, index) => {
           const count = container === 'glass' ? remaining.glasses : remaining.bottles;
           const volume = container === 'glass' ? state.mlCopo : state.mlGarrafa;
           return <React.Fragment key={container}>
@@ -47,9 +47,9 @@ export default function WaterLog({ state, t, format, onSaveSizes }) {
             </div>
           </React.Fragment>;
         })}
-      </div>
-    </>}
-  </section>
-</section>
+          </div>
+        </>}
+      </section>
+    </section>
   );
 }

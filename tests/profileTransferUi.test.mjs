@@ -60,6 +60,16 @@ test('backup UI cancels safely, replaces atomically, remounts, and retains desti
     localStorage.setItem('aguaReminders:deadline:aguaApp:perfil:destination', JSON.stringify({ minutes: 30, deadline: Date.now() + 1000 }));
     await act(async () => { root.render(React.createElement(Prototype)); await pause(); });
     await until(() => document.querySelector('.total')?.textContent === '250 ml');
+    const homeLink = document.querySelector('.nav-actions a[href="#home"]');
+    const benefitsLink = document.querySelector('.nav-actions a[href="#benefits"]');
+    assert.equal(homeLink.getAttribute('aria-current'), 'page');
+    await act(async () => { dom.window.location.hash = benefitsLink.hash; dom.window.dispatchEvent(new dom.window.Event('hashchange')); await pause(); });
+    await until(() => benefitsLink.getAttribute('aria-current') === 'page');
+    assert.equal(document.querySelector('#home').hidden, true);
+    await act(async () => { dom.window.location.hash = homeLink.hash; dom.window.dispatchEvent(new dom.window.Event('hashchange')); await pause(); });
+    await until(() => homeLink.getAttribute('aria-current') === 'page');
+    assert.equal(document.querySelector('#home').hidden, false);
+    assert.equal(document.activeElement, document.querySelector('#home h1'));
     await click('Garrafa');
     await click('×');
     await until(() => !document.querySelector('.pour-dialog'));
@@ -124,11 +134,40 @@ test('backup UI cancels safely, replaces atomically, remounts, and retains desti
     await act(async () => { root.render(null); });
     const { default: SettingsDialog } = await server.ssrLoadModule('/src/dashboard/SettingsDialog.jsx');
     const { translations } = await server.ssrLoadModule('/src/language.js');
+    const { default: StreakCard } = await server.ssrLoadModule('/src/dashboard/StreakCard.jsx');
+    const { default: ReminderCard } = await server.ssrLoadModule('/src/dashboard/ReminderCard.jsx');
     for (const language of ['pt-BR', 'en', 'es']) {
       let closeCount = 0;
       let importCount = 0;
       let release;
       const t = translations[language];
+      let reminderOpens = 0;
+      for (const [enabled, due] of [[false, false], [true, false], [true, true]]) {
+        await act(async () => { root.render(React.createElement(React.Fragment, null,
+          React.createElement(StreakCard, { label: t.streak, text: t.streakDays(3) }),
+          React.createElement(ReminderCard, { t, reminders: { enabled, minutes: 30 }, reminderVisible: due,
+            reminderSeconds: 125, onOpen: () => { reminderOpens += 1; } }),
+        )); });
+        assert.equal(document.querySelector('.achievement-panel').getAttribute('aria-label'), t.streak);
+        assert.equal(document.querySelector('.achievement-panel strong').textContent, t.streakDays(3));
+        const timer = document.querySelector('[role="timer"]');
+        if (enabled) {
+          assert.equal(timer.getAttribute('aria-live'), 'off');
+          assert.ok(document.querySelector('.reminder-card').textContent.includes(t.everyMinutes(30)));
+          if (due) {
+            assert.equal(timer.textContent.trim(), t.reminderDue);
+            assert.ok(timer.classList.contains('is-due'));
+          } else {
+            assert.ok(timer.textContent.includes(t.nextReminder));
+            assert.equal(timer.querySelector('span').textContent, '02:05');
+          }
+        } else {
+          assert.equal(timer, null);
+          assert.ok(document.querySelector('.reminder-card').textContent.includes(t.remindersOff));
+        }
+        await act(async () => { document.querySelector('.reminder-card button').click(); });
+      }
+      assert.equal(reminderOpens, 3);
       await act(async () => { root.render(React.createElement(SettingsDialog, {
         profile: destination, language, theme: 'light', color: 'green', bottleSize: 500, dailyGoal: 2,
         onClose: () => { closeCount += 1; }, onSave: () => {}, onExport: async () => backup,

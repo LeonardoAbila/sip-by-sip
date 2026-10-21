@@ -273,16 +273,23 @@ the diff. Swift and CSS are outside this JavaScript lint configuration.
 `src/App.jsx` connects navigation, hydration state, preferences, and dialogs.
 Find individual features in `src/dashboard/`:
 
+- `DashboardNav.jsx`: home/benefits navigation, settings entry point, and logout.
+- `StreakCard.jsx`: current consecutive-day streak.
+- `ReminderCard.jsx`: reminder summary, countdown, and reminder-dialog entry point.
 - `HydrationCard.jsx`: daily progress ring and add/undo actions.
 - `WaterLog.jsx`: recorded containers and remaining water; `WaterContainer.jsx` draws the icons.
 - `BottleSizeEditor.jsx`: inline bottle/glass size form.
 - `SettingsDialog.jsx`: goal, language, theme, and color edits.
+- `ProfileTransfer.jsx`: profile backup export, import preview, and replacement confirmation.
 - `RemindersDialog.jsx` and `ReminderNotice.jsx`: reminder settings, preview, and alert.
 - `useWaterReminders.js`: saved preferences, per-profile deadlines, visibility checks, audio, and timer cleanup.
 - `PourDialog.jsx` and `ResetDialog.jsx`: recording animation and reset confirmation.
 
 Hydration rules remain in `src/state.js`, persistence in `src/database.js`, and
-calendar rendering in `src/HydrationCalendar.jsx`. Dialogs keep draft edits local;
+calendar rendering in `src/HydrationCalendar.jsx`, dashboard translations in
+`src/language.js`, and responsive/theme styling in `src/styles.css`.
+The page heading, daily-summary layout, and reset footer are composed in App.
+Dialogs keep draft edits local;
 `App` applies confirmed changes. Keep these boundaries when adding features.
 
 ## Profile backup format

@@ -1,3 +1,6 @@
+import StreakCard from './dashboard/StreakCard.jsx';
+import ReminderCard from './dashboard/ReminderCard.jsx';
+import DashboardNav from './dashboard/DashboardNav.jsx';
 import PourDialog from './dashboard/PourDialog.jsx';
 import ReminderNotice from './dashboard/ReminderNotice.jsx';
 import ResetDialog from './dashboard/ResetDialog.jsx';
@@ -11,7 +14,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { achievements, currentDay, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume, selectedVolume } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY } from './theme.js';
 import { LANGUAGE_KEY, readLanguage, translations } from './language.js';
-import { formatReminderCountdown } from './reminders.js';
 import Fade from './Fade.jsx';
 import Icon from './Icon.jsx';
 import HydrationCalendar from './HydrationCalendar.jsx';
@@ -158,68 +160,45 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
 
   return (
     <>
-      <header className="site-header">
-        <nav className="navbar" aria-label={t.navigation}>
-          <a className="nav-brand" href="#home">
-            <span className="brand-mark"><Icon name="drop" /></span> {t.title}
-          </a>
-          <div className="nav-actions">
-            <a className="theme-toggle" href="#home" aria-current={screen === 'home' ? 'page' : undefined}><Icon name="home" />{t.home}</a>
-            <a className="theme-toggle" href="#benefits" aria-current={screen === 'benefits' ? 'page' : undefined}><Icon name="heart" />{benefitsCopy[language].nav}</a>
-            <button className="theme-toggle" aria-haspopup="dialog" onClick={() => setSettingsOpen(true)}>
-              <Icon name="settings" /> {t.settings}
-            </button>
-          </div>
-          {profile && <button type="button" className="theme-toggle nav-logout" onClick={onLogout}><Icon name="logout" /> {t.exit}</button>}
-        </nav>
-      </header>
+      <DashboardNav screen={screen} t={t} benefitsLabel={benefitsCopy[language].nav} showLogout={Boolean(profile)}
+        onOpenSettings={() => setSettingsOpen(true)} onLogout={onLogout} />
       <main className="app">
         {importComplete && <p role="status" className="success">{t.transferSuccess}</p>}
         <Fade visible={reminderVisible}><ReminderNotice floating t={{ ...t, add: isGlass ? t.addGlass : t.add }} onAdd={() => recordWater()} onDismiss={dismissReminder} /></Fade>
         {screen === 'benefits' && <WaterBenefits language={language} />}
         <div id="home" hidden={screen !== 'home'}>
-        <header className="page-heading">
-          <div>
-            <h1 ref={homeHeading} tabIndex={-1}>{t.dashboardTitle}</h1>
+          <header className="page-heading">
+            <div>
+              <h1 ref={homeHeading} tabIndex={-1}>{t.dashboardTitle}</h1>
+            </div>
+            <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
+          </header>
+          <div className="daily-summary">
+            <StreakCard label={t.streak} text={t.streakDays(rewards.streak)} />
+            <ReminderCard t={t} reminders={reminders} reminderVisible={reminderVisible} reminderSeconds={reminderSeconds}
+              onOpen={() => setRemindersOpen(true)} />
           </div>
-          <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
-        </header>
-        <div className="daily-summary">
-        <section className="achievement-panel" aria-label={t.streak}>
-          <div><span className="achievement-symbol" aria-hidden="true">🔥</span><p>{t.streak}</p><strong>{t.streakDays(rewards.streak)}</strong></div>
-        </section>
-        <section className="reminder-card" aria-labelledby="reminder-card-title">
-          <span className="reminder-card-icon"><Icon name="bell" /></span>
-          <div><h2 id="reminder-card-title">{t.reminders}</h2><p>{reminders.enabled ? t.everyMinutes(reminders.minutes) : t.remindersOff}</p>
-            <p className="settings-help">{t.reminderAvailability}</p>
-            {reminders.enabled && <p className={reminderVisible ? 'reminder-countdown is-due' : 'reminder-countdown'} role="timer" aria-live="off">
-              {reminderVisible ? t.reminderDue : <>{t.nextReminder} <span>{formatReminderCountdown(reminderSeconds)}</span></>}
-            </p>}
+          <div className="dashboard-grid">
+            <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
+              onUndo={() => { if (!transferBusy.current) { closePour(); setState(undoWater); } }} />
+            <div className="daily-panel">
+              <WaterLog state={state} t={t} format={format}
+                onSaveSizes={(mlGarrafa, mlCopo) => { if (!transferBusy.current) setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo })); }} />
+            </div>
           </div>
-          <button className="icon-button" onClick={() => setRemindersOpen(true)} aria-label={t.reminders} aria-haspopup="dialog"><Icon name="arrow" /></button>
-        </section>
+          <HydrationCalendar state={currentDay(state)} language={language} t={t} />
+          <footer className="dashboard-footer">
+            <button className="reset-button" onClick={() => setResetOpen(true)} disabled={state.garrafas === 0 && state.totalMl === 0}><Icon name="reset" />{t.reset}</button>
+          </footer>
+          <Fade visible={storageError}><p className="notice" role="alert">{t.storageError}</p></Fade>
         </div>
-        <div className="dashboard-grid">
-          <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
-            onUndo={() => { if (!transferBusy.current) { closePour(); setState(undoWater); } }} />
-          <div className="daily-panel">
-            <WaterLog state={state} t={t} format={format}
-              onSaveSizes={(mlGarrafa, mlCopo) => { if (!transferBusy.current) setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo })); }} />
-          </div>
-        </div>
-        <HydrationCalendar state={currentDay(state)} language={language} t={t} />
-        <footer className="dashboard-footer">
-          <button className="reset-button" onClick={() => setResetOpen(true)} disabled={state.garrafas === 0 && state.totalMl === 0}><Icon name="reset" />{t.reset}</button>
-        </footer>
-        <Fade visible={storageError}><p className="notice" role="alert">{t.storageError}</p></Fade>
-        </div>
-      <Fade visible={settingsOpen}><SettingsDialog language={language} theme={theme} color={color} bottleSize={state.mlGarrafa} dailyGoal={state.metaLitros}
-        profile={profile} onExport={downloadProfile} onImport={importProfile}
-        onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>
-      <Fade visible={remindersOpen}><RemindersDialog reminders={reminders} language={language}
-        onSave={selected => { saveReminders(selected); setRemindersOpen(false); }} onClose={() => setRemindersOpen(false)} /></Fade>
-      <Fade visible={pourAmount !== null}><PourDialog key={fillAnimation} t={t} amount={format.format(pourAmount ?? 0)} container={pourContainer} onClose={closePour} /></Fade>
-      <Fade visible={resetOpen}><ResetDialog t={t} onConfirm={resetDay} onClose={() => setResetOpen(false)} /></Fade>
+        <Fade visible={settingsOpen}><SettingsDialog language={language} theme={theme} color={color} bottleSize={state.mlGarrafa} dailyGoal={state.metaLitros}
+          profile={profile} onExport={downloadProfile} onImport={importProfile}
+          onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>
+        <Fade visible={remindersOpen}><RemindersDialog reminders={reminders} language={language}
+          onSave={selected => { saveReminders(selected); setRemindersOpen(false); }} onClose={() => setRemindersOpen(false)} /></Fade>
+        <Fade visible={pourAmount !== null}><PourDialog key={fillAnimation} t={t} amount={format.format(pourAmount ?? 0)} container={pourContainer} onClose={closePour} /></Fade>
+        <Fade visible={resetOpen}><ResetDialog t={t} onConfirm={resetDay} onClose={() => setResetOpen(false)} /></Fade>
       </main>
     </>
   );
