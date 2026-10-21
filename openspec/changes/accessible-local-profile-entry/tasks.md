@@ -10,7 +10,7 @@
 ## 2. Predictable focus and accessible feedback
 
 - [x] 2.1 Add transition-specific focus for entry/registration/logout/profile choice and restore the inline volume-editor opener after save/cancel/Escape; preserve existing Home/Benefits/onboarding focus and verify DOM focus checks plus rerenders/timer ticks do not steal focus.
-- [ ] 2.2 Associate profile/onboarding errors and help with affected inputs, expose invalid/selected/busy state and meaningful status feedback, and preserve quiet countdowns; verify rendered names/attributes/announcements structure and unchanged validation outcomes across existing forms.
+- [x] 2.2 Associate profile/onboarding errors and help with affected inputs, expose invalid/selected/busy state and meaningful status feedback, and preserve quiet countdowns; verify rendered names/attributes/announcements structure and unchanged validation outcomes across existing forms.
 - [ ] 2.3 Verify and correct focus/keyboard defects in settings, reminders, reset, pour, and nested transfer transitions, including native modal containment, cancellation, import busy/failure, and remounted success; add focused regressions for each confirmed fix and preserve drafts, commit guards, and data.
 - [ ] 2.4 Verify visible focus and reachable controls for PT-BR/EN/ES dashboards, narrow viewport, reduced motion, light/dark themes, and all accent colors; correct affected styles/semantics only, add a skip-to-main control if the keyboard audit establishes that need, and document the scope and observed results in docs/accessibility-audit.md.
 

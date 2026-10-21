@@ -39,6 +39,8 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const heading = useRef(null);
+  const invalidAge = Boolean(error) && (!Number.isInteger(Number(age)) || Number(age) < 1 || Number(age) > 120);
+  const invalidWeight = Boolean(error) && (!Number.isFinite(Number(weight)) || Number(weight) <= 0 || Number(weight) > 500);
   useEffect(() => { heading.current?.focus(); }, [result]);
 
   function calculate(event) {
@@ -70,7 +72,7 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
       <div className="auth-brand"><span className="brand-mark"><Icon name="drop" /></span> Sip by Sip</div>
       <button className="theme-toggle" disabled={busy} onClick={onLogout}>Sair</button>
     </header>
-    <section className="auth-card onboarding-card" aria-labelledby="onboarding-title">
+    <section aria-busy={busy} className="auth-card onboarding-card" aria-labelledby="onboarding-title">
       <h1 ref={heading} tabIndex={-1} id="onboarding-title">{result ? 'Sua meta' : `Olá, ${profile.username}`}</h1>
       {result ? <>
         <AnimatedGoal liters={result.liters} />
@@ -78,18 +80,18 @@ export default function Onboarding({ profile, onComplete, onLogout }) {
         <button className="add-button" onClick={finish} disabled={busy}>{busy ? 'Salvando…' : 'Começar meu dia'}</button>
         <button className="onboarding-back" disabled={busy} onClick={() => { setResult(null); setError(''); }}>Revisar idade e peso</button>
       </> : <>
-        <p className="auth-description">Informe sua idade e peso para estimar a meta diária.</p>
-        <form onSubmit={calculate}>
+        <p id="onboarding-help" className="auth-description">Informe sua idade e peso para estimar a meta diária.</p>
+        <form onSubmit={calculate} aria-describedby="onboarding-help">
           <fieldset>
             <div className="auth-measurements">
-              <label htmlFor="onboarding-age">Sua idade (anos)<input id="onboarding-age" type="number" required min="1" max="120" step="1" value={age} onChange={event => setAge(event.target.value)} /></label>
-              <label htmlFor="onboarding-weight">Seu peso (kg)<input id="onboarding-weight" type="number" required min="0.1" max="500" step="0.1" value={weight} onChange={event => setWeight(event.target.value)} /></label>
+              <label htmlFor="onboarding-age">Sua idade (anos)<input id="onboarding-age" aria-invalid={invalidAge} aria-describedby={`onboarding-help${invalidAge ? ' onboarding-error' : ''}`} type="number" required min="1" max="120" step="1" value={age} onChange={event => setAge(event.target.value)} /></label>
+              <label htmlFor="onboarding-weight">Seu peso (kg)<input id="onboarding-weight" aria-invalid={invalidWeight} aria-describedby={`onboarding-help${invalidWeight ? ' onboarding-error' : ''}`} type="number" required min="0.1" max="500" step="0.1" value={weight} onChange={event => setWeight(event.target.value)} /></label>
             </div>
             <button className="add-button" type="submit">Descobrir minha meta</button>
           </fieldset>
         </form>
       </>}
-      {error && <p className="notice" role="alert">{error}</p>}
+      {error && <p id="onboarding-error" className="notice" role="alert">{error}</p>}
       <details className="onboarding-source">
         <summary>Sobre a estimativa</summary>
         {result && <p className="onboarding-equation">{result.age} anos · {format.format(result.weight)} kg × {result.mlPerKg} ml/kg = <strong>{format.format(result.liters * 1000)} ml</strong></p>}

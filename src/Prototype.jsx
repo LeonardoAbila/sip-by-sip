@@ -33,6 +33,7 @@ export default function Prototype() {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState('');
+  const [invalidFields, setInvalidFields] = useState([]);
   const [busy, setBusy] = useState(false);
   const [listError, setListError] = useState('');
   const registering = page === 'register';
@@ -68,6 +69,7 @@ export default function Prototype() {
     setPassword('');
     setConfirmation('');
     setError('');
+    setInvalidFields([]);
   }
 
   function selectProfile(id) {
@@ -76,6 +78,7 @@ export default function Prototype() {
     setPassword('');
     setConfirmation('');
     setError('');
+    setInvalidFields([]);
   }
 
   function editUsername(value) {
@@ -84,6 +87,7 @@ export default function Prototype() {
     setPassword('');
     setConfirmation('');
     setError('');
+    setInvalidFields([]);
   }
 
   function enter(nextProfile) {
@@ -93,14 +97,22 @@ export default function Prototype() {
     setProfile(nextProfile);
   }
 
+  function rejectEntry(message, fields = []) {
+    setError(message);
+    setInvalidFields(fields);
+  }
+
+  const describedBy = field => `local-entry-help${invalidFields.includes(field) ? ' auth-error' : ''}`;
+
   async function submit(event) {
     event.preventDefault();
     if (busy) return;
     setError('');
+    setInvalidFields([]);
     const name = username.trim();
-    if (!name || !password) return setError('Preencha o usuário e a senha.');
-    if (registering && password.length < 6) return setError('Use uma senha com pelo menos 6 caracteres.');
-    if (registering && password !== confirmation) return setError('As senhas precisam ser iguais.');
+    if (!name || !password) return rejectEntry('Preencha o usuário e a senha.', [!name && 'username', !password && 'password'].filter(Boolean));
+    if (registering && password.length < 6) return rejectEntry('Use uma senha com pelo menos 6 caracteres.', ['password']);
+    if (registering && password !== confirmation) return rejectEntry('As senhas precisam ser iguais.', ['password', 'confirmation']);
     setBusy(true);
     try {
       await refreshDatabase();
@@ -111,11 +123,11 @@ export default function Prototype() {
         if (selectedId && !saved) {
           setError('Este perfil não está mais disponível. Selecione outro perfil ou digite o usuário.');
         } else if (!saved || await hashPassword(password, saved.salt) !== saved.passwordHash) {
-          setError('Usuário ou senha incorretos.');
+          rejectEntry('Usuário ou senha incorretos.', ['username', 'password']);
         } else enter(saved);
       }
     } catch (failure) {
-      setError(failure.message || 'Não foi possível entrar. Tente novamente.');
+      rejectEntry(failure.message || 'Não foi possível entrar. Tente novamente.', registering && failure.message?.startsWith('Este usuário já existe.') ? ['username'] : []);
     } finally {
       setBusy(false);
     }
@@ -151,16 +163,17 @@ export default function Prototype() {
           nem impede que alguém com acesso ao navegador os leia.
           Não há conta online, sincronização automática ou recuperação de senha. Use uma senha de teste.
         </p>
-        <form onSubmit={submit} aria-describedby="local-entry-help">
+        <form onSubmit={submit} aria-busy={busy} aria-describedby="local-entry-help">
           <fieldset disabled={busy}>
             {!registering && <ProfileSelector profiles={localProfiles} selectedId={selectedId} onSelect={selectProfile} />}
-            <label htmlFor="auth-username">Usuário<input id="auth-username" aria-describedby="local-entry-help" autoComplete="username" required maxLength={40} value={username} onChange={event => editUsername(event.target.value)} /></label>
-            <PasswordField key={`${page}:${selectedId}`} label="Senha" id="auth-password" inputRef={passwordInput} aria-describedby="local-entry-help" autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
+            <label htmlFor="auth-username">Usuário<input id="auth-username" aria-invalid={invalidFields.includes('username')} aria-describedby={describedBy('username')} autoComplete="username" required maxLength={40} value={username} onChange={event => editUsername(event.target.value)} /></label>
+            <PasswordField key={`${page}:${selectedId}`} label="Senha" id="auth-password" inputRef={passwordInput} aria-invalid={invalidFields.includes('password')} aria-describedby={describedBy('password')} autoComplete={registering ? 'new-password' : 'current-password'} required minLength={registering ? 6 : undefined} value={password} onChange={event => setPassword(event.target.value)} />
             {registering && <>
-              <PasswordField label="Confirme a senha" id="auth-confirmation" aria-describedby="local-entry-help" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
+              <PasswordField label="Confirme a senha" id="auth-confirmation" aria-invalid={invalidFields.includes('confirmation')} aria-describedby={describedBy('confirmation')} autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
             </>}
             {!registering && listError && <p className="notice" role="alert">{listError}</p>}
-            {error && <p className="notice" role="alert">{error}</p>}
+            {error && <p id="auth-error" className="notice" role="alert">{error}</p>}
+            {busy && <p className="sr-only" role="status">Aguarde…</p>}
             <button className="add-button" type="submit">{busy ? 'Aguarde…' : registering ? 'Criar perfil' : 'Entrar'}</button>
             <p className="auth-switch">{registering ? 'Já tem um perfil?' : 'Ainda não tem um perfil?'} <button type="button" onClick={() => changePage(registering ? 'login' : 'register')}>{registering ? 'Entrar' : 'Cadastre-se'}</button></p>
           </fieldset>
