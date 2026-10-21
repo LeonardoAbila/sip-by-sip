@@ -403,3 +403,23 @@ native focus trapping, constraint validation, file transport, visual layout, or
 screen-reader behavior. Rules, date arithmetic, and storage failure permutations
 remain in their existing Node suites. The browser layer will own a few complete
 journeys; palettes, audio quality, and screen-reader announcements remain manual.
+
+## Select a local profile
+
+The entry screen lists saved profile names under **Perfis neste navegador**.
+Choose a name and enter its existing password, or type the username as before.
+Choosing a name alone never opens its history. Changing profiles clears password
+and error drafts. **Cadastre-se** creates a separate profile; profiles with
+unfinished setup resume onboarding. **Sair** clears the active tab's session.
+A valid existing session still survives refresh. The list refreshes when the
+signed-out tab regains focus; storage errors leave the form available for retry.
+
+Names are visible before entry. Profiles and history stay in this browser and
+site origin. The password is for local entry through the app; it does not encrypt
+stored data or prevent someone with browser access from reading it. There is no
+online account, automatic sync, or password recovery. Use a test password.
+Existing profile IDs, passwords, progress, rewards, and backup format are retained.
+
+`src/Prototype.jsx` owns entry/session routing; `src/profile/ProfileSelector.jsx`
+renders only profile names and the selection. The credential and persistence
+rules remain in `src/profiles.js` and `src/database.js`.

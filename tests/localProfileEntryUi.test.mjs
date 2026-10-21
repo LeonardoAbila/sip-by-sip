@@ -130,3 +130,32 @@ test('login and registration visibly describe local password limits with associa
     for (const input of h.document.querySelectorAll('form input')) assert.ok(input.getAttribute('aria-describedby').includes(help.id));
   }
 });
+
+test('existing credentials, rewards, isolated backup restore, sessions and pending onboarding remain compatible', async t => {
+  const h = await ui(t); const original = await h.seed();
+  const progress = h.state.addWater(h.state.newState(), 2500, 'bottle');
+  await h.database.saveProgress('aguaApp:perfil:destination', progress);
+  const second = { ...original, id: 'pending', username: 'Pending', onboardingComplete: false };
+  await h.database.saveProfile(second, { create: true });
+  await h.database.saveProgress('aguaApp:perfil:pending', h.state.addWater(h.state.newState(), 100, 'glass'));
+  const otherBefore = h.database.readProgress('aguaApp:perfil:pending');
+  const { default: Prototype } = await h.load('Prototype.jsx');
+  await h.render(Prototype); // A valid preexisting session still opens directly.
+  await h.until(() => h.document.querySelector('.total')?.textContent === '2,5 L');
+  assert.equal(h.document.querySelector('#local-profile'), null);
+  await h.click('Sair');
+  assert.equal(h.profiles.readSession(), null);
+  await select(h, original.id); await h.input('#auth-password', 'destination-password'); await h.submit();
+  await h.until(() => h.document.querySelector('.total')?.textContent === '2,5 L');
+  assert.deepEqual(h.profiles.readProfiles().find(item => item.id === original.id), original);
+  assert.deepEqual(JSON.parse(h.database.readProgress('aguaApp:perfil:destination')).completedDays, progress.completedDays);
+  const exported = await h.database.exportProfile(original.id);
+  await h.database.restoreProfile(original.id, exported);
+  assert.deepEqual(h.profiles.readProfiles().find(item => item.id === original.id), original);
+  assert.equal(h.database.readProgress('aguaApp:perfil:pending'), otherBefore);
+  await h.click('Sair'); await select(h, second.id); await h.input('#auth-password', 'destination-password'); await h.submit();
+  await h.until(() => h.document.querySelector('#onboarding-age'));
+  assert.equal(h.profiles.readSession().id, second.id);
+  await h.click('Sair'); assert.equal(h.profiles.readSession(), null);
+  assert.equal(h.database.readProgress('aguaApp:perfil:pending'), otherBefore);
+});
