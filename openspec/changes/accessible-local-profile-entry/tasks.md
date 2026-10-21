@@ -31,3 +31,11 @@
 - Finish the six pending tasks in add-ui-interaction-coverage under its own apply workflow: browser journeys, browser documentation, required CI job, and full acceptance remain owned there. Do not mark them done from this change's artifact status.
 - Browser system libraries may require interactive administrator installation; #11 still requires actual Chromium execution. Screen-reader unavailability must be reported explicitly as required by #12.
 - Assess #11, #12, and #13 independently before closure; all three are complete only when their own acceptance evidence is recorded. Archive each change after review and required spec sync.
+
+## Verification and current blocker
+
+- Tasks 1.1 through 1.4 and 2.1 through 2.2 are complete: selectable profiles remain password-gated, refresh/stale/error cases preserve drafts and data, visible help explains limits, preexisting credentials/sessions/setup/rewards/backups remain compatible, inline-editor focus returns after save/cancel/Escape, and profile/onboarding field feedback is associated.
+- All 94 Node/DOM tests pass. npm run lint, npm run build, strict OpenSpec validation, and git diff --check pass.
+- Native browser work remains unverified. ldd on the installed Chromium headless shell still reports missing libnspr4.so, libnss3.so, libnssutil3.so, and libasound.so.2. The earlier administrator install attempt required interactive sudo; no native keyboard or modal pass is claimed.
+- No orca, spd-say, or espeak command was found. Actual screen-reader speech/order remains unverified; task 3.3 is still pending with the audit report.
+- Resume at task 2.3 after browser OS dependencies are installed. No pending native/browser task or the separate issue #11 checklist was marked complete.
