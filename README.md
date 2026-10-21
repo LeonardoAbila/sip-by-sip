@@ -378,3 +378,28 @@ file-picker behavior, downloaded-file saving, modal focus trapping, screen-reade
 announcements, mobile/light/dark visual layout, and transfer between two real
 browser installations remain manual checks. The DOM tests simulate dialog APIs
 and file selection; they do not substitute for those browser checks.
+
+## Interaction testing strategy
+
+`npm test` runs Node rules/storage tests and isolated DOM interaction tests.
+Production components are loaded through Vite into jsdom using
+`tests/helpers/ui.mjs`. Each case owns a fresh DOM, IndexedDB factory, SQLite
+instance, module environment, and React root. Cleanup restores globals and
+prototype patches and releases timers. Cases sharing globals run serially within
+a process. Helpers live outside test-file discovery. Download interception only
+applies to download anchors; ordinary navigation is left intact.
+
+| Area | DOM owner | Browser/manual owner |
+| --- | --- | --- |
+| Profile forms | Planned isolated registration/login/onboarding validation | Planned real registration, onboarding, logout/login |
+| Hydration and sizes | Planned add/undo and size-editor save/cancel/validation | Planned persistence journey |
+| Settings and reset | Planned validation, save/cancel/Escape and reset confirmation | Planned native keyboard modal behavior |
+| Reminders | `dashboardNavigationUi.test.mjs` card states; form cases planned | Planned native dialog opening; audible quality stays manual |
+| Navigation | `dashboardNavigationUi.test.mjs` ordinary links and home focus | Planned real-browser clicks |
+| Backup | `profileTransferUi.test.mjs` lifecycle/failure/retry; `transferControlsUi.test.mjs` localized busy controls | Planned real download/upload across isolated contexts |
+
+DOM dialog/cancel and file-selection APIs are simulated. They do not prove
+native focus trapping, constraint validation, file transport, visual layout, or
+screen-reader behavior. Rules, date arithmetic, and storage failure permutations
+remain in their existing Node suites. The browser layer will own a few complete
+journeys; palettes, audio quality, and screen-reader announcements remain manual.

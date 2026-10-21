@@ -48,11 +48,11 @@ Use Node.js 22.12 or newer from the repository root:
 
 - `npm ci`: install locked dependencies (also used by CI); `npm install` when intentionally updating dependencies.
 - `npm run dev`: start the Vite development server.
-- `npm test`: run the Node test suite (`node --test`). Tests use sql.js and fake-indexeddb for persistence checks; they do not exercise rendered UI interactions.
+- `npm test`: run the Node test suite (`node --test`). Tests use sql.js and fake-indexeddb for persistence checks and jsdom/Vite for rendered UI interactions.
 - `npm run build`: build the production app into `dist/`.
 - `npm run preview`: serve the production build; open `/sip-by-sip/` locally.
 
-There is currently no lint script or browser interaction test suite. For web app changes, run `npm test` and `npm run build`. When a browser is available, manually check affected behavior: registration/login and onboarding, profile switching, adding/undoing water with different containers, saving/cancelling settings, refresh persistence, reset confirmation, calendar history, reminders, languages, themes, and keyboard access. Report checks that could not be performed. Documentation-only edits need a review against the referenced files and commands.
+`npm run lint` checks JavaScript and JSX. There is currently no real-browser interaction suite. For web app changes, run `npm test` and `npm run build`. When a browser is available, manually check affected behavior: registration/login and onboarding, profile switching, adding/undoing water with different containers, saving/cancelling settings, refresh persistence, reset confirmation, calendar history, reminders, languages, themes, and keyboard access. Report checks that could not be performed. Documentation-only edits need a review against the referenced files and commands.
 
 For iOS changes, use macOS with Xcode and an iOS 17+ SDK. From the repository root:
 
