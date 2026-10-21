@@ -37,9 +37,8 @@ export async function ui(t) {
     for (let i = 0; i < 80; i += 1) { await settle(); if (check()) return; }
     assert.fail('Timed out waiting for UI');
   }
-  const buttons = () => [...document.querySelectorAll('button')];
-  function button(text) { const found = buttons().find(node => node.textContent.trim() === text); assert.ok(found, `Missing button: ${text}`); return found; }
-  async function click(text) { await act(async () => { button(text).click(); await pause(); }); }
+  function button(text, scope = document) { const found = [...scope.querySelectorAll('button')].find(node => node.textContent.trim() === text); assert.ok(found, `Missing button: ${text}`); return found; }
+  async function click(text, scope) { await act(async () => { button(text, scope).click(); await pause(); }); }
   async function choose(backup) {
     const input = document.querySelector('input[type="file"]');
     const text = typeof backup === 'string' ? backup : JSON.stringify(backup);

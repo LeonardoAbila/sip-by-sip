@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { act } from 'react';
+import { ui } from './helpers/ui.mjs';
+
+test('water buttons add both containers, size edits preserve recorded amounts, and undo survives remount', async t => {
+  const h = await ui(t); await h.dashboard();
+  const total = () => h.document.querySelector('.total').textContent;
+  const saved = () => JSON.parse(h.database.readProgress('aguaApp:perfil:destination'));
+  const { translations } = await h.load('language.js'); const copy = translations['pt-BR'];
+  await h.click(copy.bottleChoice); await h.click('×'); await h.until(() => !h.document.querySelector('.pour-dialog'));
+  await h.click(copy.glassChoice); await h.click('×'); await h.until(() => !h.document.querySelector('.pour-dialog'));
+  assert.equal(total(), '1 L');
+  await h.click(copy.changeBottleSize);
+  await h.input('.bottle-size-editor input', '0');
+  assert.equal(h.button(copy.save).disabled, true);
+  await h.input('.bottle-size-editor input', '900'); await h.click(copy.cancel);
+  assert.equal(total(), '1 L'); assert.equal(saved().mlGarrafa, 500);
+  await h.click(copy.changeBottleSize); await h.input('.bottle-size-editor input', '800');
+  await act(async () => { h.document.querySelector('.bottle-size-editor input').dispatchEvent(new h.dom.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); });
+  assert.equal(saved().mlGarrafa, 500);
+  await h.click(copy.changeBottleSize); await h.input('.bottle-size-editor input', '600');
+  await h.click(copy.glassChoice, h.document.querySelector('.bottle-size-editor')); await h.input('.bottle-size-editor input', '300'); await h.click(copy.save);
+  await h.until(() => saved().mlGarrafa === 600);
+  assert.equal(saved().mlCopo, 300); assert.equal(saved().totalMl, 1000); assert.equal(total(), '1 L');
+  const { default: Prototype } = await h.load('Prototype.jsx');
+  await act(async () => { h.root.render(null); }); await h.render(Prototype);
+  await h.click(copy.undoShort); assert.equal(total(), '750 ml');
+  await h.click(copy.undoShort); assert.equal(total(), '250 ml');
+  await h.click(copy.undoShort); assert.equal(total(), '0 ml');
+  assert.equal(h.button(copy.undoShort).disabled, true);
+  await h.until(() => saved().totalMl === 0);
+});
