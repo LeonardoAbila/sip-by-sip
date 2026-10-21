@@ -63,3 +63,54 @@ test('empty storage offers typed entry and registration without an empty chooser
   assert.ok(h.document.querySelector('#auth-username'));
   await h.click('Cadastre-se'); assert.ok(h.document.querySelector('#auth-confirmation'));
 });
+
+test('focus refresh adds newly stored profiles while preserving typed drafts and removes its listener on unmount', async t => {
+  const h = await ui(t); const first = await h.seed(); await signedOut(h);
+  await h.until(() => h.document.querySelector('#local-profile'));
+  await h.input('#auth-username', 'draft-name'); await h.input('#auth-password', 'draft-password');
+  await h.database.saveProfile({ ...first, id: 'other-tab', username: 'Other tab' }, { create: true });
+  await act(async () => { h.dom.window.dispatchEvent(new h.dom.window.Event('focus')); });
+  await h.until(() => h.document.querySelector('#local-profile option[value="other-tab"]'));
+  assert.equal(h.document.querySelector('#auth-username').value, 'draft-name');
+  assert.equal(h.document.querySelector('#auth-password').value, 'draft-password');
+  const { IDBObjectStore } = await import('fake-indexeddb');
+  const get = IDBObjectStore.prototype.get;
+  let reads = 0;
+  await act(async () => { h.root.render(null); });
+  IDBObjectStore.prototype.get = function (...args) { reads += 1; return get.apply(this, args); };
+  try {
+    await act(async () => { h.dom.window.dispatchEvent(new h.dom.window.Event('focus')); await h.pause(); });
+    assert.equal(reads, 0);
+  } finally { IDBObjectStore.prototype.get = get; }
+});
+
+test('stale selected profile cannot silently enter another profile', async t => {
+  const h = await ui(t); const first = await h.seed(); await signedOut(h);
+  await select(h, first.id); await h.input('#auth-password', 'destination-password');
+  // Simulate an unavailable record in current storage without adding a production delete API.
+  await h.database.saveProfile({ ...first, age: 0 });
+  await h.submit();
+  await h.until(() => h.document.querySelector('[role="alert"]')?.textContent.includes('não está mais disponível'));
+  assert.equal(h.profiles.readSession(), null);
+  assert.equal(h.document.querySelector('fieldset').disabled, false);
+});
+
+test('refresh errors preserve saved records and typed drafts and recover on the next focus', async t => {
+  const h = await ui(t); await h.seed(); await signedOut(h); await h.settle();
+  await h.input('#auth-username', 'draft'); await h.input('#auth-password', 'draft-secret');
+  const before = h.profiles.readProfiles();
+  const { IDBObjectStore } = await import('fake-indexeddb');
+  const get = IDBObjectStore.prototype.get;
+  try {
+    IDBObjectStore.prototype.get = function () { throw new Error('Read unavailable'); };
+    await act(async () => { h.dom.window.dispatchEvent(new h.dom.window.Event('focus')); });
+    await h.until(() => h.document.querySelector('[role="alert"]'));
+  } finally { IDBObjectStore.prototype.get = get; }
+  assert.match(h.document.querySelector('[role="alert"]').textContent, /atualizar os perfis/);
+  assert.equal(h.document.querySelector('#auth-username').value, 'draft');
+  assert.equal(h.document.querySelector('#auth-password').value, 'draft-secret');
+  assert.deepEqual(h.profiles.readProfiles(), before);
+  assert.equal(h.document.querySelector('fieldset').disabled, false);
+  await act(async () => { h.dom.window.dispatchEvent(new h.dom.window.Event('focus')); });
+  await h.until(() => !h.document.querySelector('[role="alert"]'));
+});

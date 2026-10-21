@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import App from './App.jsx';
 import ProfileSelector from './profile/ProfileSelector.jsx';
 import Icon from './Icon.jsx';
@@ -27,14 +27,35 @@ export default function Prototype() {
   const [profile, setProfile] = useState(readSession);
   const [profileGeneration, setProfileGeneration] = useState(0);
   const [page, setPage] = useState('login');
-  const [localProfiles] = useState(() => readProfiles().map(({ id, username }) => ({ id, username })));
+  const [localProfiles, setLocalProfiles] = useState(() => readProfiles().map(({ id, username }) => ({ id, username })));
   const [selectedId, setSelectedId] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [listError, setListError] = useState('');
   const registering = page === 'register';
+
+  useEffect(() => {
+    if (profile || page !== 'login') return;
+    let active = true;
+    let latest = 0;
+    async function refreshProfiles() {
+      const request = ++latest;
+      try {
+        await refreshDatabase();
+        if (!active || request !== latest) return;
+        setLocalProfiles(readProfiles().map(({ id, username }) => ({ id, username })));
+        setListError('');
+      } catch {
+        if (active && request === latest) setListError('Não foi possível atualizar os perfis. Tente entrar novamente ou volte a esta aba.');
+      }
+    }
+    void refreshProfiles();
+    window.addEventListener('focus', refreshProfiles);
+    return () => { active = false; window.removeEventListener('focus', refreshProfiles); };
+  }, [profile, page]);
 
   function changePage(next) {
     setPage(next);
@@ -69,6 +90,7 @@ export default function Prototype() {
 
   async function submit(event) {
     event.preventDefault();
+    if (busy) return;
     setError('');
     const name = username.trim();
     if (!name || !password) return setError('Preencha o usuário e a senha.');
@@ -81,7 +103,9 @@ export default function Prototype() {
         enter(await registerProfile(name, password));
       } else {
         const saved = readProfiles().find(item => selectedId ? item.id === selectedId : item.username.toLowerCase() === name.toLowerCase());
-        if (!saved || await hashPassword(password, saved.salt) !== saved.passwordHash) {
+        if (selectedId && !saved) {
+          setError('Este perfil não está mais disponível. Selecione outro perfil ou digite o usuário.');
+        } else if (!saved || await hashPassword(password, saved.salt) !== saved.passwordHash) {
           setError('Usuário ou senha incorretos.');
         } else enter(saved);
       }
@@ -124,6 +148,7 @@ export default function Prototype() {
             {registering && <>
               <PasswordField label="Confirme a senha" id="auth-confirmation" autoComplete="new-password" required value={confirmation} onChange={event => setConfirmation(event.target.value)} />
             </>}
+            {!registering && listError && <p className="notice" role="alert">{listError}</p>}
             {error && <p className="notice" role="alert">{error}</p>}
             <button className="add-button" type="submit">{busy ? 'Aguarde…' : registering ? 'Criar perfil' : 'Entrar'}</button>
             <p className="auth-switch">{registering ? 'Já tem um perfil?' : 'Ainda não tem um perfil?'} <button type="button" onClick={() => changePage(registering ? 'login' : 'register')}>{registering ? 'Entrar' : 'Cadastre-se'}</button></p>

@@ -3,7 +3,7 @@
 ## 1. Local profile selection and honest entry
 
 - [x] 1.1 Add a labeled native saved-profile selector alongside typed username entry and registration; clear password/confirmation/errors on deliberate selection/mode changes, hide the chooser for an empty valid-profile list, and retain normal password verification; verify DOM cases for two profiles, selection without entry, missing/wrong/correct password, typed fallback, and no accidental saves.
-- [ ] 1.2 Refresh the signed-out list on return/focus, safely handle stale selections and refresh failures, and reread selected identity before submit; verify DOM/database cases for another-tab additions, stale selection, retained typed drafts, recoverable storage failure, and proper listener cleanup.
+- [x] 1.2 Refresh the signed-out list on return/focus, safely handle stale selections and refresh failures, and reread selected identity before submit; verify DOM/database cases for another-tab additions, stale selection, retained typed drafts, recoverable storage failure, and proper listener cleanup.
 - [ ] 1.3 Add the visible Portuguese local-entry notice associated with login and registration forms; verify both forms explain browser-only storage, no encryption/browser-access protection, no online account/sync/recovery, and test-password use without requiring a link or showing technical internals.
 - [ ] 1.4 Verify compatibility with preexisting credentials, IDs, progress/rewards, pending onboarding, valid sessions, logout, and profile-isolated backup restore using focused regression cases; document the selectable-name visibility and local-entry contract in README and update the feature-file guide if a component is added.
 
