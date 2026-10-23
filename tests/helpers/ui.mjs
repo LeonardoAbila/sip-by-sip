@@ -41,9 +41,8 @@ export async function ui(t) {
   async function click(text, scope) { await act(async () => { button(text, scope).click(); await pause(); }); }
   async function record(text) {
     await click(text);
-    const close = document.querySelector('.drink-close');
-    assert.ok(close, 'Every water entry opens the drinking popup');
-    await act(async () => { close.click(); });
+    assert.equal(document.querySelector('.drink-dialog'), null);
+    assert.ok(document.querySelector('.water-confirmation').textContent.trim());
   }
   async function choose(backup) {
     const input = document.querySelector('input[type="file"]');
