@@ -206,3 +206,72 @@ dialog::backdrop { background: #10101888; }
   .buddy-body, .buddy-wave, .is-celebrating .buddy-body { animation: none; }
   .goal-celebration { display: none; }
 }
+
+/* Task-focused dashboard: progress, recording, then supporting information. */
+.app-home { max-width: 1080px; }
+.app-home .page-heading { flex-direction: row; justify-content: space-between; align-items: flex-end; text-align: left; margin-bottom: 28px; }
+.page-eyebrow { margin: 0 0 10px; color: var(--accent-text); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; }
+.today-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+.today-layout > * { min-width: 0; }
+.today-layout .hydration-card { padding: 28px; }
+.hydration-card .card-heading { align-items: flex-start; text-align: left; padding-bottom: 22px; border-bottom: 1px solid var(--border); gap: 8px; }
+.hydration-workspace { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px; align-items: center; width: 100%; padding-top: 24px; }
+.progress-overview { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.hydration-card .goal-ring { width: min(100%, 260px); margin: 12px 0 24px; }
+.water-buddy { width: 64px; height: 76px; right: -3px; bottom: -4px; }
+.total { font-size: clamp(30px, 3.5vw, 46px); }
+.buddy-message { margin: 0; line-height: 1.6; }
+.record-panel { min-width: 0; }
+.record-panel h3 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.5px; }
+.record-help { margin: 0 0 20px; color: var(--muted); font-size: 13px; }
+.record-container-actions { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.record-container-actions .add-button { min-height: 78px; padding: 16px; border-radius: 16px; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 4px 10px; text-align: left; }
+.record-container-actions .add-button > .icon { grid-row: span 2; }
+.record-container-actions .button-label { font-size: 13px; font-weight: 650; }
+.record-container-actions .button-volume { grid-column: 2; }
+.record-container-actions .add-button:not(.add-glass-button) { box-shadow: none; }
+.record-container-actions .add-glass-button { border-width: 1px; box-shadow: none; }
+.record-container-actions .undo-water { font-size: 12px; margin-top: 4px; }
+.today-summary { padding: 26px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--panel-radius); }
+.summary-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--accent-soft); color: var(--accent-text); }
+.summary-intro h2 { margin: 20px 0 10px; font-size: 23px; line-height: 1.35; letter-spacing: -.7px; }
+.summary-intro p { margin: 0 0 24px; color: var(--muted); font-size: 13px; }
+.today-summary .daily-motivation { grid-template-columns: 1fr; margin-bottom: 20px; gap: 10px; }
+.today-summary .daily-motivation > div { justify-content: flex-start; background: var(--input); border: 0; padding: 14px; }
+.summary-link { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 12px 0; border: 0; border-top: 1px solid var(--border); background: transparent; color: var(--text); text-decoration: none; text-align: left; font-size: 13px; font-weight: 600; }
+.summary-link > span:last-child { margin-left: auto; color: var(--muted); }
+.summary-link .icon { color: var(--muted); width: 18px; height: 18px; }
+.auth-intro { padding: 32px 12px; }
+.auth-intro h1 { max-width: 440px; font-size: clamp(40px, 5vw, 68px); line-height: 1.06; margin-block: 32px 24px; }
+.auth-brand { color: var(--accent-text); }
+.auth-welcome { color: var(--muted); margin: 0 0 24px; line-height: 1.6; }
+.local-profile-details { margin-bottom: 24px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--input); font-size: 12px; color: var(--muted); }
+.local-profile-details .settings-help { margin: 0; line-height: 1.65; }
+@media (min-width: 721px) and (max-width: 1000px) {
+  .today-layout { grid-template-columns: minmax(0, 1fr) 230px; gap: 16px; }
+  .today-layout .hydration-card, .today-summary { padding: 20px; }
+  .hydration-workspace { gap: 18px; }
+  .header-tools .theme-toggle span { display: none; }
+}
+@media (max-width: 720px) {
+  .app-home { max-width: 540px; }
+  .app-home .page-heading { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .page-eyebrow { font-size: 10px; margin-bottom: 8px; }
+  .today-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .today-layout .hydration-card { padding: 22px; }
+  .hydration-workspace { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 12px; }
+  .hydration-card .goal-ring { width: 220px; max-width: 100%; margin: 12px 0 18px; }
+  .total { font-size: 40px; }
+  .record-panel { width: 100%; padding-top: 20px; border-top: 1px solid var(--border); }
+  .record-panel h3 { font-size: 18px; }
+  .record-help { margin-bottom: 16px; }
+  .record-container-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .record-container-actions .add-button { display: flex; flex-direction: column; justify-content: center; text-align: center; min-height: 96px; padding: 12px 8px; }
+  .record-container-actions .button-label { font-size: 12px; }
+  .today-summary { padding: 22px; }
+  .summary-intro h2 { font-size: 20px; margin-top: 14px; }
+  .today-summary .daily-motivation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .today-summary .daily-motivation > div { padding: 12px; }
+  .auth-intro { padding: 8px 0; }
+  .auth-intro h1 { font-size: 42px; margin-block: 24px 16px; }
+}

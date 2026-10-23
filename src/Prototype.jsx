@@ -157,12 +157,15 @@ export default function Prototype() {
       </section>
       <section className="auth-card" aria-labelledby="auth-title">
         <h2 id="auth-title" ref={entryHeading} tabIndex={-1}>{registering ? 'Crie seu perfil' : 'Entre no seu perfil'}</h2>
+        <p className="auth-welcome">{registering ? 'Comece seu novo hábito com um perfil local.' : 'Seu próximo gole começa aqui.'}</p>
+        <div className="local-profile-details">
         <p id="local-entry-help" className="settings-help">
           Seus perfis e históricos ficam apenas neste navegador e neste endereço do site.
           A senha serve para entrar no perfil pelo aplicativo: ela não criptografa os dados
           nem impede que alguém com acesso ao navegador os leia.
           Não há conta online, sincronização automática ou recuperação de senha. Use uma senha de teste.
         </p>
+        </div>
         <form onSubmit={submit} aria-busy={busy} aria-describedby="local-entry-help">
           <fieldset disabled={busy}>
             {!registering && <ProfileSelector profiles={localProfiles} selectedId={selectedId} onSelect={selectProfile} />}

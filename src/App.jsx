@@ -179,14 +179,21 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
         <div id="home" hidden={screen !== 'home'}>
           <header className="page-heading">
             <div>
+              <p className="page-eyebrow">{t.dailyOverview}</p>
               <h1 ref={homeHeading} tabIndex={-1}>{t.dashboardTitle}</h1>
             </div>
             <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
           </header>
-          <DailyMotivation rewards={rewards} t={t} format={format} />
+          <div className="today-layout">
           <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
             earnedToday={rewards.earnedToday}
             onUndo={() => { if (!transferBusy.current) { setConfirmation(null); closeDrink(); setState(undoWater); } }} />
+          <aside className="today-summary" aria-label={t.dailyOverview}>
+            <div className="summary-intro"><span className="summary-icon"><Icon name="drop" /></span><h2>{t.smallSteps}</h2><p>{t.goalToday(format.format(state.metaLitros))}</p></div>
+            <DailyMotivation rewards={rewards} t={t} format={format} />
+            <a className="summary-link" href="#history"><Icon name="history" />{t.history}<span aria-hidden="true">→</span></a>
+          </aside>
+          </div>
         </div>
         <section id="history" hidden={screen !== 'history'} aria-labelledby="history-title">
           <header className="page-heading"><h1 id="history-title" tabIndex={-1} ref={historyHeading}>{t.history}</h1></header>

@@ -28,6 +28,8 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo, e
         <h2><Icon name="drop" />{t.consumption}</h2>
         <p className="buddy-encouragement">{encouragement}</p>
       </div>
+      <div className="hydration-workspace">
+      <div className="progress-overview">
       <div className="goal-ring" style={{ '--water-level': `${percentage}%` }}>
         <svg className="ring-svg" viewBox="0 0 260 260" aria-hidden="true">
           <circle className="ring-track" cx="130" cy="130" r="112" />
@@ -44,6 +46,10 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo, e
       <p className={`buddy-message${percentage >= 100 ? ' success' : ''}`} role={percentage >= 100 ? 'status' : undefined}>
         {percentage >= 100 ? t.success : t.remainingToday(remainingLabel)}
       </p>
+      </div>
+      <div className="record-panel">
+      <h3>{t.addDrink}</h3>
+      <p className="record-help">{t.chooseContainer}</p>
       <div className="record-container-actions">
         <button className="add-button" aria-label={`${t.add} · ${format.format(state.mlGarrafa)} ml`} onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
           <Icon name="bottle" /><span className="button-label">{t.bottleChoice}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml</span>
@@ -54,6 +60,8 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo, e
         <button className="undo-water" type="button" aria-label={t.undoDrink} disabled={!state.entries.length} onClick={onUndo}>
           <Icon name="reset" />{t.undoShort}
         </button>
+      </div>
+      </div>
       </div>
     </section>
   );
