@@ -88,7 +88,7 @@ test('simple home keeps history secondary and calendar follows add, undo and res
   assert.equal(document.querySelector('#home .reminder-card'), null);
   const calendarVolume = () => document.querySelector('.calendar-today .calendar-volume').textContent;
   assert.equal(calendarVolume(), '250 ml');
-  await h.click(copy.bottleChoice);
+  await h.record(copy.bottleChoice);
   assert.equal(calendarVolume(), '750 ml');
   await h.click(copy.undoShort); assert.equal(calendarVolume(), '250 ml');
   await act(async () => { document.querySelector('a[href="#history"]').click(); await h.pause(); });

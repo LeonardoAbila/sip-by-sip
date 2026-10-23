@@ -10,7 +10,7 @@ test('home rewards celebrate a new daily goal once and survive undo, recrossing 
   const streak = () => h.document.querySelector('#home .motivation-streak dd').textContent;
   assert.equal(points(), '0 pontos'); assert.equal(streak(), '0 dias');
   assert.equal(h.document.querySelector('.buddy-message').textContent.trim(), 'Faltam 1,75 L para a meta.');
-  for (let index = 0; index < 4; index += 1) await h.click(copy.bottleChoice);
+  for (let index = 0; index < 4; index += 1) await h.record(copy.bottleChoice);
   assert.equal(points(), '10 pontos'); assert.equal(streak(), '1 dia');
   assert.ok(h.document.querySelector('.is-celebrating'));
   assert.equal(h.document.querySelector('.buddy-message').textContent.trim(), copy.success);
@@ -18,7 +18,7 @@ test('home rewards celebrate a new daily goal once and survive undo, recrossing 
   await h.click(copy.undoShort);
   assert.equal(h.document.querySelector('.is-celebrating'), null);
   assert.equal(points(), '10 pontos');
-  await h.click(copy.bottleChoice);
+  await h.record(copy.bottleChoice);
   assert.equal(h.document.querySelector('.is-celebrating'), null);
   assert.equal(points(), '10 pontos');
   await act(async () => { await h.database.refreshDatabase(); });

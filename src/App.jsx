@@ -1,5 +1,6 @@
 import StreakCard from './dashboard/StreakCard.jsx';
 import DailyMotivation from './dashboard/DailyMotivation.jsx';
+import DrinkDialog from './dashboard/DrinkDialog.jsx';
 import DashboardNav from './dashboard/DashboardNav.jsx';
 import ReminderNotice from './dashboard/ReminderNotice.jsx';
 import ResetDialog from './dashboard/ResetDialog.jsx';
@@ -8,7 +9,7 @@ import HydrationCard from './dashboard/HydrationCard.jsx';
 import WaterLog from './dashboard/WaterLog.jsx';
 import useWaterReminders from './dashboard/useWaterReminders.js';
 import { saveProgress, exportProfile, restoreProfile } from './database.js';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { achievements, currentDay, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume, selectedVolume } from './state.js';
 import { readTheme, THEME_KEY, readColor, COLOR_KEY } from './theme.js';
 import { LANGUAGE_KEY, readLanguage, translations } from './language.js';
@@ -41,13 +42,15 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
   const storageKey = profile ? `${STORAGE_KEY}:perfil:${profile.id}` : STORAGE_KEY;
   const [state, setState] = useState(() => readState(storageKey, profile?.goalLiters ?? 2));
   const [confirmation, setConfirmation] = useState(null);
+  const [drinkEntry, setDrinkEntry] = useState(null);
+  const closeDrink = useCallback(() => setDrinkEntry(null), []);
   const confirmationId = useRef(0);
   useEffect(() => {
     if (!confirmation) return;
     const timer = setTimeout(() => setConfirmation(null), 4000);
     return () => clearTimeout(timer);
   }, [confirmation]);
-  useEffect(() => { setConfirmation(null); }, [screen]);
+  useEffect(() => { setConfirmation(null); setDrinkEntry(null); }, [screen]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [storageError, setStorageError] = useState(false);
@@ -133,6 +136,7 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
       const restored = await restoreProfile(profile.id, backup);
       committed = true;
       setConfirmation(null);
+      closeDrink();
       dismissReminder();
       onProfileRestored(restored);
     } finally { if (!committed) transferBusy.current = false; }
@@ -150,13 +154,16 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
   function recordWater(amount = containerVolume, container = state.container) {
     if (transferBusy.current || !validVolume(amount)) return;
     dismissReminder();
-    setConfirmation({ id: ++confirmationId.current, amount: Number(amount) });
+    const entry = { id: ++confirmationId.current, amount: Number(amount), container };
+    setConfirmation(entry);
+    setDrinkEntry(entry);
     setState(previous => addWater({ ...previous, container: container === 'custom' ? previous.container : container }, Number(amount), container));
   }
 
   function resetDay() {
     if (transferBusy.current) return;
     setConfirmation(null);
+    closeDrink();
     setState(resetWater);
     setResetOpen(false);
   }
@@ -179,7 +186,7 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
           <DailyMotivation rewards={rewards} t={t} format={format} />
           <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
             earnedToday={rewards.earnedToday}
-            onUndo={() => { if (!transferBusy.current) { setConfirmation(null); setState(undoWater); } }} />
+            onUndo={() => { if (!transferBusy.current) { setConfirmation(null); closeDrink(); setState(undoWater); } }} />
         </div>
         <section id="history" hidden={screen !== 'history'} aria-labelledby="history-title">
           <header className="page-heading"><h1 id="history-title" tabIndex={-1} ref={historyHeading}>{t.history}</h1></header>
@@ -202,6 +209,7 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
           profile={profile} onExport={downloadProfile} onImport={importProfile}
           onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>
         <Fade visible={resetOpen}><ResetDialog t={t} onConfirm={resetDay} onClose={() => setResetOpen(false)} /></Fade>
+        {drinkEntry && <DrinkDialog key={drinkEntry.id} entry={drinkEntry} t={t} format={format} onClose={closeDrink} />}
       </main>
     </>
   );

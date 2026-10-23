@@ -39,6 +39,12 @@ export async function ui(t) {
   }
   function button(text, scope = document) { const found = [...scope.querySelectorAll('button')].find(node => node.textContent.trim() === text || node.querySelector('.button-label')?.textContent.trim() === text); assert.ok(found, `Missing button: ${text}`); return found; }
   async function click(text, scope) { await act(async () => { button(text, scope).click(); await pause(); }); }
+  async function record(text) {
+    await click(text);
+    const close = document.querySelector('.drink-close');
+    assert.ok(close, 'Every water entry opens the drinking popup');
+    await act(async () => { close.click(); });
+  }
   async function choose(backup) {
     const input = document.querySelector('input[type="file"]');
     const text = typeof backup === 'string' ? backup : JSON.stringify(backup);
@@ -90,6 +96,6 @@ export async function ui(t) {
     await until(() => document.querySelector('.total')?.textContent === '250 ml');
     return profile;
   }
-  return { dom, document, server, root, pause, settle, until, button, click, choose, load, database, profiles, state,
+  return { dom, document, server, root, pause, settle, until, button, click, record, choose, load, database, profiles, state,
     render, input, submit, escape, seed, dashboard, downloads: () => downloads };
 }

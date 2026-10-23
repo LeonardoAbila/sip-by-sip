@@ -20,7 +20,7 @@ test('backup lifecycle: export latest entry, cancel, retry atomic restore, remou
     localStorage.setItem('aguaReminders:deadline:aguaApp:perfil:destination', JSON.stringify({ minutes: 30, deadline: Date.now() + 1000 }));
     await act(async () => { root.render(React.createElement(Prototype)); await pause(); });
     await until(() => document.querySelector('.total')?.textContent === '250 ml');
-    await click('Garrafa');
+    await h.record('Garrafa');
     await click('Configurações');
     // An unsaved goal draft must not become part of an export/import.
     const goal = document.querySelector('#daily-goal');
