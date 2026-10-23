@@ -143,7 +143,7 @@ test('capture home and history for desktop and phone including dark, reduced mot
     }
   }
   expect(await page.locator('.ring-content').evaluate(node => getComputedStyle(node, '::before').animationName)).toBe('none');
-  expect(await page.locator('.buddy-body').evaluate(node => getComputedStyle(node).animationName)).toBe('none');
+  await expect(page.locator('.water-buddy')).toHaveCount(0);
 });
 
 test('shared appearance keeps login, registration and onboarding usable on a small phone', async ({ page }, testInfo) => {

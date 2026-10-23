@@ -216,7 +216,7 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
           profile={profile} onExport={downloadProfile} onImport={importProfile}
           onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>
         <Fade visible={resetOpen}><ResetDialog t={t} onConfirm={resetDay} onClose={() => setResetOpen(false)} /></Fade>
-        {drinkEntry && <PourDialog key={drinkEntry.id} amount={format.format(drinkEntry.amount)} container={drinkEntry.container} t={t} onClose={closeDrink} />}
+        <Fade visible={Boolean(drinkEntry)}>{drinkEntry && <PourDialog key={drinkEntry.id} amount={format.format(drinkEntry.amount)} container={drinkEntry.container} t={t} onClose={closeDrink} />}</Fade>
       </main>
     </>
   );

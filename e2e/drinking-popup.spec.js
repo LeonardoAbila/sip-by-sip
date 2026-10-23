@@ -10,6 +10,7 @@ test('bottle-filling popup shows each vessel, closes and preserves recorded wate
     await button.click();
     const dialog = page.getByRole('dialog', { name: 'Água registrada! 💙' });
     await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveCSS('animation-name', 'panel-arrive');
     await expect(page.locator('.pour-scene')).toHaveAttribute('data-container', container);
     await expect(page.locator('#pour-amount')).toContainText(container === 'glass' ? '+250 ml' : '+500 ml');
     await expect(page.locator('.pour-water')).toBeVisible();
@@ -18,7 +19,10 @@ test('bottle-filling popup shows each vessel, closes and preserves recorded wate
     const path = testInfo.outputPath(`phone-drinking-${container}.png`);
     await page.screenshot({ path });
     await testInfo.attach(`drinking-${container}`, { path, contentType: 'image/png' });
-    if (container === 'bottle') await page.locator('.pour-close').click();
+    if (container === 'bottle') {
+      await page.locator('.pour-close').click();
+      await expect(page.locator('.fade-shell[data-visible="false"] > .pour-dialog')).toHaveCSS('animation-name', 'interface-fade-out');
+    }
     await expect(dialog).toHaveCount(0); // The glass scene closes automatically.
     await expect(button).toBeFocused();
   }

@@ -60,10 +60,6 @@ button, .nav-actions a { transition: transform 180ms ease, background-color 240m
 .buddy-encouragement { margin: 0; color: var(--muted); font-size: 13px; }
 .buddy-message { min-height: 20px; margin: 0 0 16px; font-size: 13px; color: var(--muted); text-align: center; }
 .buddy-message.success { color: var(--success); }
-.water-buddy { position: absolute; width: 88px; height: 103px; right: -16px; bottom: -4px; color: var(--accent); overflow: visible; pointer-events: none; }
-.buddy-body { transform-origin: 60px 124px; animation: buddy-arrive 400ms ease-out both; }
-.buddy-wave { transform-origin: 100px 87px; animation: buddy-wave 650ms ease-in-out 2; }
-.is-celebrating .buddy-body { animation: buddy-cheer 600ms ease-in-out 3; }
 .goal-celebration { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .goal-celebration i { position: absolute; left: 15%; top: 48%; width: 7px; height: 12px; border-radius: 3px; background: var(--accent); animation: sip-confetti 1600ms ease-out both; }
 .goal-celebration i:nth-child(2n) { background: #e3a843; border-radius: 50%; width: 8px; height: 8px; }
@@ -141,9 +137,6 @@ dialog::backdrop { background: #10101888; }
 .auth-intro h1 { font-weight: 700; letter-spacing: -2px; }
 .auth-goal, .onboarding-reasons > div { border-radius: 20px; }
 @keyframes fluid-wave { to { transform: rotate(360deg); } }
-@keyframes buddy-arrive { from { transform: scale(.88); } to { transform: scale(1); } }
-@keyframes buddy-wave { 50% { transform: rotate(22deg); } }
-@keyframes buddy-cheer { 40% { transform: translateY(-8px) rotate(-5deg); } 70% { transform: translateY(-3px) rotate(4deg); } }
 @keyframes sip-confetti { from { opacity: 1; transform: translateY(0) rotate(0); } to { opacity: 0; transform: translateY(-100px) rotate(200deg); } }
 @keyframes panel-arrive { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (hover: hover) {
@@ -173,7 +166,6 @@ dialog::backdrop { background: #10101888; }
   .app-home .page-heading h1 { font-size: 30px; }
   .app-home .hydration-card { padding: 16px; }
   .hydration-card .goal-ring { width: min(100%, 190px); margin-block: 8px; }
-  .water-buddy { width: 72px; height: 84px; right: -20px; bottom: -2px; }
   .record-container-actions .add-button { min-height: 80px; padding: 10px; }
   .buddy-message { margin-bottom: 12px; font-size: 12px; }
   .buddy-encouragement { font-size: 12px; }
@@ -203,7 +195,6 @@ dialog::backdrop { background: #10101888; }
 @media (prefers-reduced-motion: reduce) {
   .ring-content::before, .ring-content::after, .fade-shell[data-visible='true'] > dialog { animation: none; transition: none; }
   .record-container-actions .add-button:hover, .record-container-actions .add-button:active { transform: none; }
-  .buddy-body, .buddy-wave, .is-celebrating .buddy-body { animation: none; }
   .goal-celebration { display: none; }
 }
 
@@ -218,7 +209,6 @@ dialog::backdrop { background: #10101888; }
 .hydration-workspace { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px; align-items: center; width: 100%; padding-top: 24px; }
 .progress-overview { min-width: 0; display: flex; flex-direction: column; align-items: center; }
 .hydration-card .goal-ring { width: min(100%, 260px); margin: 12px 0 24px; }
-.water-buddy { width: 64px; height: 76px; right: -3px; bottom: -4px; }
 .total { font-size: clamp(30px, 3.5vw, 46px); }
 .buddy-message { margin: 0; line-height: 1.6; }
 .record-panel { min-width: 0; }

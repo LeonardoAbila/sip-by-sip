@@ -49,11 +49,13 @@ test('every entry opens the matching filling scene and closing restores focus wi
   assert.ok(h.document.querySelector('#pour-amount').textContent.includes('+500 ml'));
   assert.ok(h.document.activeElement === h.document.querySelector('.pour-close'));
   await act(async () => { h.document.querySelector('.pour-close').click(); });
+  await h.until(() => !h.document.querySelector('.pour-dialog'));
   assert.ok(h.document.activeElement === bottle);
   await act(async () => { glass.focus(); glass.click(); });
   assert.equal(h.document.querySelector('.pour-scene').dataset.container, 'glass');
   assert.ok(h.document.querySelector('#pour-amount').textContent.includes('+250 ml'));
   await h.escape('.pour-dialog');
+  await h.until(() => !h.document.querySelector('.pour-dialog'));
   assert.ok(h.document.activeElement === glass);
   assert.equal(h.document.querySelector('.total').textContent, '1 L');
   assert.equal(h.document.querySelector('dialog'), null);
@@ -75,6 +77,8 @@ test('same-volume confirmation renews its timer and undo survives expiry', async
   assert.ok(h.document.querySelector('.pour-dialog'));
   assert.ok(feedback.textContent.trim());
   await act(async () => { t.mock.timers.tick(2999); });
+  // Flush the exit cleanup scheduled after React commits the hidden state.
+  await act(async () => { t.mock.timers.tick(0); });
   assert.equal(h.document.querySelector('.pour-dialog'), null);
   assert.ok(feedback.textContent.trim());
   await act(async () => { t.mock.timers.tick(1); });
@@ -102,6 +106,7 @@ test('overdue reminder records through quick entry and is dismissed', async t =>
   assert.equal(h.document.querySelector('.pour-scene').dataset.container, 'bottle');
   assert.ok(h.document.querySelector('.pour-water'));
   await act(async () => { h.document.querySelector('.pour-close').click(); });
+  await h.until(() => !h.document.querySelector('.pour-dialog'));
   assert.equal(h.document.querySelector('.water-confirmation').textContent.trim(), '+500 ml adicionados');
 });
 

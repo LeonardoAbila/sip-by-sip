@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../Icon.jsx';
-import WaterBuddy from './WaterBuddy.jsx';
 import { remainingWater } from '../state.js';
 
 export default function HydrationCard({ state, t, format, recordWater, onUndo, earnedToday }) {
@@ -41,7 +40,6 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo, e
           <span className="goal-caption">{t.goalToday(format.format(state.metaLitros))}</span>
           <span className="percentage-pill">{Math.floor(percentage)}%</span>
         </div>
-        <WaterBuddy key={state.garrafas} happy={percentage >= 50} />
       </div>
       <p className={`buddy-message${percentage >= 100 ? ' success' : ''}`} role={percentage >= 100 ? 'status' : undefined}>
         {percentage >= 100 ? t.success : t.remainingToday(remainingLabel)}

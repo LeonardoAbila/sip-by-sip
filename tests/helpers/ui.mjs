@@ -44,6 +44,7 @@ export async function ui(t) {
     const close = document.querySelector('.pour-close');
     assert.ok(close, 'Every water entry opens the drinking popup');
     await act(async () => { close.click(); });
+    await until(() => !document.querySelector('.pour-dialog'));
   }
   async function choose(backup) {
     const input = document.querySelector('input[type="file"]');
