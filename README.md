@@ -145,7 +145,7 @@ lose travel history and undo information.
 
 - The responsive top navigation includes the app name, **Início**, **Benefícios**, and **Configurações**. Open the dashboard reminder card to manage **Lembretes de água**. Navigation labels follow your chosen language.
 
-- Recording a bottle or glass updates the total and progress immediately. A discreet inline confirmation displays the added volume for about four seconds without opening a popup or moving keyboard focus. Another entry renews the timer. **Desfazer / Undo / Deshacer** remains available on Home and after reload, removing the actual last recorded amount. The storage-error alert is independent of this confirmation.
+- Recording a bottle or glass updates the total and progress immediately and opens a compact popup with a simple stick figure lifting the matching container to drink. Only the arm and container move; there are no sparkles or decorative effects. The popup shows the recorded amount, closes automatically after 2.8 seconds, and can be dismissed with its close button or Escape. Closing it keeps the entry and returns focus to the original control. Reduced-motion mode shows a static drinking pose. An inline confirmation also displays the added volume for four seconds. **Desfazer / Undo / Deshacer** remains available on Home and after reload, removing the actual last recorded amount. The storage-error alert is independent of this confirmation.
 - The bottle log shows recorded bottles filled with water and remaining bottles as faint, dashed outlines. Remaining bottles are calculated from the water still needed and the current bottle size, rounding up; each group displays at most 24 illustrations with an overflow count.
 - Use **Alterar ml** inside the bottle log to edit the bottle volume directly. Save applies a positive value to future bottles; Cancel or Escape discards edits. Recorded water is preserved and ghost bottles update to the new size.
 - Add a bottle using its current size. Changing the size affects future bottles; it preserves water already recorded.
@@ -196,7 +196,7 @@ Recorded entries keep their actual volume and container. The log displays
 bottle and glass illustrations together and shows separate counts. Older
 entries whose container was not recorded, and custom amounts, appear as water
 drops under other entries. Aggregate-only records also remain in that count.
-Bottle and glass entries both show the recorded volume in the inline confirmation.
+Bottle and glass entries show the matching container and recorded amount in the stick-figure popup.
 
 Use **Alterar ml** to adjust the bottle or glass volume. Volumes
 accept 0.01–1,000,000 ml with at most two decimal places; totals use integer
@@ -285,7 +285,7 @@ Find individual features in `src/dashboard/`:
 - `ProfileTransfer.jsx`: profile backup export, import preview, and replacement confirmation.
 - `RemindersForm.jsx` and `ReminderNotice.jsx`: reminder settings, preview, and alert.
 - `useWaterReminders.js`: saved preferences, per-profile deadlines, visibility checks, audio, and timer cleanup.
-- `ResetDialog.jsx`: reset confirmation. Water recording feedback uses a non-modal live region owned by `App.jsx`.
+- `ResetDialog.jsx`: reset confirmation. `DrinkDialog.jsx` and `drink-dialog.css`: minimal stick-figure drinking popup. `App.jsx` also owns the inline recording confirmation.
 
 Hydration rules remain in `src/state.js`, persistence in `src/database.js`, and
 calendar rendering in `src/HydrationCalendar.jsx`, dashboard translations in
@@ -396,7 +396,7 @@ applies to download anchors; ordinary navigation is left intact.
 | --- | --- | --- |
 | Profile forms | `profileFormsUi.test.mjs`: registration/login/onboarding validation | `e2e/hydration.spec.js`: registration, onboarding, logout/login |
 | Hydration and sizes | `hydrationUi.test.mjs`: add/undo and size-editor save/cancel/validation | `e2e/hydration.spec.js`: immediate entries, size editing, undo and reload |
-| Water confirmation | `hydrationUi.test.mjs`: inline amounts, focus, renewed timer and undo | `e2e/water-confirmation.spec.js`: consecutive keyboard entries, confirmation expiry and persistence |
+| Drinking popup | `hydrationUi.test.mjs`: stick figure, matching container, close/Escape, timer and focus restoration | `e2e/drinking-popup.spec.js`: phone popup, automatic close, reduced motion and persistence |
 | Settings and reset | `settingsUi.test.mjs`: validation, save/cancel/Escape and reset confirmation | `e2e/fluid-layout.spec.js`: keyboard focus and reminder subpanels; hydration journey covers reset |
 | Reminders | `dashboardNavigationUi.test.mjs` card states; `reminderFormsUi.test.mjs` validation/save/cancel/preview | `e2e/fluid-layout.spec.js`: native dialog and keyboard return; audible quality stays manual |
 | Navigation | `dashboardNavigationUi.test.mjs` ordinary links and home focus | `e2e/fluid-layout.spec.js`: destination clicks, sizes, palettes and localized layouts |

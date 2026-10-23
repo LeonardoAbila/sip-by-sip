@@ -25,7 +25,9 @@ export async function login(page, username, secret = password) {
 
 export async function record(page, container = 'bottle') {
   await page.getByRole('button', { name: container === 'bottle' ? /Adicionar garrafa/ : /Adicionar copo/ }).click();
-  await expect(page.locator('.water-confirmation')).toContainText(container === 'bottle' ? '+500 ml' : '+250 ml');
+  await expect(page.locator('.drink-dialog')).toBeVisible();
+  await expect(page.locator('.drink-scene')).toHaveAttribute('data-container', container);
+  await page.locator('.drink-close').click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
 }
 

@@ -38,16 +38,24 @@ test('water buttons add both containers, size edits preserve recorded amounts, a
   await h.until(() => saved().totalMl === 0);
 });
 
-test('water recording confirms the amount inline and keeps focus on the action', async t => {
+test('every entry opens the matching stick-figure drinking scene and closing restores focus without changing totals', async t => {
   const h = await ui(t); await h.dashboard();
   const bottle = h.document.querySelector('.record-container-actions .add-button');
   const glass = h.document.querySelector('.add-glass-button');
   await act(async () => { bottle.focus(); bottle.click(); });
   assert.equal(h.document.querySelector('.total').textContent, '750 ml');
-  assert.equal(h.document.activeElement, bottle);
-  assert.equal(h.document.querySelector('.water-confirmation').textContent.trim(), '+500 ml adicionados');
+  assert.equal(h.document.querySelector('.drink-scene').dataset.container, 'bottle');
+  assert.ok(h.document.querySelector('.stick-drinking-arm'));
+  assert.equal(h.document.querySelector('.drink-sparkles'), null);
+  assert.ok(h.document.querySelector('#drink-amount').textContent.includes('+500 ml'));
+  assert.ok(h.document.activeElement === h.document.querySelector('.drink-close'));
+  await act(async () => { h.document.querySelector('.drink-close').click(); });
+  assert.ok(h.document.activeElement === bottle);
   await act(async () => { glass.focus(); glass.click(); });
-  assert.equal(h.document.activeElement, glass);
+  assert.equal(h.document.querySelector('.drink-scene').dataset.container, 'glass');
+  assert.ok(h.document.querySelector('#drink-amount').textContent.includes('+250 ml'));
+  await h.escape('.drink-dialog');
+  assert.ok(h.document.activeElement === glass);
   assert.equal(h.document.querySelector('.total').textContent, '1 L');
   assert.equal(h.document.querySelector('dialog'), null);
   assert.equal(h.document.querySelector('.water-confirmation').textContent.trim(), '+250 ml adicionados');
@@ -65,7 +73,7 @@ test('same-volume confirmation renews its timer and undo survives expiry', async
   assert.notEqual(feedback.firstElementChild, previousMessage);
   assert.equal(feedback.textContent.trim(), '+250 ml adicionados');
   await act(async () => { t.mock.timers.tick(1000); });
-  assert.equal(h.document.querySelector('dialog'), null);
+  assert.ok(h.document.querySelector('.drink-dialog'));
   assert.ok(feedback.textContent.trim());
   await act(async () => { t.mock.timers.tick(2999); });
   assert.equal(h.document.querySelector('.drink-dialog'), null);
@@ -92,7 +100,10 @@ test('overdue reminder records through quick entry and is dismissed', async t =>
   await h.click(translations['pt-BR'].add, h.document.querySelector('.reminder-toast'));
   await h.until(() => !h.document.querySelector('.reminder-toast'));
   assert.equal(h.document.querySelector('.total').textContent, '750 ml');
-  assert.equal(h.document.querySelector('dialog'), null);
+  assert.equal(h.document.querySelector('.drink-scene').dataset.container, 'bottle');
+  assert.ok(h.document.querySelector('.stick-drinking-arm'));
+  assert.equal(h.document.querySelector('.drink-sparkles'), null);
+  await act(async () => { h.document.querySelector('.drink-close').click(); });
   assert.equal(h.document.querySelector('.water-confirmation').textContent.trim(), '+500 ml adicionados');
 });
 
