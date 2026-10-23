@@ -475,7 +475,7 @@ progress::-moz-progress-bar { background: var(--accent); }
 .bottle-settings small { color: var(--muted); font-size: 13px; font-weight: 400; }
 .daily-summary .reminder-card { gap: 8px; padding: 16px; background: var(--surface); border-radius: 16px; }
 .daily-summary .reminder-card-icon { width: 28px; height: 28px; background: transparent; }
-#home .hydration-card .add-button { margin-top: 0; box-shadow: none; }
+#home .hydration-card .add-button { margin-top: 0; }
 #home .percentage-pill { background: transparent; padding-inline: 0; font-size: 12px; }
 @media (max-width: 720px) {
   .daily-panel { gap: 14px; }

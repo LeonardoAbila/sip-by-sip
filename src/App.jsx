@@ -1,4 +1,5 @@
 import StreakCard from './dashboard/StreakCard.jsx';
+import DailyMotivation from './dashboard/DailyMotivation.jsx';
 import DashboardNav from './dashboard/DashboardNav.jsx';
 import ReminderNotice from './dashboard/ReminderNotice.jsx';
 import ResetDialog from './dashboard/ResetDialog.jsx';
@@ -175,7 +176,9 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
             </div>
             <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
           </header>
+          <DailyMotivation rewards={rewards} t={t} format={format} />
           <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
+            earnedToday={rewards.earnedToday}
             onUndo={() => { if (!transferBusy.current) { setConfirmation(null); setState(undoWater); } }} />
         </div>
         <section id="history" hidden={screen !== 'history'} aria-labelledby="history-title">

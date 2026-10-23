@@ -46,11 +46,34 @@ button, .nav-actions a { transition: transform 180ms ease, background-color 240m
 .page-heading h1[tabindex='-1']:focus { outline: none; }
 .app-home .page-heading { align-items: center; text-align: center; }
 .date-chip { font-size: 13px; }
+.daily-motivation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 14px; }
+.daily-motivation > div { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 44px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.daily-motivation dt { display: flex; color: var(--warm-text); }
+.daily-motivation dd { margin: 0; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.motivation-points .icon { fill: var(--warm); }
 .hydration-card, .bottle-card, .hydration-calendar, .auth-card, .achievement-panel > div {
   border-radius: var(--panel-radius); border-color: var(--border); box-shadow: var(--panel-shadow); background: var(--surface);
 }
 .hydration-card, .bottle-card { padding: clamp(20px, 3vw, 36px); }
-.hydration-card .card-heading { align-items: center; }
+.hydration-card { position: relative; overflow: hidden; }
+.hydration-card .card-heading { align-items: center; gap: 4px; }
+.buddy-encouragement { margin: 0; color: var(--muted); font-size: 13px; }
+.buddy-message { min-height: 20px; margin: 0 0 16px; font-size: 13px; color: var(--muted); text-align: center; }
+.buddy-message.success { color: var(--success); }
+.water-buddy { position: absolute; width: 88px; height: 103px; right: -16px; bottom: -4px; color: var(--accent); overflow: visible; pointer-events: none; }
+.buddy-body { transform-origin: 60px 124px; animation: buddy-arrive 400ms ease-out both; }
+.buddy-wave { transform-origin: 100px 87px; animation: buddy-wave 650ms ease-in-out 2; }
+.is-celebrating .buddy-body { animation: buddy-cheer 600ms ease-in-out 3; }
+.goal-celebration { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.goal-celebration i { position: absolute; left: 15%; top: 48%; width: 7px; height: 12px; border-radius: 3px; background: var(--accent); animation: sip-confetti 1600ms ease-out both; }
+.goal-celebration i:nth-child(2n) { background: #e3a843; border-radius: 50%; width: 8px; height: 8px; }
+.goal-celebration i:nth-child(2) { left: 30%; animation-delay: 80ms; }
+.goal-celebration i:nth-child(3) { left: 65%; animation-delay: 140ms; }
+.goal-celebration i:nth-child(4) { left: 85%; animation-delay: 40ms; }
+.goal-celebration i:nth-child(5) { left: 8%; top: 32%; animation-delay: 120ms; }
+.goal-celebration i:nth-child(6) { left: 90%; top: 32%; animation-delay: 160ms; }
+.goal-celebration i:nth-child(7) { left: 40%; top: 24%; animation-delay: 60ms; }
+.goal-celebration i:nth-child(8) { left: 60%; top: 24%; animation-delay: 100ms; }
 .bottle-card .card-heading { align-items: flex-start; text-align: left; }
 .card-heading h2 { font-size: 16px; font-weight: 650; letter-spacing: -.3px; }
 .goal-ring { width: min(100%, 300px); isolation: isolate; }
@@ -73,11 +96,11 @@ button, .nav-actions a { transition: transform 180ms ease, background-color 240m
   width: 100%; height: auto; min-height: 100px; justify-self: stretch;
   flex-direction: column; gap: 5px; padding: 16px 12px; border-radius: 20px; font-size: 14px;
 }
-.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent-button); color: #fff; }
-.record-container-actions .add-glass-button { border-color: transparent; background: var(--accent-soft); color: var(--accent-text); }
+.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent-button); color: #fff; box-shadow: 0 5px 0 color-mix(in srgb, var(--accent-button) 72%, #000); }
+.record-container-actions .add-glass-button { border: 2px solid color-mix(in srgb, var(--accent) 25%, var(--border)); background: var(--accent-soft); color: var(--accent-text); box-shadow: 0 5px 0 color-mix(in srgb, var(--accent-soft) 75%, var(--accent)); }
 .record-container-actions .button-volume { padding: 0; border: 0; font-size: 12px; font-weight: 400; }
 .record-container-actions .undo-water { min-height: 44px; padding: 10px; border: 0; border-radius: var(--control-radius); background: transparent; }
-.water-confirmation { min-height: 28px; margin: 16px 0 0; text-align: center; font-size: 13px; color: var(--accent-text); }
+.water-confirmation { min-height: 28px; margin: 12px 0 0; text-align: center; font-size: 13px; color: var(--accent-text); }
 .history-overview { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); gap: 24px; align-items: start; }
 .history-overview > * { min-width: 0; }
 .achievement-panel > div { padding: 24px; }
@@ -118,11 +141,15 @@ dialog::backdrop { background: #10101888; }
 .auth-intro h1 { font-weight: 700; letter-spacing: -2px; }
 .auth-goal, .onboarding-reasons > div { border-radius: 20px; }
 @keyframes fluid-wave { to { transform: rotate(360deg); } }
+@keyframes buddy-arrive { from { transform: scale(.88); } to { transform: scale(1); } }
+@keyframes buddy-wave { 50% { transform: rotate(22deg); } }
+@keyframes buddy-cheer { 40% { transform: translateY(-8px) rotate(-5deg); } 70% { transform: translateY(-3px) rotate(4deg); } }
+@keyframes sip-confetti { from { opacity: 1; transform: translateY(0) rotate(0); } to { opacity: 0; transform: translateY(-100px) rotate(200deg); } }
 @keyframes panel-arrive { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (hover: hover) {
-  .record-container-actions .add-button:hover:enabled { transform: translateY(-2px); box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 16%, transparent); }
+  .record-container-actions .add-button:hover:enabled { filter: brightness(1.04); }
 }
-.record-container-actions .add-button:active:enabled { transform: scale(.97); }
+.record-container-actions .add-button:active:enabled { transform: translateY(4px); box-shadow: 0 1px 0 var(--accent-button); }
 @media (max-width: 720px) {
   :root { --panel-radius: 24px; }
   #root:has(.app) { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
@@ -142,8 +169,14 @@ dialog::backdrop { background: #10101888; }
   .nav-actions .icon { width: 21px; height: 21px; }
   .app { max-width: 540px; }
   .app-home { max-width: 480px; }
-  .hydration-card .goal-ring { width: min(100%, 220px); margin-block: 16px; }
-  .record-container-actions .add-button { min-height: 92px; }
+  .app-home .page-heading { margin-bottom: 16px; }
+  .app-home .page-heading h1 { font-size: 30px; }
+  .app-home .hydration-card { padding: 16px; }
+  .hydration-card .goal-ring { width: min(100%, 190px); margin-block: 8px; }
+  .water-buddy { width: 72px; height: 84px; right: -20px; bottom: -2px; }
+  .record-container-actions .add-button { min-height: 80px; padding: 10px; }
+  .buddy-message { margin-bottom: 12px; font-size: 12px; }
+  .buddy-encouragement { font-size: 12px; }
   .history-overview { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .achievement-panel > div { display: grid; grid-template-columns: auto 1fr auto; align-items: center; text-align: left; gap: 12px; padding: 18px 20px; }
   .achievement-symbol { margin: 0; }
@@ -170,4 +203,6 @@ dialog::backdrop { background: #10101888; }
 @media (prefers-reduced-motion: reduce) {
   .ring-content::before, .ring-content::after, .fade-shell[data-visible='true'] > dialog { animation: none; transition: none; }
   .record-container-actions .add-button:hover, .record-container-actions .add-button:active { transform: none; }
+  .buddy-body, .buddy-wave, .is-celebrating .buddy-body { animation: none; }
+  .goal-celebration { display: none; }
 }

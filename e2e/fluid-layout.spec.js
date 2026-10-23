@@ -129,6 +129,8 @@ test('capture home and history for desktop and phone including dark, reduced mot
       if (view.theme === 'dark' && destination === 'home') await expect(page.locator('.percentage-pill')).toHaveText('100%');
       await page.evaluate(() => window.scrollTo(0, 0));
       if (view.theme === 'dark' && destination === 'home') {
+        await expect(page.locator('.motivation-points')).toContainText('10 pontos');
+        await expect(page.locator('.motivation-streak')).toContainText('1 dia');
         const feedback = await page.locator('.water-confirmation').boundingBox();
         const navigation = await page.locator('.nav-actions').boundingBox();
         expect(feedback.y + feedback.height).toBeLessThanOrEqual(navigation.y);
@@ -139,6 +141,7 @@ test('capture home and history for desktop and phone including dark, reduced mot
     }
   }
   expect(await page.locator('.ring-content').evaluate(node => getComputedStyle(node, '::before').animationName)).toBe('none');
+  expect(await page.locator('.buddy-body').evaluate(node => getComputedStyle(node).animationName)).toBe('none');
 });
 
 test('shared appearance keeps login, registration and onboarding usable on a small phone', async ({ page }, testInfo) => {

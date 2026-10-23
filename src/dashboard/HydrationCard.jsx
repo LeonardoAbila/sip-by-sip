@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../Icon.jsx';
-import Fade from '../Fade.jsx';
+import WaterBuddy from './WaterBuddy.jsx';
+import { remainingWater } from '../state.js';
 
-export default function HydrationCard({ state, t, format, recordWater, onUndo }) {
+export default function HydrationCard({ state, t, format, recordWater, onUndo, earnedToday }) {
   const percentage = Math.min((state.totalMl / (state.metaLitros * 1000)) * 100, 100);
   const total = state.totalMl >= 1000 ? `${format.format(state.totalMl / 1000)} L` : `${format.format(state.totalMl)} ml`;
+  const remaining = remainingWater(state).ml;
+  const remainingLabel = remaining >= 1000 ? `${format.format(remaining / 1000)} L` : `${format.format(remaining)} ml`;
+  const previousReward = useRef(earnedToday);
+  const [celebrating, setCelebrating] = useState(false);
+  useEffect(() => {
+    if (earnedToday && !previousReward.current) setCelebrating(true);
+    previousReward.current = earnedToday;
+  }, [earnedToday]);
+  useEffect(() => { if (percentage < 100) setCelebrating(false); }, [percentage]);
+  useEffect(() => {
+    if (!celebrating) return;
+    const timer = setTimeout(() => setCelebrating(false), 1800);
+    return () => clearTimeout(timer);
+  }, [celebrating]);
+  const encouragement = percentage >= 100 ? t.buddyComplete : percentage >= 50 ? t.buddyProgress : t.buddyStart;
   return (
-    <section className="hydration-card" aria-label={t.consumption}>
+    <section className={`hydration-card${celebrating ? ' is-celebrating' : ''}`} aria-label={t.consumption}>
+      {celebrating && <div className="goal-celebration" aria-hidden="true">{Array.from({ length: 8 }, (_, index) => <i key={index} />)}</div>}
       <div className="card-heading">
         <h2><Icon name="drop" />{t.consumption}</h2>
+        <p className="buddy-encouragement">{encouragement}</p>
       </div>
       <div className="goal-ring" style={{ '--water-level': `${percentage}%` }}>
         <svg className="ring-svg" viewBox="0 0 260 260" aria-hidden="true">
@@ -21,8 +39,11 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo })
           <span className="goal-caption">{t.goalToday(format.format(state.metaLitros))}</span>
           <span className="percentage-pill">{Math.floor(percentage)}%</span>
         </div>
+        <WaterBuddy key={state.garrafas} happy={percentage >= 50} />
       </div>
-      <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
+      <p className={`buddy-message${percentage >= 100 ? ' success' : ''}`} role={percentage >= 100 ? 'status' : undefined}>
+        {percentage >= 100 ? t.success : t.remainingToday(remainingLabel)}
+      </p>
       <div className="record-container-actions">
         <button className="add-button" aria-label={`${t.add} · ${format.format(state.mlGarrafa)} ml`} onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
           <Icon name="bottle" /><span className="button-label">{t.bottleChoice}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml</span>

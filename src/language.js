@@ -13,6 +13,8 @@ export function readLanguage() {
 export const translations = {
   'pt-BR': {
     history: 'Histórico', waterRecorded: amount => `+${amount} ml adicionados`,
+    pointsCount: count => `${count} pontos`, buddyStart: 'Cada gole conta.', buddyProgress: 'Você está no caminho!', buddyComplete: 'Um hábito para comemorar!',
+    remainingToday: amount => `Faltam ${amount} para a meta.`,
     undoShort: 'Desfazer', moreInfo: 'Saiba mais', calendarLegend: 'Legenda',
     or: 'ou', remainingOptionsHelp: 'Para completar a meta', bottlesNeeded: count => `${count} ${count === 1 ? 'garrafa' : 'garrafas'}`, glassesNeeded: count => `${count} ${count === 1 ? 'copo' : 'copos'}`,
     chooseContainer: 'Registrar com', bottleChoice: 'Garrafa', glassChoice: 'Copo', glass: 'Seu copo', glassSize: 'Seu copo (ml)', addGlass: '+ Adicionar copo', containerSettingsHelp: 'O novo tamanho vale para os próximos registros desse recipiente. A água já registrada será mantida.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'garrafa' : 'garrafas'} · ${glasses} ${glasses === 1 ? 'copo' : 'copos'}${other ? ` · ${other} ${other === 1 ? 'outro registro' : 'outros registros'}` : ''}`, remainingGlasses: count => count === 0 ? 'Meta cumprida! Nenhum copo faltando.' : `${count} ${count === 1 ? 'copo falta' : 'copos faltam'} para a meta.`,
@@ -42,6 +44,8 @@ export const translations = {
   },
   en: {
     history: 'History', waterRecorded: amount => `+${amount} ml added`,
+    pointsCount: count => `${count} points`, buddyStart: 'Every sip counts.', buddyProgress: 'You’re making progress!', buddyComplete: 'A habit worth celebrating!',
+    remainingToday: amount => `${amount} left to your goal.`,
     undoShort: 'Undo', moreInfo: 'Learn more', calendarLegend: 'Legend',
     or: 'or', remainingOptionsHelp: 'To reach your goal', bottlesNeeded: count => `${count} ${count === 1 ? 'bottle' : 'bottles'}`, glassesNeeded: count => `${count} ${count === 1 ? 'glass' : 'glasses'}`,
     chooseContainer: 'Record using', bottleChoice: 'Bottle', glassChoice: 'Glass', glass: 'Your glass', glassSize: 'Your glass (ml)', addGlass: '+ Add glass', containerSettingsHelp: 'The new size applies to future entries for this container. Water already recorded will be kept.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'bottle' : 'bottles'} · ${glasses} ${glasses === 1 ? 'glass' : 'glasses'}${other ? ` · ${other} ${other === 1 ? 'other entry' : 'other entries'}` : ''}`, remainingGlasses: count => count === 0 ? 'Goal reached! No glasses remaining.' : `${count} ${count === 1 ? 'glass' : 'glasses'} left to your goal.`,
@@ -71,6 +75,8 @@ export const translations = {
   },
   es: {
     history: 'Historial', waterRecorded: amount => `+${amount} ml añadidos`,
+    pointsCount: count => `${count} puntos`, buddyStart: 'Cada sorbo cuenta.', buddyProgress: '¡Vas por buen camino!', buddyComplete: '¡Un hábito para celebrar!',
+    remainingToday: amount => `Faltan ${amount} para la meta.`,
     appearance: 'Apariencia', favoriteColor: 'Tu color favorito', appearanceHelp: 'Guarda para aplicar el modo y el color elegidos.', exit: 'Salir', colors: { green: 'Verde', blue: 'Azul', purple: 'Morado', rose: 'Rosa', orange: 'Naranja' },
     undoShort: 'Deshacer', moreInfo: 'Más información', calendarLegend: 'Leyenda',
     or: 'o', remainingOptionsHelp: 'Para completar la meta', bottlesNeeded: count => `${count} ${count === 1 ? 'botella' : 'botellas'}`, glassesNeeded: count => `${count} ${count === 1 ? 'vaso' : 'vasos'}`,
