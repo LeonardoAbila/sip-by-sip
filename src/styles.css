@@ -185,7 +185,7 @@ progress::-moz-progress-bar { background: #1e88e5; border-radius: 10px; }
 .pour-dialog::backdrop { background: #071b36a6; }
 .pour-dialog h2 { margin: 16px 0 8px; font-size: 24px; }
 .pour-amount { margin: 0; color: var(--accent-text); font-size: 28px; font-weight: 700; }
-.pour-close { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--secondary); color: var(--text); font-size: 24px; }
+.pour-close { position: absolute; top: 10px; right: 12px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--secondary); color: var(--text); font-size: 24px; }
 .pour-scene { display: block; width: 100%; max-height: 45dvh; margin: 8px auto 0; }
 .pour-jug { transform-origin: 176px 64px; animation: jug-tip 2.8s ease-in-out both; }
 .pour-stream { stroke-dasharray: 80; stroke-dashoffset: 80; animation: water-stream 2.8s ease-in-out both; }

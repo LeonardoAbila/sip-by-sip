@@ -107,7 +107,7 @@ test('settings subpanels support keyboard return and preserve independent drafts
   await expect(page.locator('.settings-trigger')).toBeFocused();
   await page.locator('.add-glass-button').focus();
   await page.keyboard.press('Enter');
-  await expect(page.locator('.drink-dialog')).toBeVisible();
+  await expect(page.locator('.pour-dialog')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('.add-glass-button')).toBeFocused();
   await expect(page.getByRole('dialog')).toHaveCount(0);

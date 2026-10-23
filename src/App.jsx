@@ -1,6 +1,6 @@
 import StreakCard from './dashboard/StreakCard.jsx';
 import DailyMotivation from './dashboard/DailyMotivation.jsx';
-import DrinkDialog from './dashboard/DrinkDialog.jsx';
+import PourDialog from './dashboard/PourDialog.jsx';
 import DashboardNav from './dashboard/DashboardNav.jsx';
 import ReminderNotice from './dashboard/ReminderNotice.jsx';
 import ResetDialog from './dashboard/ResetDialog.jsx';
@@ -216,7 +216,7 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
           profile={profile} onExport={downloadProfile} onImport={importProfile}
           onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>
         <Fade visible={resetOpen}><ResetDialog t={t} onConfirm={resetDay} onClose={() => setResetOpen(false)} /></Fade>
-        {drinkEntry && <DrinkDialog key={drinkEntry.id} entry={drinkEntry} t={t} format={format} onClose={closeDrink} />}
+        {drinkEntry && <PourDialog key={drinkEntry.id} amount={format.format(drinkEntry.amount)} container={drinkEntry.container} t={t} onClose={closeDrink} />}
       </main>
     </>
   );

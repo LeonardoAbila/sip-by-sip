@@ -41,7 +41,7 @@ export async function ui(t) {
   async function click(text, scope) { await act(async () => { button(text, scope).click(); await pause(); }); }
   async function record(text) {
     await click(text);
-    const close = document.querySelector('.drink-close');
+    const close = document.querySelector('.pour-close');
     assert.ok(close, 'Every water entry opens the drinking popup');
     await act(async () => { close.click(); });
   }

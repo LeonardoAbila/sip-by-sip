@@ -2,20 +2,25 @@ import React, { useEffect, useRef } from 'react';
 
 export default function PourDialog({ t, amount, container, onClose, fadingOut }) {
   const dialog = useRef(null);
+  const opener = useRef(document.activeElement);
 
   useEffect(() => {
     const element = dialog.current;
     element.showModal();
     const timer = setTimeout(onClose, 3400);
-    return () => { clearTimeout(timer); element.close(); };
+    return () => {
+      clearTimeout(timer);
+      element.close();
+      if (opener.current?.isConnected) opener.current.focus();
+    };
   }, [onClose]);
 
   return (
-    <dialog inert={fadingOut} ref={dialog} className="pour-dialog" aria-labelledby="pour-title" onCancel={event => { event.preventDefault(); onClose(); }}>
-      <button autoFocus className="pour-close" onClick={onClose} aria-label={t.close}>×</button>
+    <dialog inert={fadingOut} ref={dialog} className="pour-dialog" aria-labelledby="pour-title" aria-describedby="pour-amount" onCancel={event => { event.preventDefault(); onClose(); }}>
+      <button autoFocus type="button" className="pour-close" onClick={onClose} aria-label={t.close}>×</button>
       <h2 id="pour-title">{t.waterAdded}</h2>
-      <p className="pour-amount">+{amount} ml</p>
-      <svg className="pour-scene" viewBox="0 0 320 300" aria-hidden="true">
+      <p id="pour-amount" className="pour-amount">+{amount} ml</p>
+      <svg className="pour-scene" data-container={container === 'glass' ? 'glass' : 'bottle'} focusable="false" viewBox="0 0 320 300" aria-hidden="true">
         <ellipse cx="186" cy="278" rx="66" ry="10" fill="currentColor" opacity=".08" />
         <g className="pour-jug">
           <path d="M70 48 H105 L120 64 H176 L153 88 L144 142 Q140 156 126 156 H83 Q70 156 68 141 L58 64 Z"
