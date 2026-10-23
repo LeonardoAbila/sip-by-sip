@@ -1,126 +1,88 @@
-/* Fluid visual layer. Palette variables keep every accent and theme available. */
-body {
-  background: radial-gradient(ellipse at 8% 5%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 48%),
-    radial-gradient(ellipse at 95% 65%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 52%), var(--page);
-}
-.site-header { background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(18px); }
-.app { max-width: 1080px; padding-top: clamp(28px, 5vw, 64px); }
-.page-heading { margin-bottom: clamp(24px, 4vw, 40px); }
-.page-heading h1 { font-size: clamp(28px, 4vw, 44px); letter-spacing: -1.5px; font-weight: 650; }
-.date-chip, .theme-toggle, .nav-link { border-radius: 100px; }
-.dashboard-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: clamp(16px, 2.5vw, 28px); }
-.hydration-card, .bottle-card, .hydration-calendar, .auth-card,
-.daily-summary .achievement-panel > div, .daily-summary .reminder-card {
-  border-radius: 28px;
-  border-color: color-mix(in srgb, var(--accent) 13%, var(--border));
-  box-shadow: 0 12px 42px color-mix(in srgb, var(--text) 5%, transparent);
-}
-.hydration-card, .bottle-card { padding: clamp(20px, 3vw, 36px); }
-.hydration-card { background: linear-gradient(160deg, var(--surface) 55%, color-mix(in srgb, var(--accent) 6%, var(--surface))); }
-.goal-ring { isolation: isolate; }
-.ring-content { isolation: isolate; inset: 11%; padding: 16px; border-radius: 50%; overflow: hidden; background: color-mix(in srgb, var(--accent) 4%, var(--surface)); }
-.ring-content::before, .ring-content::after {
-  content: ''; position: absolute; z-index: -1; width: 200%; height: 200%; left: -50%;
-  top: calc(100% - var(--water-level) + 4%); border-radius: 43%;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  animation: fluid-wave 16s linear infinite;
-  transition: top 900ms cubic-bezier(.22, 1, .36, 1);
-}
-.ring-content::after { border-radius: 46%; background: color-mix(in srgb, var(--accent) 8%, transparent); animation-direction: reverse; animation-duration: 21s; }
-.ring-value { stroke-width: 7; transition: stroke-dashoffset 900ms cubic-bezier(.22, 1, .36, 1); }
-.ring-track { stroke-width: 7; }
-.total { font-weight: 650; font-variant-numeric: tabular-nums; }
-.percentage-pill { background: var(--surface); border: 1px solid var(--border); }
-.record-container-actions { column-gap: 12px; row-gap: 12px; }
-.record-container-actions .add-button { width: 100%; height: auto; min-height: 76px; flex-direction: row; border-radius: 22px; gap: 10px; }
-.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent); color: var(--page); }
-.record-container-actions .undo-water { border-radius: 18px; }
-button, .nav-link { transition: transform 220ms ease, background-color 240ms ease, color 240ms ease, box-shadow 240ms ease; }
-@media (hover: hover) {
-  .record-container-actions .add-button:hover:enabled { transform: translateY(-3px); box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 18%, transparent); }
-  .theme-toggle:hover, .nav-link:hover { transform: translateY(-2px); }
-}
-.record-container-actions .add-button:active:enabled { transform: scale(.97); }
-.remaining-options, .empty-bottles, .stat-card { border-radius: 20px; }
-.hydration-calendar { margin-top: 28px; padding: clamp(16px, 3vw, 32px); }
-.calendar-day { border-radius: 16px; }
-.auth-page { gap: clamp(24px, 6vw, 80px); }
-.auth-card { padding: clamp(24px, 4vw, 44px); }
-.auth-intro h1 { font-weight: 650; }
-@keyframes fluid-wave { to { transform: rotate(360deg); } }
-@media (max-width: 720px) {
-  .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
-  .app { max-width: 540px; }
-  .page-heading h1 { letter-spacing: -1px; }
-  .hydration-card, .bottle-card, .hydration-calendar { border-radius: 24px; }
-  .calendar-day { border-radius: 12px; }
-}
-@media (max-width: 360px) {
-  .record-container-actions .add-button { flex-direction: column; gap: 6px; }
-  .hydration-calendar { padding-inline: 12px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ring-content::before, .ring-content::after { animation: none; transition: none; }
-  button:hover, .nav-link:hover, button:active { transform: none !important; }
-}
-
-/* System-inspired surfaces, typography and controls. */
+/* Presentation for the three hydration destinations. Accent palettes live in styles.css. */
 :root {
-  --page: #f5f5f7; --surface: #fff; --text: #1d1d1f; --muted: #626268;
-  --border: #e4e4e9; --input: #f5f5f7; --track: #ededf1;
-  --glass: #ffffffd9; --panel-shadow: 0 4px 24px #16162d06;
+  --page: #f5f5f7;
+  --surface: #fff;
+  --text: #1d1d1f;
+  --muted: #626268;
+  --border: #e4e4e9;
+  --input: #f5f5f7;
+  --track: #ededf1;
+  --glass: #ffffffde;
+  --panel-shadow: 0 4px 24px #16162d06;
+  --panel-radius: 28px;
+  --control-radius: 16px;
+  --space: 8px;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 :root[data-theme='dark'] {
-  --page: #101012; --surface: #1c1c1e; --text: #f5f5f7; --muted: #aeaeb5;
-  --border: #38383c; --input: #27272a; --track: #343438;
-  --glass: #1c1c1ee8; --panel-shadow: 0 4px 24px #0002;
+  --page: #101012;
+  --surface: #1c1c1e;
+  --text: #f5f5f7;
+  --muted: #aeaeb5;
+  --border: #38383c;
+  --input: #27272a;
+  --track: #343438;
+  --glass: #1c1c1ee8;
+  --panel-shadow: 0 4px 24px #0002;
 }
-body { background: radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 45%), var(--page); }
-.site-header {
-  position: sticky; top: 0; z-index: 20; background: var(--glass);
-  -webkit-backdrop-filter: blur(24px) saturate(150%); backdrop-filter: blur(24px) saturate(150%);
-  border-bottom-color: color-mix(in srgb, var(--border) 65%, transparent);
-}
-.navbar { max-width: 1144px; min-height: 76px; }
+body { background: radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 45%), var(--page); }
+button, .theme-toggle { touch-action: manipulation; }
+button, .nav-actions a { transition: transform 180ms ease, background-color 240ms ease, color 240ms ease, box-shadow 240ms ease; }
+.site-header { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom-color: var(--border); }
+.navbar { max-width: 1144px; min-height: 80px; padding: 16px 24px; gap: 16px; }
 .nav-brand { font-size: 18px; letter-spacing: -.5px; }
 .brand-mark { width: 36px; height: 36px; border-radius: 11px; box-shadow: inset 0 1px 0 #fff3; }
-.nav-actions { padding: 5px; gap: 4px; border: 1px solid var(--border); border-radius: 100px; background: var(--input); }
-.nav-actions .theme-toggle { border: 0; min-height: 40px; padding: 10px 18px; color: var(--muted); text-decoration: none; font-weight: 600; }
+.nav-actions { margin-left: auto; padding: 5px; gap: 4px; border: 1px solid var(--border); border-radius: 100px; background: var(--input); }
+.nav-actions .theme-toggle { border: 0; min-height: 44px; padding: 10px 16px; color: var(--muted); text-decoration: none; font-weight: 600; border-radius: 100px; }
 .nav-actions .theme-toggle[aria-current='page'] { color: var(--text); background: var(--surface); box-shadow: 0 2px 7px #0000000d; }
-.nav-logout { border: 0; color: var(--muted); }
-.app { padding-top: clamp(28px, 5vw, 52px); }
+.header-tools { display: flex; align-items: center; gap: var(--space); }
+.header-tools .theme-toggle { min-width: 44px; min-height: 44px; justify-content: center; border: 0; border-radius: var(--control-radius); }
+.nav-logout { color: var(--muted); }
+.app { max-width: 1080px; padding-top: clamp(28px, 5vw, 48px); }
+.app-home { max-width: 560px; }
 .page-heading { align-items: flex-start; text-align: left; gap: 6px; margin-bottom: 28px; }
-.page-heading h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.15; letter-spacing: -1.6px; font-weight: 700; }
+.page-heading h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.15; letter-spacing: -1.5px; font-weight: 700; }
+.page-heading h1[tabindex='-1']:focus { outline: none; }
+.app-home .page-heading { align-items: center; text-align: center; }
 .date-chip { font-size: 13px; }
-.daily-summary { gap: 16px; margin-bottom: 24px; }
-.daily-summary .achievement-panel > div {
-  display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 14px;
-  text-align: left; padding: 20px 24px; border-radius: 24px; justify-content: start;
+.hydration-card, .bottle-card, .hydration-calendar, .auth-card, .achievement-panel > div {
+  border-radius: var(--panel-radius); border-color: var(--border); box-shadow: var(--panel-shadow); background: var(--surface);
 }
-.achievement-symbol { grid-row: 1 / 3; display: grid; place-items: center; width: 44px; height: 44px; margin: 0; background: var(--warm); border-radius: 14px; }
-.daily-summary .achievement-panel p { font-size: 12px; margin: 0 0 2px; }
-.daily-summary .achievement-panel strong { font-size: 22px; letter-spacing: -.6px; color: var(--text); }
-.daily-summary .reminder-card { flex-direction: row; gap: 14px; padding: 20px 24px; border-radius: 24px; text-align: left; justify-content: flex-start; }
-.daily-summary .reminder-card > div { flex: 1; min-width: 0; text-align: left; }
-.daily-summary .reminder-card-icon { width: 44px; height: 44px; background: var(--accent-soft); border-radius: 14px; }
-.daily-summary .reminder-card .settings-help { margin-top: 4px; }
-.hydration-card, .bottle-card, .hydration-calendar, .auth-card,
-.daily-summary .achievement-panel > div, .daily-summary .reminder-card { border-color: color-mix(in srgb, var(--border) 70%, transparent); box-shadow: var(--panel-shadow); }
-.hydration-card { background: var(--surface); }
-.hydration-card .card-heading, .bottle-card .card-heading { align-items: flex-start; text-align: left; }
-.card-heading h2 { font-size: 17px; font-weight: 650; letter-spacing: -.4px; }
-.goal-ring { width: min(100%, 300px); }
+.hydration-card, .bottle-card { padding: clamp(20px, 3vw, 36px); }
+.hydration-card .card-heading { align-items: center; }
+.bottle-card .card-heading { align-items: flex-start; text-align: left; }
+.card-heading h2 { font-size: 16px; font-weight: 650; letter-spacing: -.3px; }
+.goal-ring { width: min(100%, 300px); isolation: isolate; }
+.hydration-card .goal-ring { margin-block: 28px; }
 .ring-track, .ring-value { stroke-width: 11; }
-.ring-value { filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--accent) 20%, transparent)); }
-.ring-content { inset: 12%; background: var(--surface); }
-.total { font-size: clamp(36px, 4.5vw, 54px); font-weight: 700; letter-spacing: -2px; }
+.ring-value { transition: stroke-dashoffset 600ms cubic-bezier(.22, 1, .36, 1); }
+.ring-content { isolation: isolate; inset: 12%; padding: 16px; border-radius: 50%; overflow: hidden; background: var(--surface); }
+.ring-content::before, .ring-content::after {
+  content: ''; position: absolute; z-index: -1; width: 200%; height: 200%; left: -50%;
+  top: calc(100% - var(--water-level) + 4%); border-radius: 43%;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  animation: fluid-wave 20s linear infinite; transition: top 600ms ease;
+}
+.ring-content::after { border-radius: 46%; background: color-mix(in srgb, var(--accent) 7%, transparent); animation-direction: reverse; animation-duration: 26s; }
+.total { font-size: clamp(34px, 5vw, 54px); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
+.goal-caption { font-size: 13px; }
 .percentage-pill { border: 0; background: var(--accent-soft); font-size: 12px; padding: 5px 12px; }
-.record-container-actions .add-button { min-height: 60px; border-radius: 18px; font-size: 14px; }
-.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent-button, var(--accent)); color: #fff; }
-.record-container-actions .add-glass-button { border-color: transparent; background: var(--accent-soft); }
-.record-container-actions .undo-water { border: 0; background: transparent; }
+.record-container-actions { column-gap: 12px; row-gap: 8px; margin-top: 0; }
+.record-container-actions .add-button {
+  width: 100%; height: auto; min-height: 100px; justify-self: stretch;
+  flex-direction: column; gap: 5px; padding: 16px 12px; border-radius: 20px; font-size: 14px;
+}
+.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent-button); color: #fff; }
+.record-container-actions .add-glass-button { border-color: transparent; background: var(--accent-soft); color: var(--accent-text); }
+.record-container-actions .button-volume { padding: 0; border: 0; font-size: 12px; font-weight: 400; }
+.record-container-actions .undo-water { min-height: 44px; padding: 10px; border: 0; border-radius: var(--control-radius); background: transparent; }
+.water-confirmation { min-height: 28px; margin: 16px 0 0; text-align: center; font-size: 13px; color: var(--accent-text); }
+.history-overview { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); gap: 24px; align-items: start; }
+.history-overview > * { min-width: 0; }
+.achievement-panel > div { padding: 24px; }
+.achievement-symbol { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 12px; border-radius: 14px; background: var(--warm); }
+.achievement-panel strong { font-size: 32px; letter-spacing: -1px; color: var(--text); }
 .container-volumes { gap: 0; padding: 18px 0; margin: 20px 0; border-radius: 18px; background: var(--input); }
 .container-volumes > div { flex: 1; padding-inline: 8px; }
 .container-volumes > div + div { border-left: 1px solid var(--border); }
@@ -128,54 +90,84 @@ body { background: radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--a
 .section-description { font-size: 12px; }
 .remaining-row { justify-content: space-between; font-size: 13px; padding-top: 8px; }
 .remaining-row strong { font-size: 21px; font-weight: 650; letter-spacing: -.5px; }
-.remaining-options { border-style: solid; border-color: transparent; background: var(--input); }
-.hydration-calendar { text-align: left; }
+.remaining-options { border: 0; border-radius: 18px; background: var(--input); }
+.hydration-calendar { margin-top: 24px; padding: clamp(16px, 3vw, 32px); text-align: left; }
 .calendar-heading { flex-direction: row; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 .calendar-heading h2 { font-size: 22px; letter-spacing: -.6px; }
-.calendar-streak { border-radius: 100px; font-size: 12px; }
-.calendar-day { border-color: transparent; }
+.calendar-streak { display: inline-flex; align-items: center; gap: 6px; border-radius: 100px; font-size: 12px; }
+.calendar-streak .icon { width: 16px; height: 16px; }
+.calendar-day { border-color: transparent; border-radius: 16px; }
 .calendar-today { outline-width: 2px; outline-offset: -2px; }
-.calendar-navigation button, .dialog-actions button { min-height: 44px; border-radius: 14px; }
-input, .settings-dialog input, .reminder-settings select { border-radius: 14px; min-height: 48px; }
+.calendar-navigation button, .dialog-actions button, .bottle-edit-button, .panel-back { min-height: 44px; border-radius: 14px; }
+.dashboard-footer .reset-button { min-height: 44px; padding: 10px 12px; border-radius: 12px; }
+input, .settings-dialog input { border-radius: 14px; min-height: 48px; }
+input[type='checkbox'], .settings-dialog input[type='checkbox'] { min-height: 0; width: 20px; height: 20px; }
 input:focus, select:focus { border-color: var(--accent); }
-.reset-dialog, .pour-dialog { border-radius: 28px; background: var(--surface); box-shadow: 0 24px 100px #0003; }
-dialog::backdrop { background: #10101855; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-.fade-shell[data-visible='true'] > dialog { animation: panel-arrive 360ms cubic-bezier(.16, 1, .3, 1) both; }
+.reset-dialog { border-radius: var(--panel-radius); background: var(--surface); box-shadow: 0 24px 100px #0003; }
+dialog::backdrop { background: #10101888; }
+.fade-shell[data-visible='true'] > dialog { animation: panel-arrive 280ms cubic-bezier(.16, 1, .3, 1) both; }
+.settings-reminders { margin-top: 24px; padding: 16px; border-radius: 18px; background: var(--input); }
+.settings-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 0; text-align: left; border: 0; background: transparent; color: var(--text); font-weight: 600; }
+.settings-row .icon:last-child { margin-left: auto; }
+.settings-reminders p { margin: 6px 0 0; }
+.transfer-open, .panel-back { min-height: 44px; padding: 10px 14px; border: 0; border-radius: 14px; }
+.auth-page { gap: clamp(24px, 6vw, 80px); }
+.auth-card { padding: clamp(24px, 4vw, 44px); }
 .auth-card h2, .onboarding-card h1 { letter-spacing: -.8px; }
-.auth-card .add-button { min-height: 52px; border-radius: 16px; background: var(--accent-button, var(--accent)); }
+.auth-card .add-button { min-height: 52px; border-radius: var(--control-radius); background: var(--accent-button); }
 .auth-intro h1 { font-weight: 700; letter-spacing: -2px; }
 .auth-goal, .onboarding-reasons > div { border-radius: 20px; }
-@keyframes panel-arrive { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fluid-wave { to { transform: rotate(360deg); } }
+@keyframes panel-arrive { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (hover: hover) {
+  .record-container-actions .add-button:hover:enabled { transform: translateY(-2px); box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 16%, transparent); }
+}
+.record-container-actions .add-button:active:enabled { transform: scale(.97); }
 @media (max-width: 720px) {
-  #root { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
-  .site-header { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--surface); }
-  .navbar { display: flex; flex-wrap: nowrap; min-height: 64px; padding: 12px 20px; }
-  .nav-brand { font-size: 17px; }
+  :root { --panel-radius: 24px; }
+  #root:has(.app) { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+  .navbar { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; min-height: 68px; padding: 12px 16px; gap: 8px; }
+  .nav-brand { font-size: 17px; gap: 8px; }
+  .header-tools { gap: 4px; }
+  .header-tools .theme-toggle { padding: 10px; }
+  .header-tools .theme-toggle span { display: none; }
   .nav-actions {
-    position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%;
-    transform: translateX(-50%); width: min(440px, calc(100vw - 32px));
+    position: fixed; z-index: 21; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%;
+    transform: translateX(-50%); width: min(440px, calc(100vw - 32px)); margin: 0;
     display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px;
-    background: var(--glass); border-color: var(--border); border-radius: 28px;
-    -webkit-backdrop-filter: blur(24px) saturate(150%); backdrop-filter: blur(24px) saturate(150%);
-    box-shadow: 0 8px 40px #0000001a;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 8px 40px #0000001a;
   }
-  .nav-actions .theme-toggle { min-height: 56px; padding: 7px 4px; gap: 4px; font-size: 11px; border-radius: 22px; }
+  .nav-actions .theme-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px; padding: 7px 4px; gap: 4px; font-size: 11px; border-radius: 22px; overflow-wrap: anywhere; }
   .nav-actions .theme-toggle[aria-current='page'] { background: var(--accent-soft); color: var(--accent-text); box-shadow: none; }
   .nav-actions .icon { width: 21px; height: 21px; }
-  .nav-logout { margin-left: auto; }
-  .page-heading { align-items: flex-start; text-align: left; }
-  .daily-summary { gap: 12px; }
-  .daily-summary .achievement-panel > div { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 16px; }
-  .daily-summary .reminder-card { flex-wrap: wrap; gap: 8px; padding: 16px; align-content: flex-start; }
-  .daily-summary .reminder-card > div { flex-basis: 100%; order: 2; }
-  .daily-summary .reminder-card .icon-button { margin-left: auto; }
-  .daily-summary .reminder-card .settings-help { font-size: 11px; }
-  .daily-summary .reminder-card-icon, .achievement-symbol { width: 36px; height: 36px; border-radius: 12px; }
-  .daily-summary .achievement-panel strong { font-size: 20px; }
+  .app { max-width: 540px; }
+  .app-home { max-width: 480px; }
+  .hydration-card .goal-ring { width: min(100%, 220px); margin-block: 16px; }
+  .record-container-actions .add-button { min-height: 92px; }
+  .history-overview { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .achievement-panel > div { display: grid; grid-template-columns: auto 1fr auto; align-items: center; text-align: left; gap: 12px; padding: 18px 20px; }
+  .achievement-symbol { margin: 0; }
+  .achievement-panel p { margin: 0; }
+  .achievement-panel strong { font-size: 24px; }
+  .calendar-day { border-radius: 12px; }
+  .calendar-volume { font-size: 10px; font-weight: 400; overflow-wrap: normal; }
   .reminder-toast { bottom: calc(104px + env(safe-area-inset-bottom)); }
-  .reset-dialog, .pour-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 24px); border-radius: 28px; }
-  .settings-dialog { margin-top: auto; margin-bottom: 8px; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .settings-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 24px); margin-top: auto; margin-bottom: 8px; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+}
+@media (max-width: 360px) {
+  .hydration-calendar { padding-inline: 12px; }
+  .record-container-actions .add-button { font-size: 13px; }
+  .total { font-size: 34px; }
+}
+/* Opaque surfaces above are the fallback when backdrop filtering is unavailable. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-actions { background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(140%); backdrop-filter: blur(24px) saturate(140%); }
+  dialog::backdrop { background: #10101855; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  @media (min-width: 721px) {
+    .site-header { background: var(--glass); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); }
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fade-shell[data-visible='true'] > dialog { animation: none; }
+  .ring-content::before, .ring-content::after, .fade-shell[data-visible='true'] > dialog { animation: none; transition: none; }
+  .record-container-actions .add-button:hover, .record-container-actions .add-button:active { transform: none; }
 }

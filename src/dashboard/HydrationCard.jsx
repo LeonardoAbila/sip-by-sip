@@ -16,7 +16,7 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo })
           <circle className="ring-value" cx="130" cy="130" r="112"
             strokeDasharray={2 * Math.PI * 112} strokeDashoffset={2 * Math.PI * 112 * (1 - percentage / 100)} />
         </svg>
-        <div className="ring-content" aria-live="polite">
+        <div className="ring-content">
           <strong className="total">{total}</strong>
           <span className="goal-caption">{t.goalToday(format.format(state.metaLitros))}</span>
           <span className="percentage-pill">{Math.floor(percentage)}%</span>
@@ -25,10 +25,10 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo })
       <Fade visible={percentage >= 100}><p className="success" role="status">{t.success}</p></Fade>
       <div className="record-container-actions">
         <button className="add-button" aria-label={`${t.add} · ${format.format(state.mlGarrafa)} ml`} onClick={() => recordWater(state.mlGarrafa, 'bottle')}>
-          <Icon name="bottle" /><span>{t.bottleChoice}</span>
+          <Icon name="bottle" /><span className="button-label">{t.bottleChoice}</span><span className="button-volume">{format.format(state.mlGarrafa)} ml</span>
         </button>
         <button className="add-button add-glass-button" aria-label={`${t.addGlass} · ${format.format(state.mlCopo)} ml`} onClick={() => recordWater(state.mlCopo, 'glass')}>
-          <Icon name="glass" /><span>{t.glassChoice}</span>
+          <Icon name="glass" /><span className="button-label">{t.glassChoice}</span><span className="button-volume">{format.format(state.mlCopo)} ml</span>
         </button>
         <button className="undo-water" type="button" aria-label={t.undoDrink} disabled={!state.entries.length} onClick={onUndo}>
           <Icon name="reset" />{t.undoShort}

@@ -16,8 +16,17 @@ test('register, onboard, record/undo, persist preferences, reset and log in agai
   await page.getByRole('button', { name: 'Configurações', exact: true }).click();
   await expect(page.getByLabel('Meta diária (L)', { exact: true })).toHaveValue('3');
   await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('link', { name: 'Histórico', exact: true }).click();
+  await page.getByRole('button', { name: 'Alterar ml', exact: true }).click();
+  await page.getByLabel('Sua garrafa (ml)', { exact: true }).fill('600');
+  await page.getByRole('button', { name: 'Salvar', exact: true }).click();
+  await page.getByRole('link', { name: 'Início', exact: true }).click();
+  await expect(page.locator('.record-container-actions .add-button').first()).toContainText('600 ml');
+  await expect(page.locator('.total')).toHaveText('500 ml');
+  await page.getByRole('link', { name: 'Histórico', exact: true }).click();
   await page.getByRole('button', { name: 'Zerar dia', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Cancelar', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page.locator('.total')).toHaveText('500 ml');
   await page.getByRole('button', { name: 'Zerar dia', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Zerar dia', exact: true }).click();

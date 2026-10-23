@@ -1,3 +1,4 @@
+import Icon from './Icon.jsx';
 import React, { useId, useState } from 'react';
 import { achievements, calendarKey } from './state.js';
 import { calendarStatus, monthDays, calendarVolume, formatCalendarVolume, calendarMonth } from './calendar.js';
@@ -29,7 +30,7 @@ export default function HydrationCalendar({ state, language, t }) {
   }
 
   return <section className="hydration-calendar" aria-labelledby={titleId}>
-    <div className="calendar-heading"><div><p className="eyebrow">{t.calendarEyebrow}</p><h2 id={titleId}>{t.calendarTitle}</h2></div><span className="calendar-streak">🔥 {t.streakDays(streak)}</span></div>
+    <div className="calendar-heading"><div><p className="eyebrow">{t.calendarEyebrow}</p><h2 id={titleId}>{t.calendarTitle}</h2></div><span className="calendar-streak"><Icon name="flame" />{t.streakDays(streak)}</span></div>
     <p className="calendar-description">{t.calendarStreakHelp(streak)}</p>
     <div className="calendar-navigation">
       <button type="button" className="theme-toggle" disabled={displayedMonth <= startMonth} onClick={() => changeMonth(-1)} aria-label={t.previousMonth}>‹</button>

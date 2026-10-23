@@ -12,6 +12,7 @@ export function readLanguage() {
 
 export const translations = {
   'pt-BR': {
+    history: 'Histórico', waterRecorded: amount => `+${amount} ml adicionados`,
     undoShort: 'Desfazer', moreInfo: 'Saiba mais', calendarLegend: 'Legenda',
     or: 'ou', remainingOptionsHelp: 'Para completar a meta', bottlesNeeded: count => `${count} ${count === 1 ? 'garrafa' : 'garrafas'}`, glassesNeeded: count => `${count} ${count === 1 ? 'copo' : 'copos'}`,
     chooseContainer: 'Registrar com', bottleChoice: 'Garrafa', glassChoice: 'Copo', glass: 'Seu copo', glassSize: 'Seu copo (ml)', addGlass: '+ Adicionar copo', containerSettingsHelp: 'O novo tamanho vale para os próximos registros desse recipiente. A água já registrada será mantida.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'garrafa' : 'garrafas'} · ${glasses} ${glasses === 1 ? 'copo' : 'copos'}${other ? ` · ${other} ${other === 1 ? 'outro registro' : 'outros registros'}` : ''}`, remainingGlasses: count => count === 0 ? 'Meta cumprida! Nenhum copo faltando.' : `${count} ${count === 1 ? 'copo falta' : 'copos faltam'} para a meta.`,
@@ -29,7 +30,7 @@ export const translations = {
     consumption: 'Consumo de hoje', goalToday: goal => `de ${goal} L hoje`,
     bottles: count => `${count} ${count === 1 ? 'registro de água' : 'registros de água'}`,
     remainingBottles: count => count === 0 ? 'Meta cumprida! Nenhuma garrafa faltando.' : `${count} ${count === 1 ? 'garrafa fantasma falta' : 'garrafas fantasmas faltam'} para a meta.`,
-    progress: 'Seu progresso', progressLabel: 'Progresso da meta diária', success: 'Meta alcançada! 💙',
+    progress: 'Seu progresso', progressLabel: 'Progresso da meta diária', success: 'Meta alcançada!',
     empty: 'Registre sua primeira garrafa do dia.', add: '+ Adicionar garrafa', reset: 'Zerar dia',
     footnote: 'Seu progresso reinicia a cada novo dia.',
     storageError: 'O navegador não permitiu salvar. Seu progresso ficará disponível apenas enquanto o app estiver aberto.',
@@ -40,6 +41,7 @@ export const translations = {
     settingsHelp: 'O novo tamanho vale para as próximas garrafas. A água já registrada será mantida.',
   },
   en: {
+    history: 'History', waterRecorded: amount => `+${amount} ml added`,
     undoShort: 'Undo', moreInfo: 'Learn more', calendarLegend: 'Legend',
     or: 'or', remainingOptionsHelp: 'To reach your goal', bottlesNeeded: count => `${count} ${count === 1 ? 'bottle' : 'bottles'}`, glassesNeeded: count => `${count} ${count === 1 ? 'glass' : 'glasses'}`,
     chooseContainer: 'Record using', bottleChoice: 'Bottle', glassChoice: 'Glass', glass: 'Your glass', glassSize: 'Your glass (ml)', addGlass: '+ Add glass', containerSettingsHelp: 'The new size applies to future entries for this container. Water already recorded will be kept.', containerCounts: (bottles, glasses, other) => `${bottles} ${bottles === 1 ? 'bottle' : 'bottles'} · ${glasses} ${glasses === 1 ? 'glass' : 'glasses'}${other ? ` · ${other} ${other === 1 ? 'other entry' : 'other entries'}` : ''}`, remainingGlasses: count => count === 0 ? 'Goal reached! No glasses remaining.' : `${count} ${count === 1 ? 'glass' : 'glasses'} left to your goal.`,
@@ -57,7 +59,7 @@ export const translations = {
     consumption: "Today's water intake", goalToday: goal => `of ${goal} L today`,
     bottles: count => `${count} ${count === 1 ? 'water entry' : 'water entries'}`,
     remainingBottles: count => count === 0 ? 'Goal reached! No bottles remaining.' : `${count} ghost ${count === 1 ? 'bottle' : 'bottles'} left to your goal.`,
-    progress: 'Your progress', progressLabel: 'Daily goal progress', success: 'Goal reached! 💙',
+    progress: 'Your progress', progressLabel: 'Daily goal progress', success: 'Goal reached!',
     empty: 'Record your first bottle of the day.', add: '+ Add bottle', reset: 'Reset day',
     footnote: 'Your progress resets each new day.',
     storageError: 'Your browser could not save your progress. It will only be available while the app is open.',
@@ -68,6 +70,7 @@ export const translations = {
     settingsHelp: 'The new size applies to future bottles. Water already recorded will be kept.',
   },
   es: {
+    history: 'Historial', waterRecorded: amount => `+${amount} ml añadidos`,
     appearance: 'Apariencia', favoriteColor: 'Tu color favorito', appearanceHelp: 'Guarda para aplicar el modo y el color elegidos.', exit: 'Salir', colors: { green: 'Verde', blue: 'Azul', purple: 'Morado', rose: 'Rosa', orange: 'Naranja' },
     undoShort: 'Deshacer', moreInfo: 'Más información', calendarLegend: 'Leyenda',
     or: 'o', remainingOptionsHelp: 'Para completar la meta', bottlesNeeded: count => `${count} ${count === 1 ? 'botella' : 'botellas'}`, glassesNeeded: count => `${count} ${count === 1 ? 'vaso' : 'vasos'}`,
@@ -85,7 +88,7 @@ export const translations = {
     consumption: 'Consumo de hoy', goalToday: goal => `de ${goal} L hoy`,
     bottles: count => `${count} ${count === 1 ? 'registro de agua' : 'registros de agua'}`,
     remainingBottles: count => count === 0 ? '¡Meta cumplida! No faltan botellas.' : `${count} ${count === 1 ? 'botella fantasma restante' : 'botellas fantasma restantes'} para la meta.`,
-    progress: 'Tu progreso', progressLabel: 'Progreso de la meta diaria', success: '¡Meta alcanzada! 💙',
+    progress: 'Tu progreso', progressLabel: 'Progreso de la meta diaria', success: '¡Meta alcanzada!',
     empty: 'Registra tu primera botella del día.', add: '+ Añadir botella', reset: 'Reiniciar día',
     footnote: 'Tu progreso se reinicia cada nuevo día.',
     storageError: 'El navegador no pudo guardar tu progreso. Solo estará disponible mientras la aplicación esté abierta.',

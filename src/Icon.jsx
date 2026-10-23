@@ -2,6 +2,8 @@ import React from 'react';
 
 export default function Icon({ name, className = '' }) {
   const paths = {
+    flame: <path d="M12 3c1 5-5 5-3 10 1-2 3-2 4-5 5 4 7 8 4 12a7 7 0 0 1-11-1C2 13 8 10 12 3Z" />,
+    history: <><path d="M4 5h16v16H4zM8 3v4m8-4v4M4 11h16" /><path d="M8 15h2m4 0h2m-8 3h2" /></>,
     home: <><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" /><path d="M9 21v-8h6v8" /></>,
     logout: <><path d="M9 4H4v16h5M10 12h11m-4-4 4 4-4 4" /></>,
     eye: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></>,

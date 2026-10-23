@@ -135,15 +135,15 @@ lose travel history and undo information.
 - **Sair** returns to login; entering again restores that profile's saved progress and goal. Profiles and counters are local to this browser and origin; the active profile survives a refresh in the same tab. Existing pre-login progress is migrated into its own SQLite progress row under its original key, separate from the new profiles. Theme, language, and reminder preferences remain browser-wide.
 - Login is a demonstration, with no server authentication, account recovery, or cross-device accounts. Use test credentials. Passwords are saved as salted SHA-256 hashes rather than plain text; this is not production authentication. Clearing browser site data removes profiles and progress. Malformed saved profile data falls back safely to the login screen.
 
-- The web dashboard uses a responsive two-column layout with a circular daily goal and primary add-water action, alongside the bottle log, with both cards sharing the same width and height on desktop. A pair of compact streak and reminder cards sits above them, using the same equal-width columns on desktop. Goal and bottle size appear as compact details inside the bottle log; the hydration calendar follows below. On phones it stacks into one column, scales the progress ring to the card width, and uses a compact three-item navigation row with logout beside the brand. Mobile text remains readable, and the add-water button stacks its label and volume on narrow screens. Mobile controls have larger touch targets, settings fields stack vertically, and dialogs scroll within the viewport. All labels, number formatting, and the date follow the selected language.
+- The web app has three destinations: **Início / Home / Inicio** (`#home`) for today’s progress, bottle/glass registration and undo; **Histórico / History / Historial** (`#history`) for the calendar, streak, today’s container summary, size editing and confirmed reset; and **Benefícios / Benefits / Beneficios** (`#benefits`). Settings and logout remain in the header. Empty or unknown hashes open Home, and browser back/forward preserves recorded progress. Navigation moves focus to the destination heading. All dashboard labels and number/date formatting follow the selected language.
 
-- Dialogs, reminder notices, language options and reminder previews fade in and out over 240 ms. Theme colors and button states transition smoothly. Reduced-motion preferences disable these effects; Escape still closes dialogs.
+- The interface uses system fonts, neutral surfaces, rounded controls and five accent palettes in light/dark themes. Home is centered; History uses the wider desktop space. Phones have a floating three-destination bottom bar with safe-area spacing, and Settings/Exit remain in the header. Translucency is a progressive enhancement over opaque surfaces. Panels enter over 280 ms, the progress ring transitions over 600 ms, and existing fades last 240 ms. Reduced-motion preferences disable decorative waves and transition effects; all text and actions remain available. Escape closes a root dialog or returns from the reminder subpanel.
 
-- Enable water reminders by opening the **Lembretes de água** dashboard card and enter a custom interval in whole minutes or choose 15, 30, 60, or 120 minutes, then save. Custom intervals persist after reloading; empty, zero, negative, and fractional intervals cannot be saved. Preferences persist in this browser. A subtle countdown appears in the reminder card. Its per-profile deadline is saved, so reloading preserves the remaining time. The **Som de água enchendo um copo** checkbox enables a recording of water being poured into a cup, with two final drips, played with Web Audio; the visual reminder appears as a floating notice on both mobile and desktop. Saving enabled reminders prepares browser audio; playback may require a user interaction after reloading. The visual reminder always remains available. **Testar aviso** displays the same reminder inside the Reminders dialog immediately, even when reminders are disabled. Preview buttons dismiss the test without recording water or changing settings. Reminders are off by default and appear inside the open app; an overdue reminder appears when you return to the tab. **Adicionar garrafa** records water and restarts the interval; **Agora não** dismisses it and restarts the interval. No system notification permission is needed. Reopening restores the saved deadline; expired reminders appear when the app is visible. Alerts and sounds are delivered only while the page is visible. See the browser reminder limits below.
+- Enable water reminders by opening **Configurações → Lembretes de água** and enter a custom interval in whole minutes or choose 15, 30, 60, or 120 minutes, then save. Custom intervals persist after reloading; empty, zero, negative, and fractional intervals cannot be saved. Preferences persist in this browser. A subtle countdown appears in the Settings reminder summary. Its per-profile deadline is saved, so reloading preserves the remaining time. The **Som de água enchendo um copo** checkbox enables a recording of water being poured into a cup, with two final drips, played with Web Audio; the visual reminder appears as a floating notice on both mobile and desktop. Saving enabled reminders prepares browser audio; playback may require a user interaction after reloading. The visual reminder always remains available. **Testar aviso** displays the same reminder inside the Reminders subpanel immediately, even when reminders are disabled. Preview buttons dismiss the test without recording water or changing settings. Reminders are off by default and appear inside the open app; an overdue reminder appears when you return to the tab. **Adicionar garrafa** records water and restarts the interval; **Agora não** dismisses it and restarts the interval. No system notification permission is needed. Reopening restores the saved deadline; expired reminders appear when the app is visible. Alerts and sounds are delivered only while the page is visible. See the browser reminder limits below.
 
 - The responsive top navigation includes the app name, **Início**, **Benefícios**, and **Configurações**. Open the dashboard reminder card to manage **Lembretes de água**. Navigation labels follow your chosen language.
 
-- Each click on **Adicionar garrafa** opens a large popup showing a jug pouring water into a bottle and the recorded volume. It closes automatically after 3.4 seconds, or immediately with the close button or Escape. Closing the popup preserves the recorded water. The animation respects the system preference for reduced motion.
+- Recording a bottle or glass updates the total and progress immediately, without opening a modal or moving keyboard focus. Each button shows its configured amount. A polite, non-modal confirmation displays the last added volume for about four seconds; another entry renews that timer. **Desfazer / Undo / Deshacer** remains available on Home after the message expires and after reload, removing the actual last recorded amount. The storage-error alert is independent of this confirmation.
 - The bottle log shows recorded bottles filled with water and remaining bottles as faint, dashed outlines. Remaining bottles are calculated from the water still needed and the current bottle size, rounding up; each group displays at most 24 illustrations with an overflow count.
 - Use **Alterar ml** inside the bottle log to edit the bottle volume directly. Save applies a positive value to future bottles; Cancel or Escape discards edits. Recorded water is preserved and ghost bottles update to the new size.
 - Add a bottle using its current size. Changing the size affects future bottles; it preserves water already recorded.
@@ -161,7 +161,7 @@ The theme is another `useState` example: saving the appearance settings changes 
 
 Change the dashboard heading inside `App.jsx`, then save the file while the dev server is running. Vite updates the page. Next, change the button text or the bottle colors. These edits let you explore JSX and CSS before changing state logic.
 
-`SettingsDialog` holds temporary input state. Saving passes both values to `App` through the `onSave` prop; cancelling removes the dialog and discards that temporary state.
+`SettingsDialog` holds temporary input state. Reminders use a subpanel inside the same modal: Back, Cancel or Escape discards the reminder draft and returns focus to its entry button, preserving unsaved goal/appearance drafts. Saving reminders applies only reminder preferences. Escape at the Settings root closes it without applying Settings drafts. Saving passes both values to `App` through the `onSave` prop; cancelling removes the dialog and discards that temporary state.
 
 The reminder audio is **pouring with two drips at the end** by Mafon2, released under CC0 on [Freesound](https://freesound.org/people/Mafon2/sounds/330025/). Source and license details are in `src/assets/SOURCES.md`.
 
@@ -194,7 +194,7 @@ Recorded entries keep their actual volume and container. The log displays
 bottle and glass illustrations together and shows separate counts. Older
 entries whose container was not recorded, and custom amounts, appear as water
 drops under other entries. Aggregate-only records also remain in that count.
-The recording popup shows a glass when recording a glass.
+Bottle and glass entries use the same immediate, non-modal confirmation.
 
 Use **Alterar ml** to adjust the bottle or glass volume. Volumes
 accept 0.01–1,000,000 ml with at most two decimal places; totals use integer
@@ -273,22 +273,22 @@ the diff. Swift and CSS are outside this JavaScript lint configuration.
 `src/App.jsx` connects navigation, hydration state, preferences, and dialogs.
 Find individual features in `src/dashboard/`:
 
-- `DashboardNav.jsx`: home/benefits navigation, settings entry point, and logout.
+- `DashboardNav.jsx`: home/history/benefits navigation, settings entry point, and logout.
 - `StreakCard.jsx`: current consecutive-day streak.
-- `ReminderCard.jsx`: reminder summary, countdown, and reminder-dialog entry point.
+- `SettingsDialog.jsx` includes the reminder entry point and countdown; `RemindersForm.jsx` owns the reminder draft and preview.
 - `HydrationCard.jsx`: daily progress ring and add/undo actions.
 - `WaterLog.jsx`: recorded containers and remaining water; `WaterContainer.jsx` draws the icons.
 - `BottleSizeEditor.jsx`: inline bottle/glass size form.
 - `SettingsDialog.jsx`: goal, language, theme, and color edits.
 - `ProfileTransfer.jsx`: profile backup export, import preview, and replacement confirmation.
-- `RemindersDialog.jsx` and `ReminderNotice.jsx`: reminder settings, preview, and alert.
+- `RemindersForm.jsx` and `ReminderNotice.jsx`: reminder settings, preview, and alert.
 - `useWaterReminders.js`: saved preferences, per-profile deadlines, visibility checks, audio, and timer cleanup.
-- `PourDialog.jsx` and `ResetDialog.jsx`: recording animation and reset confirmation.
+- `ResetDialog.jsx`: reset confirmation. Recording feedback is a non-modal live region owned by `App.jsx`.
 
 Hydration rules remain in `src/state.js`, persistence in `src/database.js`, and
 calendar rendering in `src/HydrationCalendar.jsx`, dashboard translations in
 `src/language.js`, and responsive/theme styling in `src/styles.css`.
-The page heading, daily-summary layout, and reset footer are composed in App.
+The destination headings, simple Home, History composition, recording confirmation and reset footer are composed in App.
 Dialogs keep draft edits local;
 `App` applies confirmed changes. Keep these boundaries when adding features.
 
@@ -373,11 +373,12 @@ file preview/cancellation, Escape, download initiation, pending-save handling,
 replacement/retry, repeated import, destination credential retention, reminder
 restart, localized controls, busy states, and reload persistence.
 
-A real browser and screen reader were unavailable during implementation. Native
-file-picker behavior, downloaded-file saving, modal focus trapping, screen-reader
-announcements, mobile/light/dark visual layout, and transfer between two real
-browser installations remain manual checks. The DOM tests simulate dialog APIs
-and file selection; they do not substitute for those browser checks.
+The Chromium suite now exercises real backup download and file upload, restore,
+reload persistence, profile isolation and separate browser contexts. Keyboard
+focus and responsive light/dark layouts are also checked in Chromium. Native
+file-picker chrome, screen-reader announcements, audio quality and transfer
+between two physical browser installations remain manual checks. DOM tests
+simulate dialog APIs and file selection; they complement the browser suite.
 
 ## Interaction testing strategy
 
@@ -391,18 +392,20 @@ applies to download anchors; ordinary navigation is left intact.
 
 | Area | DOM owner | Browser/manual owner |
 | --- | --- | --- |
-| Profile forms | `profileFormsUi.test.mjs`: registration/login/onboarding validation | Planned real registration, onboarding, logout/login |
-| Hydration and sizes | `hydrationUi.test.mjs`: add/undo and size-editor save/cancel/validation | Planned persistence journey |
-| Settings and reset | `settingsUi.test.mjs`: validation, save/cancel/Escape and reset confirmation | Planned native keyboard modal behavior |
-| Reminders | `dashboardNavigationUi.test.mjs` card states; `reminderFormsUi.test.mjs` validation/save/cancel/preview | Planned native dialog opening; audible quality stays manual |
-| Navigation | `dashboardNavigationUi.test.mjs` ordinary links and home focus | Planned real-browser clicks |
-| Backup | `profileTransferUi.test.mjs` lifecycle/failure/retry; `transferControlsUi.test.mjs` localized busy controls | Planned real download/upload across isolated contexts |
+| Profile forms | `profileFormsUi.test.mjs`: registration/login/onboarding validation | `e2e/hydration.spec.js`: registration, onboarding, logout/login |
+| Hydration and sizes | `hydrationUi.test.mjs`: add/undo and size-editor save/cancel/validation | `e2e/hydration.spec.js`: immediate entries, size editing, undo and reload |
+| Settings and reset | `settingsUi.test.mjs`: validation, save/cancel/Escape and reset confirmation | `e2e/fluid-layout.spec.js`: keyboard focus and reminder subpanels; hydration journey covers reset |
+| Reminders | `dashboardNavigationUi.test.mjs` card states; `reminderFormsUi.test.mjs` validation/save/cancel/preview | `e2e/fluid-layout.spec.js`: native dialog and keyboard return; audible quality stays manual |
+| Navigation | `dashboardNavigationUi.test.mjs` ordinary links and home focus | `e2e/fluid-layout.spec.js`: destination clicks, sizes, palettes and localized layouts |
+| Backup | `profileTransferUi.test.mjs` lifecycle/failure/retry; `transferControlsUi.test.mjs` localized busy controls | `e2e/profile-backup.spec.js`: real download/upload, reload and isolated profiles/contexts |
 
 DOM dialog/cancel and file-selection APIs are simulated. They do not prove
 native focus trapping, constraint validation, file transport, visual layout, or
 screen-reader behavior. Rules, date arithmetic, and storage failure permutations
-remain in their existing Node suites. The browser layer will own a few complete
-journeys; palettes, audio quality, and screen-reader announcements remain manual.
+remain in their existing Node suites. The Chromium layer covers complete journeys, palette contrast and responsive layouts;
+audio quality and screen-reader announcements remain manual. Run `npm run test:e2e`
+after installing Playwright Chromium and its system dependencies. Review screenshots
+are generated under `test-results/` and attached to `playwright-report/`.
 
 ## Select a local profile
 

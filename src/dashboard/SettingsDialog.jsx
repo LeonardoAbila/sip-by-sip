@@ -1,3 +1,5 @@
+import RemindersForm from './RemindersForm.jsx';
+import { formatReminderCountdown } from '../reminders.js';
 import ProfileTransfer from './ProfileTransfer.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../Icon.jsx';
@@ -6,9 +8,14 @@ import { languages, translations } from '../language.js';
 import { appColors } from '../theme.js';
 import { positiveNumber, validVolume } from '../state.js';
 
-export default function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave, onClose, fadingOut, profile, onExport, onImport }) {
+export default function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave, onClose, fadingOut, profile, onExport, onImport, reminders, reminderSeconds, onSaveReminders }) {
   const dialog = useRef(null);
+  const opener = useRef(document.activeElement);
   const transferBusy = useRef(false);
+  const remindersButton = useRef(null);
+  const backupButton = useRef(null);
+  const panelReturn = useRef(null);
+  const [remindersOpen, setRemindersOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [bottleInput, setBottleInput] = useState(String(bottleSize));
   const [goalInput, setGoalInput] = useState(String(dailyGoal));
@@ -23,8 +30,15 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
   useEffect(() => {
     const element = dialog.current;
     element.showModal();
-    return () => element.close();
+    return () => { element.close(); if (opener.current?.isConnected) opener.current.focus(); };
   }, []);
+
+  useEffect(() => {
+    if (remindersOpen || transferOpen || !panelReturn.current) return;
+    const target = panelReturn.current === 'reminders' ? remindersButton.current : backupButton.current;
+    target?.focus();
+    panelReturn.current = null;
+  }, [remindersOpen, transferOpen]);
 
   function save(event) {
     event.preventDefault();
@@ -32,8 +46,12 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
   }
 
   return (
-    <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); if (!transferBusy.current) onClose(); }} aria-labelledby={transferOpen ? 'transfer-title' : 'settings-title'}>
-      {transferOpen ? <ProfileTransfer profile={profile} t={t} onExport={onExport} onImport={onImport}
+    <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); if (transferBusy.current) return; if (remindersOpen) setRemindersOpen(false); else onClose(); }} aria-labelledby={remindersOpen ? 'reminders-title' : transferOpen ? 'transfer-title' : 'settings-title'}>
+      {remindersOpen ? <>
+        <button type="button" className="panel-back secondary" onClick={() => setRemindersOpen(false)}>{t.transferBack}</button>
+        <RemindersForm reminders={reminders} t={t} onClose={() => setRemindersOpen(false)}
+          onSave={selected => { onSaveReminders(selected); setRemindersOpen(false); }} />
+      </> : transferOpen ? <ProfileTransfer profile={profile} t={t} onExport={onExport} onImport={onImport}
         onBusy={value => { transferBusy.current = value; }} onBack={() => setTransferOpen(false)} /> : <>
           <form onSubmit={save}>
             <h2 id="settings-title">{t.settings}</h2>
@@ -86,7 +104,12 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
               <button type="submit" className="save-button" disabled={!validBottle || !validGoal}>{t.save}</button>
             </div>
           </form>
-          {profile && <button type="button" className="secondary transfer-open" onClick={() => setTransferOpen(true)}>{t.transferTitle}</button>}
+          {reminders && <div className="settings-reminders">
+            <button ref={remindersButton} type="button" className="settings-row" onClick={() => { panelReturn.current = 'reminders'; setRemindersOpen(true); }}><Icon name="bell" />{t.reminders}<Icon name="arrow" /></button>
+            <p className="settings-help">{reminders.enabled ? t.everyMinutes(reminders.minutes) : t.remindersOff}</p>
+            {reminders.enabled && <p className="settings-help" role="timer" aria-live="off">{t.nextReminder} <span>{formatReminderCountdown(reminderSeconds)}</span></p>}
+          </div>}
+          {profile && <button ref={backupButton} type="button" className="secondary transfer-open" onClick={() => { panelReturn.current = 'transfer'; setTransferOpen(true); }}>{t.transferTitle}</button>}
         </>}
     </dialog>
   );

@@ -413,12 +413,7 @@ progress::-moz-progress-bar { background: var(--accent); }
 .swatch-orange { background: #a34d1b; }
 
 :root[data-color] {
-  --page: color-mix(in srgb, var(--accent-soft) 40%, #f5f7f6);
-  --track: var(--accent-soft);
   --secondary: var(--accent-soft);
-}
-:root[data-color][data-theme='dark'] {
-  --page: color-mix(in srgb, var(--accent-soft) 35%, #11181e);
 }
 .add-button, .save-button, .benefits-footer .benefits-back, .brand-mark { background: var(--accent-button, #218768); }
 .add-button { box-shadow: 0 4px 10px color-mix(in srgb, var(--accent-button) 15%, transparent); }

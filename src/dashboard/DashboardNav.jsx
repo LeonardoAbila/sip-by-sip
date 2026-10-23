@@ -10,12 +10,13 @@ export default function DashboardNav({ screen, t, benefitsLabel, showLogout, onO
         </a>
         <div className="nav-actions">
           <a className="theme-toggle" href="#home" aria-current={screen === 'home' ? 'page' : undefined}><Icon name="home" />{t.home}</a>
+          <a className="theme-toggle" href="#history" aria-current={screen === 'history' ? 'page' : undefined}><Icon name="history" />{t.history}</a>
           <a className="theme-toggle" href="#benefits" aria-current={screen === 'benefits' ? 'page' : undefined}><Icon name="heart" />{benefitsLabel}</a>
-          <button className="theme-toggle" aria-haspopup="dialog" onClick={() => onOpenSettings()}>
-            <Icon name="settings" /> {t.settings}
-          </button>
         </div>
-        {showLogout && <button type="button" className="theme-toggle nav-logout" onClick={onLogout}><Icon name="logout" /> {t.exit}</button>}
+        <div className="header-tools">
+          <button className="theme-toggle settings-trigger" aria-label={t.settings} title={t.settings} aria-haspopup="dialog" onClick={onOpenSettings}><Icon name="settings" /><span>{t.settings}</span></button>
+          {showLogout && <button type="button" className="theme-toggle nav-logout" aria-label={t.exit} title={t.exit} onClick={onLogout}><Icon name="logout" /><span>{t.exit}</span></button>}
+        </div>
       </nav>
     </header>
   );

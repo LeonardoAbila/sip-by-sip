@@ -52,6 +52,8 @@ for (const action of ['cancel', 'Escape', 'confirm']) {
   test(`reset ${action} changes only on confirmation`, async context => {
     const h = await ui(context); await h.dashboard();
     const { translations } = await h.load('language.js'); const t = translations['pt-BR'];
+    await act(async () => { h.document.querySelector('a[href="#history"]').click(); await h.pause(); });
+    await h.until(() => !h.document.querySelector('#history').hidden);
     await h.click(t.reset);
     if (action === 'Escape') await h.escape();
     else await h.click(action === 'cancel' ? t.cancel : t.reset, h.document.querySelector('dialog'));

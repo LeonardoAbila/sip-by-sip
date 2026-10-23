@@ -1,31 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Fade from '../Fade.jsx';
 import ReminderNotice from './ReminderNotice.jsx';
-import { translations } from '../language.js';
 import { reminderIntervals, validReminderMinutes } from '../reminders.js';
 import { playReminderSound, stopReminderSound } from '../reminderSound.js';
 
-export default function RemindersDialog({ reminders, language, onSave, onClose, fadingOut }) {
-  const dialog = useRef(null);
+export default function RemindersForm({ reminders, t, onSave, onClose }) {
   const [reminderInput, setReminderInput] = useState(reminders);
   const [reminderPreview, setReminderPreview] = useState(false);
   const validInterval = validReminderMinutes(Number(reminderInput.minutes));
-  const t = translations[language];
 
-  useEffect(() => {
-    const element = dialog.current;
-    element.showModal();
-    return () => { element.close(); stopReminderSound(); };
-  }, []);
+  useEffect(() => () => stopReminderSound(), []);
 
   return (
-    <dialog inert={fadingOut} ref={dialog} className="reset-dialog settings-dialog" onCancel={event => { event.preventDefault(); onClose(); }} aria-labelledby="reminders-title">
       <form onSubmit={event => { event.preventDefault(); if (validInterval) onSave({ ...reminderInput, minutes: Number(reminderInput.minutes) }); }}>
         <h2 id="reminders-title">{t.reminders}</h2>
         <fieldset className="reminder-settings">
           <legend className="sr-only">{t.reminders}</legend>
           <label className="reminder-switch">
-            <input type="checkbox" checked={reminderInput.enabled}
+            <input autoFocus type="checkbox" checked={reminderInput.enabled}
               onChange={event => setReminderInput(previous => ({ ...previous, enabled: event.target.checked }))} />
             {t.enableReminders}
           </label>
@@ -65,6 +57,5 @@ export default function RemindersDialog({ reminders, language, onSave, onClose, 
           <button type="submit" className="save-button" disabled={!validInterval}>{t.save}</button>
         </div>
       </form>
-    </dialog>
   );
 }

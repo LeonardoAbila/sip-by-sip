@@ -21,8 +21,6 @@ test('backup lifecycle: export latest entry, cancel, retry atomic restore, remou
     await act(async () => { root.render(React.createElement(Prototype)); await pause(); });
     await until(() => document.querySelector('.total')?.textContent === '250 ml');
     await click('Garrafa');
-    await click('×');
-    await until(() => !document.querySelector('.pour-dialog'));
     await click('Configurações');
     // An unsaved goal draft must not become part of an export/import.
     const goal = document.querySelector('#daily-goal');
@@ -82,4 +80,22 @@ test('backup lifecycle: export latest entry, cancel, retry atomic restore, remou
     await act(async () => { root.render(React.createElement(Prototype)); await pause(); });
     await until(() => document.querySelector('.total')?.textContent === '750,25 ml');
     await act(async () => { root.render(null); });
+});
+
+test('import in progress rejects water additions and undo', async t => {
+  const h = await ui(t); const profile = await h.dashboard();
+  const { createBackup } = await h.load('profileBackup.js');
+  const backup = createBackup(profile, h.state.addWater(h.state.newState(), 900, 'glass'));
+  await h.click('Configurações'); await h.click('Backup do perfil'); await h.choose(backup);
+  await act(async () => {
+    h.button('Confirmar substituição').click();
+    h.document.querySelector('.add-glass-button').click();
+    h.document.querySelector('.undo-water').click();
+  });
+  // The old in-memory counter cannot change while the restore is pending.
+  assert.equal(h.document.querySelector('.total').textContent, '250 ml');
+  await h.until(() => !h.document.querySelector('dialog'));
+  assert.equal(h.document.querySelector('.total').textContent, '900 ml');
+  assert.equal(JSON.parse(h.database.readProgress('aguaApp:perfil:destination')).totalMl, 900);
+  assert.equal(h.document.querySelector('.water-confirmation').textContent.trim(), '');
 });

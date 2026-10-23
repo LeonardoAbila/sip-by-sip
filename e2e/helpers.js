@@ -25,7 +25,6 @@ export async function login(page, username, secret = password) {
 
 export async function record(page, container = 'bottle') {
   await page.getByRole('button', { name: container === 'bottle' ? /Adicionar garrafa/ : /Adicionar copo/ }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Fechar', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
 }
 
