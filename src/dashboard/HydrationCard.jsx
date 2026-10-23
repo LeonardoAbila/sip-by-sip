@@ -10,7 +10,7 @@ export default function HydrationCard({ state, t, format, recordWater, onUndo })
       <div className="card-heading">
         <h2><Icon name="drop" />{t.consumption}</h2>
       </div>
-      <div className="goal-ring">
+      <div className="goal-ring" style={{ '--water-level': `${percentage}%` }}>
         <svg className="ring-svg" viewBox="0 0 260 260" aria-hidden="true">
           <circle className="ring-track" cx="130" cy="130" r="112" />
           <circle className="ring-value" cx="130" cy="130" r="112"

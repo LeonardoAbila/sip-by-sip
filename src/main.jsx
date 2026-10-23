@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import Prototype from './Prototype.jsx';
 import './styles.css';
+import './fluid.css';
 import { readTheme, readColor } from './theme.js';
 import initSqlJs from 'sql.js';
 import wasmUrl from 'sql.js/dist/sql-wasm.wasm?url';

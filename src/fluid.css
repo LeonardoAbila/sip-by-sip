@@ -1,0 +1,65 @@
+/* Fluid visual layer. Palette variables keep every accent and theme available. */
+body {
+  background: radial-gradient(ellipse at 8% 5%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 48%),
+    radial-gradient(ellipse at 95% 65%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 52%), var(--page);
+}
+.site-header { background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(18px); }
+.app { max-width: 1080px; padding-top: clamp(28px, 5vw, 64px); }
+.page-heading { margin-bottom: clamp(24px, 4vw, 40px); }
+.page-heading h1 { font-size: clamp(28px, 4vw, 44px); letter-spacing: -1.5px; font-weight: 650; }
+.date-chip, .theme-toggle, .nav-link { border-radius: 100px; }
+.dashboard-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: clamp(16px, 2.5vw, 28px); }
+.hydration-card, .bottle-card, .hydration-calendar, .auth-card,
+.daily-summary .achievement-panel > div, .daily-summary .reminder-card {
+  border-radius: 28px;
+  border-color: color-mix(in srgb, var(--accent) 13%, var(--border));
+  box-shadow: 0 12px 42px color-mix(in srgb, var(--text) 5%, transparent);
+}
+.hydration-card, .bottle-card { padding: clamp(20px, 3vw, 36px); }
+.hydration-card { background: linear-gradient(160deg, var(--surface) 55%, color-mix(in srgb, var(--accent) 6%, var(--surface))); }
+.goal-ring { isolation: isolate; }
+.ring-content { isolation: isolate; inset: 11%; padding: 16px; border-radius: 50%; overflow: hidden; background: color-mix(in srgb, var(--accent) 4%, var(--surface)); }
+.ring-content::before, .ring-content::after {
+  content: ''; position: absolute; z-index: -1; width: 200%; height: 200%; left: -50%;
+  top: calc(100% - var(--water-level) + 4%); border-radius: 43%;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  animation: fluid-wave 16s linear infinite;
+  transition: top 900ms cubic-bezier(.22, 1, .36, 1);
+}
+.ring-content::after { border-radius: 46%; background: color-mix(in srgb, var(--accent) 8%, transparent); animation-direction: reverse; animation-duration: 21s; }
+.ring-value { stroke-width: 7; transition: stroke-dashoffset 900ms cubic-bezier(.22, 1, .36, 1); }
+.ring-track { stroke-width: 7; }
+.total { font-weight: 650; font-variant-numeric: tabular-nums; }
+.percentage-pill { background: var(--surface); border: 1px solid var(--border); }
+.record-container-actions { column-gap: 12px; row-gap: 12px; }
+.record-container-actions .add-button { width: 100%; height: auto; min-height: 76px; flex-direction: row; border-radius: 22px; gap: 10px; }
+.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent); color: var(--page); }
+.record-container-actions .undo-water { border-radius: 18px; }
+button, .nav-link { transition: transform 220ms ease, background-color 240ms ease, color 240ms ease, box-shadow 240ms ease; }
+@media (hover: hover) {
+  .record-container-actions .add-button:hover:enabled { transform: translateY(-3px); box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .theme-toggle:hover, .nav-link:hover { transform: translateY(-2px); }
+}
+.record-container-actions .add-button:active:enabled { transform: scale(.97); }
+.remaining-options, .empty-bottles, .stat-card { border-radius: 20px; }
+.hydration-calendar { margin-top: 28px; padding: clamp(16px, 3vw, 32px); }
+.calendar-day { border-radius: 16px; }
+.auth-page { gap: clamp(24px, 6vw, 80px); }
+.auth-card { padding: clamp(24px, 4vw, 44px); }
+.auth-intro h1 { font-weight: 650; }
+@keyframes fluid-wave { to { transform: rotate(360deg); } }
+@media (max-width: 720px) {
+  .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+  .app { max-width: 540px; }
+  .page-heading h1 { letter-spacing: -1px; }
+  .hydration-card, .bottle-card, .hydration-calendar { border-radius: 24px; }
+  .calendar-day { border-radius: 12px; }
+}
+@media (max-width: 360px) {
+  .record-container-actions .add-button { flex-direction: column; gap: 6px; }
+  .hydration-calendar { padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring-content::before, .ring-content::after { animation: none; transition: none; }
+  button:hover, .nav-link:hover, button:active { transform: none !important; }
+}
