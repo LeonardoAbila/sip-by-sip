@@ -161,7 +161,10 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
               <p className="page-eyebrow">{t.dailyOverview}</p>
               <h1 ref={homeHeading} tabIndex={-1}>{t.dashboardTitle}</h1>
             </div>
-            <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
+            <div className="day-context">
+              <StreakCard label={t.streak} text={t.streakDays(rewards.streak)} />
+              <p className="date-chip"><span className="status-dot" />{dateLabel}</p>
+            </div>
           </header>
           <div className="today-layout">
           <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
@@ -171,7 +174,6 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
           <section id="history" className="history-section" aria-labelledby="history-title">
           <header className="history-heading">
             <h2 id="history-title">{t.history}</h2>
-            <StreakCard label={t.streak} text={t.streakDays(rewards.streak)} />
           </header>
           <div className="history-overview">
             <HydrationCalendar state={currentDay(state)} language={language} t={t} />
