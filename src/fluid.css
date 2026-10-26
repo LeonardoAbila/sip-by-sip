@@ -77,7 +77,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .goal-celebration i:nth-child(2n) { top: 32%; left: 75%; background: var(--warm-text); }
 
 /* History reads from days to the details of the current containers. */
-.history-overview { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.history-overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
 .history-overview > * { min-width: 0; }
 .achievement-panel > div { padding: 24px; }
 .achievement-symbol { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 12px; border-radius: 13px; background: var(--warm); }
@@ -165,6 +165,10 @@ input[type='checkbox'], .settings-dialog input[type='checkbox'] { width: 20px; h
 @keyframes sip-confetti { to { opacity: 0; transform: translateY(-100px) rotate(200deg); } }
 @keyframes panel-arrive { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
+@media (min-width: 901px) {
+  .history-overview .calendar-day { min-height: 64px; padding: 6px 2px; gap: 3px; }
+  .history-overview .calendar-volume { font-size: 11px; line-height: 1.25; }
+}
 @media (max-width: 900px) {
   .today-layout { grid-template-columns: minmax(0, 1fr); }
   :root { --panel-radius: 18px; }
