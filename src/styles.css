@@ -483,7 +483,7 @@ progress::-moz-progress-bar { background: var(--accent); }
 }
 
 .bottle-settings .stat-icon { margin-bottom: 8px; }
-.bottle-edit-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 14px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--input); color: var(--accent-text); font-size: 13px; }
+.bottle-edit-button { display: flex; width: fit-content; margin-inline: auto; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 14px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--input); color: var(--accent-text); font-size: 13px; }
 .bottle-edit-button:hover { background: var(--secondary); }
 .bottle-size-editor { margin-bottom: 18px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--input); text-align: left; }
 .bottle-size-editor label { font-size: 13px; font-weight: 600; }
