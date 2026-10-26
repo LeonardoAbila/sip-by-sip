@@ -1,20 +1,20 @@
 /* Shared surfaces and spacing; saved accent palettes are defined below. */
 :root {
-  --page: #f8f7f3;
-  --surface: #fffefa;
-  --text: #25332f;
-  --muted: #62736d;
-  --border: #e4e9e2;
-  --input: #f3f5f0;
-  --track: #e7eee8;
-  --secondary: #ecf4ed;
+  --page: #fafafa;
+  --surface: #ffffff;
+  --text: #171717;
+  --muted: #62666d;
+  --border: #e5e7eb;
+  --input: #f4f5f7;
+  --track: #e9edf3;
+  --secondary: #edf4ff;
   --accent-text: #18795e;
   --error: #a33232;
-  --success: #167857;
+  --success: #245fc7;
   --glass: var(--surface);
   --panel-shadow: 0 4px 24px #263d3005;
-  --panel-radius: 24px;
-  --control-radius: 16px;
+  --panel-radius: 18px;
+  --control-radius: 12px;
   --space: 8px;
   color-scheme: light;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -24,17 +24,17 @@
   -webkit-font-smoothing: antialiased;
 }
 :root[data-theme='dark'] {
-  --page: #151d1a;
-  --surface: #202b25;
-  --text: #f0f5ef;
-  --muted: #b1c2b7;
-  --border: #3a4b40;
-  --input: #27362c;
-  --track: #3a4c3e;
-  --secondary: #2e4536;
+  --page: #101114;
+  --surface: #191b20;
+  --text: #f5f6f8;
+  --muted: #b0b5c0;
+  --border: #30343d;
+  --input: #22252c;
+  --track: #303746;
+  --secondary: #202d43;
   --accent-text: #83daba;
   --error: #ffaaaa;
-  --success: #7dddb6;
+  --success: #91bfff;
   --glass: var(--surface);
   --panel-shadow: 0 4px 24px #0002;
   color-scheme: dark;
@@ -239,8 +239,8 @@ progress::-webkit-progress-value { transition: width 240ms ease; }
 }
 
 /* Dashboard layout */
-:root { --accent: #218768; --accent-soft: #edf7f0; --warm: #fff5e7; --warm-text: #946428; --shadow: 0 8px 32px #213d3705; }
-:root[data-theme='dark'] { --accent: #68c7a3; --accent-soft: #213d30; --warm: #3b3022; --warm-text: #e5bb79; --shadow: 0 8px 32px #00000014; }
+:root { --accent: #218768; --accent-soft: #edf7f0; --warm: #edf4ff; --warm-text: #245fc7; --shadow: 0 8px 32px #213d3705; }
+:root[data-theme='dark'] { --accent: #68c7a3; --accent-soft: #213d30; --warm: #202d43; --warm-text: #91bfff; --shadow: 0 8px 32px #00000014; }
 body { line-height: 1.5; }
 #root { padding: 0 24px 32px; }
 .icon { width: 20px; height: 20px; flex-shrink: 0; vertical-align: middle; }
@@ -405,21 +405,9 @@ progress::-moz-progress-bar { background: var(--accent); }
 
 
 /* Saved accent colors work with both light and dark mode. */
-:root[data-color='green'] { --accent: #18795e; --accent-text: #18795e; --accent-button: #18795e; --accent-soft: #edf7f0; }
-:root[data-color='green'][data-theme='dark'] { --accent: #83daba; --accent-text: #83daba; --accent-soft: #213d30; }
-.swatch-green { background: #18795e; }
-:root[data-color='blue'] { --accent: #2463ad; --accent-text: #2463ad; --accent-button: #2463ad; --accent-soft: #edf4fc; }
-:root[data-color='blue'][data-theme='dark'] { --accent: #91bfff; --accent-text: #91bfff; --accent-soft: #203448; }
-.swatch-blue { background: #2463ad; }
-:root[data-color='purple'] { --accent: #7543ae; --accent-text: #7543ae; --accent-button: #7543ae; --accent-soft: #f5effb; }
-:root[data-color='purple'][data-theme='dark'] { --accent: #c9a7ef; --accent-text: #c9a7ef; --accent-soft: #352944; }
-.swatch-purple { background: #7543ae; }
-:root[data-color='rose'] { --accent: #ad3866; --accent-text: #ad3866; --accent-button: #ad3866; --accent-soft: #fceff4; }
-:root[data-color='rose'][data-theme='dark'] { --accent: #f5a6c4; --accent-text: #f5a6c4; --accent-soft: #442a36; }
-.swatch-rose { background: #ad3866; }
-:root[data-color='orange'] { --accent: #a34d1b; --accent-text: #a34d1b; --accent-button: #a34d1b; --accent-soft: #fcf2ea; }
-:root[data-color='orange'][data-theme='dark'] { --accent: #f4b78e; --accent-text: #f4b78e; --accent-soft: #443224; }
-.swatch-orange { background: #a34d1b; }
+/* A single blue accent keeps all screens consistent. */
+:root[data-color='blue'] { --accent: #2563eb; --accent-text: #245fc7; --accent-button: #2563eb; --accent-soft: #edf4ff; }
+:root[data-color='blue'][data-theme='dark'] { --accent: #91bfff; --accent-text: #91bfff; --accent-soft: #202d43; }
 
 :root[data-color] {
   --secondary: var(--accent-soft);
@@ -429,12 +417,6 @@ progress::-moz-progress-bar { background: var(--accent); }
 .add-button:hover:enabled, .save-button:hover:enabled { background: color-mix(in srgb, var(--accent-button) 85%, black); }
 .appearance-settings { margin: 22px 0; padding: 16px; border: 1px solid var(--border); border-radius: 14px; }
 .appearance-settings legend { font-weight: 600; font-size: 14px; }
-.color-options { display: flex; flex-wrap: wrap; gap: 8px; }
-.color-option { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--text); font-size: 12px; }
-.color-option[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); }
-.color-swatch { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: white; }
-.color-swatch .icon { width: 18px; height: 18px; }
-
 /* Keep the dashboard and its controls proportional to narrow phone screens. */
 #home, .dashboard-grid > *, .stat-card, .auth-intro, .auth-card { min-width: 0; }
 .auth-card, .hydration-card, .bottle-card, .reminder-card, .hydration-calendar { overflow-wrap: anywhere; }

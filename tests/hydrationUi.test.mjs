@@ -12,8 +12,6 @@ test('water buttons add both containers, size edits preserve recorded amounts, a
   await h.record(copy.bottleChoice);
   await h.record(copy.glassChoice);
   assert.equal(total(), '1 L');
-  await act(async () => { h.document.querySelector('a[href="#history"]').click(); await h.pause(); });
-  await h.until(() => !h.document.querySelector('#history').hidden);
   await h.click(copy.changeBottleSize);
   await h.input('.bottle-size-editor input', '0');
   assert.equal(h.button(copy.save).disabled, true);

@@ -10,7 +10,6 @@ for (const dismissal of ['cancel', 'Escape']) {
     const before = { ...h.document.documentElement.dataset };
     await h.click(t.settings); await h.input('#daily-goal', '9'); await h.input('#bottle-size', '700');
     await act(async () => { h.document.querySelector('.appearance-settings input').click(); });
-    await h.click(t.colors.blue);
     await act(async () => { h.document.querySelector('.language-button').click(); });
     await h.click('English');
     if (dismissal === 'cancel') await h.click(translations.en.cancel); else await h.escape();
@@ -36,24 +35,19 @@ test('settings reject invalid values and save valid goal, size, language and app
   assert.equal(h.button(t.save).disabled, true);
   await h.input('#bottle-size', '600');
   await act(async () => { h.document.querySelector('.appearance-settings input').click(); });
-  await h.click(t.colors.blue);
   await act(async () => { h.document.querySelector('.language-button').click(); });
   await h.click('English'); await h.click(translations.en.save);
   await h.until(() => !h.document.querySelector('dialog'));
   const saved = JSON.parse(h.database.readProgress('aguaApp:perfil:destination'));
   assert.equal(saved.metaLitros, 3); assert.equal(saved.mlGarrafa, 600); assert.equal(saved.totalMl, 250);
   assert.equal(h.dom.window.localStorage.getItem((await h.load('language.js')).LANGUAGE_KEY), 'en');
-  assert.equal(h.document.documentElement.dataset.color, 'blue');
   assert.equal(h.dom.window.localStorage.getItem('aguaAppTheme'), h.document.documentElement.dataset.theme);
-  assert.equal(h.dom.window.localStorage.getItem('aguaAppColor'), 'blue');
 });
 
 for (const action of ['cancel', 'Escape', 'confirm']) {
   test(`reset ${action} changes only on confirmation`, async context => {
     const h = await ui(context); await h.dashboard();
     const { translations } = await h.load('language.js'); const t = translations['pt-BR'];
-    await act(async () => { h.document.querySelector('a[href="#history"]').click(); await h.pause(); });
-    await h.until(() => !h.document.querySelector('#history').hidden);
     await h.click(t.reset);
     if (action === 'Escape') await h.escape();
     else await h.click(action === 'cancel' ? t.cancel : t.reset, h.document.querySelector('dialog'));

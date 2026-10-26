@@ -2,7 +2,7 @@
 import { test, expect } from '@playwright/test';
 import { register, record } from './helpers.js';
 
-async function preferences(page, language, theme = 'light', color = 'green') {
+async function preferences(page, language, theme = 'light', color = 'blue') {
   await page.evaluate(({ language, theme, color }) => {
     localStorage.setItem('aguaLanguage', language);
     localStorage.setItem('aguaAppTheme', theme);
@@ -35,15 +35,14 @@ test('home, history and preferences stay reachable across phone and desktop size
     for (const language of ['pt-BR', 'en', 'es']) {
       await preferences(page, language);
       await noOverflow(page);
-      await expect(page.locator('#home .hydration-calendar')).toHaveCount(0);
-      await expect(page.locator('#history')).toBeHidden();
+      await expect(page.locator('#home .hydration-calendar')).toHaveCount(1);
+      await expect(page.locator('#history')).toBeVisible();
+      await expect(page.locator('.motivation-points')).toHaveCount(0);
       await uncovered(page, page.locator('.add-glass-button'));
       await uncovered(page, page.locator('.undo-water'));
       for (const link of await page.locator('.nav-actions a').all()) await uncovered(page, link);
-      await page.locator('.nav-actions a[href="#history"]').click();
       await expect(page.locator('.hydration-calendar')).toBeVisible();
       expect(await page.locator('.hydration-calendar').evaluate(node => Boolean(node.compareDocumentPosition(document.querySelector('#history .bottle-card')) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
-      await expect(page.locator('#history h1')).toBeFocused();
       await noOverflow(page);
       await uncovered(page, page.locator('.reset-button'));
       await page.locator('.nav-actions a[href="#benefits"]').click();
@@ -63,7 +62,7 @@ test('home, history and preferences stay reachable across phone and desktop size
       await expect(page.locator('.settings-trigger')).toBeFocused();
     }
   }
-  await page.locator('.nav-actions a[href="#history"]').click();
+  await page.locator('.nav-actions a[href="#home"]').click();
   // CSS zoom exercises a magnified layout in addition to the narrow viewport checks.
   await page.setViewportSize({ width: 768, height: 900 });
   await page.evaluate(() => { document.body.style.zoom = '2'; });
@@ -82,12 +81,13 @@ function contrast(foreground, background) {
   return (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
 }
 
-test('all accent palettes preserve neutral surfaces and readable water actions in both themes', async ({ page }) => {
+test('blue accent and neutral surfaces stay readable in both themes despite legacy color preferences', async ({ page }) => {
   await register(page, 'Palettes');
   for (const theme of ['light', 'dark']) {
     for (const color of ['green', 'blue', 'purple', 'rose', 'orange']) {
       await preferences(page, 'pt-BR', theme, color);
-      expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--page').trim())).toBe(theme === 'dark' ? '#151d1a' : '#f8f7f3');
+      expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--page').trim())).toBe(theme === 'dark' ? '#101114' : '#fafafa');
+      expect(await page.evaluate(() => document.documentElement.dataset.color)).toBe('blue');
       for (const button of await page.locator('.record-container-actions .add-button').all()) {
         const colors = await button.evaluate(node => ({ foreground: getComputedStyle(node).color, background: getComputedStyle(node).backgroundColor }));
         expect(contrast(colors.foreground, colors.background)).toBeGreaterThanOrEqual(4.5);
@@ -126,7 +126,7 @@ test('settings subpanels support keyboard return and preserve independent drafts
   await expect(page.locator('.total')).toHaveText('250 ml');
 });
 
-test('capture home and history for desktop and phone including dark, reduced motion and goal reached', async ({ page }, testInfo) => {
+test('capture combined dashboard and benefits for desktop and phone including dark and reduced motion', async ({ page }, testInfo) => {
   await register(page, 'Preview');
   for (const view of [
     { name: 'desktop-empty', width: 1440, height: 1000, theme: 'light' },
@@ -137,14 +137,14 @@ test('capture home and history for desktop and phone including dark, reduced mot
     await page.emulateMedia({ reducedMotion: view.theme === 'dark' ? 'reduce' : 'no-preference' });
     await preferences(page, 'pt-BR', view.theme);
     if (view.theme === 'dark') for (let index = 0; index < 5; index += 1) await record(page);
-    for (const destination of ['home', 'history', 'benefits']) {
+    for (const destination of ['home', 'benefits']) {
       await page.locator(`.nav-actions a[href="#${destination}"]`).click();
       await expect(page.locator(destination === 'benefits' ? '.benefits-screen' : `#${destination}`)).toBeVisible();
       if (view.theme === 'dark' && destination === 'home') await expect(page.locator('.percentage-pill')).toHaveText('100%');
       await page.evaluate(() => window.scrollTo(0, 0));
       if (view.theme === 'dark' && destination === 'home') {
-        await expect(page.locator('.motivation-points')).toContainText('10 pontos');
-        await expect(page.locator('.motivation-streak')).toContainText('1 dia');
+        await expect(page.locator('.motivation-points')).toHaveCount(0);
+        await expect(page.locator('.achievement-panel strong')).toContainText('1 dia');
         const feedback = await page.locator('.water-confirmation').boundingBox();
         const navigation = await page.locator('.nav-actions').boundingBox();
         expect(feedback.y + feedback.height).toBeLessThanOrEqual(navigation.y);
@@ -195,11 +195,36 @@ test('opaque fallback remains readable without backdrop-filter support', async (
   const style = await page.locator('.nav-actions').evaluate(node => ({
     background: getComputedStyle(node).backgroundColor, filter: getComputedStyle(node).backdropFilter,
   }));
-  expect(style.background).toBe('rgb(255, 254, 250)');
+  expect(style.background).toBe('rgb(255, 255, 255)');
   expect(style.filter).toBe('none');
   await uncovered(page, page.locator('.add-glass-button'));
   await page.locator('.settings-trigger').click();
-  expect(await page.getByRole('dialog').evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgb(255, 254, 250)');
+  expect(await page.getByRole('dialog').evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgb(255, 255, 255)');
   await page.keyboard.press('Escape');
   await noOverflow(page);
+});
+
+
+test('screen transitions support rapid navigation, fallback and reduced motion without losing water', async ({ page }) => {
+  await register(page, 'Transitions');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const destination of ['benefits', 'home', 'benefits', 'home']) {
+    await page.locator(`.nav-actions a[href="#${destination}"]`).click();
+    await expect(page.locator(destination === 'home' ? '#home' : '.benefits-screen')).toBeVisible();
+  }
+  await expect(page.locator('#home h1')).toBeFocused();
+  // Exercise the JavaScript animation fallback in browsers without View Transitions.
+  await page.evaluate(() => { document.startViewTransition = undefined; });
+  await page.locator('.nav-actions a[href="#benefits"]').click();
+  await expect(page.locator('#benefits-title')).toBeFocused();
+  await page.locator('.nav-actions a[href="#home"]').click();
+  await expect(page.locator('.screen-content')).toHaveCSS('view-transition-name', 'app-screen');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.locator('.nav-actions a[href="#benefits"]').click();
+  await expect(page.locator('#benefits-title')).toBeFocused();
+  await page.locator('.nav-actions a[href="#home"]').click();
+  await expect(page.locator('#home h1')).toBeFocused();
+  await expect(page.locator('.total')).toHaveText('0 ml');
+  await expect(page.locator('.hydration-calendar')).toBeVisible();
+  expect(await page.locator('.screen-content').evaluate(node => node.getAnimations().length)).toBe(0);
 });

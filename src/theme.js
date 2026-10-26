@@ -11,14 +11,7 @@ export function readTheme() {
 }
 
 export const COLOR_KEY = 'aguaAppColor';
-export const appColors = ['green', 'blue', 'purple', 'rose', 'orange'];
-
+// The interface uses a single blue accent in both themes.
 export function readColor() {
-  try {
-    const saved = localStorage.getItem(COLOR_KEY);
-    if (appColors.includes(saved)) return saved;
-  } catch {
-    // Color choices still work for this session.
-  }
-  return 'green';
+  return 'blue';
 }

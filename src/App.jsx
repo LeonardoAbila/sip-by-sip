@@ -1,5 +1,4 @@
 import StreakCard from './dashboard/StreakCard.jsx';
-import DailyMotivation from './dashboard/DailyMotivation.jsx';
 import PourDialog from './dashboard/PourDialog.jsx';
 import DashboardNav from './dashboard/DashboardNav.jsx';
 import ReminderNotice from './dashboard/ReminderNotice.jsx';
@@ -11,31 +10,19 @@ import useWaterReminders from './dashboard/useWaterReminders.js';
 import { saveProgress, exportProfile, restoreProfile } from './database.js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { achievements, currentDay, readState, rewardGoal, STORAGE_KEY, addWater, undoWater, resetWater, validVolume, selectedVolume } from './state.js';
-import { readTheme, THEME_KEY, readColor, COLOR_KEY } from './theme.js';
+import { readTheme, THEME_KEY } from './theme.js';
 import { LANGUAGE_KEY, readLanguage, translations } from './language.js';
 import Fade from './Fade.jsx';
 import Icon from './Icon.jsx';
 import HydrationCalendar from './HydrationCalendar.jsx';
 import WaterBenefits, { benefitsCopy } from './WaterBenefits.jsx';
-
-function currentScreen() {
-  return { '#home': 'home', '#history': 'history', '#benefits': 'benefits' }[window.location.hash] ?? 'home';
-}
+import useScreenNavigation from './useScreenNavigation.js';
 
 export default function App({ profile, onLogout, onProfileRestored, importComplete = false }) {
-  const [screen, setScreen] = useState(currentScreen);
+  const { screen, contentRef } = useScreenNavigation();
   const homeHeading = useRef(null);
-  const historyHeading = useRef(null);
-  useEffect(() => {
-    const navigate = () => {
-      setScreen(currentScreen());
-    };
-    window.addEventListener('hashchange', navigate);
-    return () => window.removeEventListener('hashchange', navigate);
-  }, []);
   useEffect(() => {
     if (screen === 'home') homeHeading.current?.focus();
-    if (screen === 'history') historyHeading.current?.focus();
     window.scrollTo(0, 0);
   }, [screen]);
   // State is the app's memory. Updating it tells React to render the screen again.
@@ -57,17 +44,9 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
   const transferBusy = useRef(false);
   const pendingSave = useRef(Promise.resolve());
   const [theme, setTheme] = useState(readTheme);
-  const [color, setColor] = useState(readColor);
   const [language, setLanguage] = useState(readLanguage);
   const t = translations[language];
   const { reminders, reminderVisible, reminderSeconds, dismissReminder, saveReminders } = useWaterReminders(storageKey, importComplete);
-
-  useEffect(() => {
-    document.documentElement.dataset.color = color;
-    try { localStorage.setItem(COLOR_KEY, color); } catch {
-      // Keep the selected color usable when browser storage is unavailable.
-    }
-  }, [color]);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -142,10 +121,9 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
     } finally { if (!committed) transferBusy.current = false; }
   }
 
-  function saveSettings(mlGarrafa, metaLitros, selectedLanguage, selectedTheme, selectedColor) {
+  function saveSettings(mlGarrafa, metaLitros, selectedLanguage, selectedTheme) {
     if (transferBusy.current) return;
     setTheme(selectedTheme);
-    setColor(selectedColor);
     setLanguage(selectedLanguage);
     setState(previous => rewardGoal({ ...currentDay(previous), mlGarrafa, metaLitros }));
     setSettingsOpen(false);
@@ -175,6 +153,7 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
       <main className={`app app-${screen}`}>
         {importComplete && <p role="status" className="success">{t.transferSuccess}</p>}
         <Fade visible={reminderVisible}><ReminderNotice floating t={{ ...t, add: isGlass ? t.addGlass : t.add }} onAdd={() => recordWater()} onDismiss={dismissReminder} /></Fade>
+        <div className="screen-content" ref={contentRef}>
         {screen === 'benefits' && <WaterBenefits language={language} />}
         <div id="home" hidden={screen !== 'home'}>
           <header className="page-heading">
@@ -188,30 +167,28 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
           <HydrationCard state={state} t={t} format={format} recordWater={recordWater}
             earnedToday={rewards.earnedToday}
             onUndo={() => { if (!transferBusy.current) { setConfirmation(null); closeDrink(); setState(undoWater); } }} />
-          <aside className="today-summary" aria-label={t.dailyOverview}>
-            <div className="summary-intro"><span className="summary-icon"><Icon name="drop" /></span><h2>{t.smallSteps}</h2><p>{t.goalToday(format.format(state.metaLitros))}</p></div>
-            <DailyMotivation rewards={rewards} t={t} format={format} />
-            <a className="summary-link" href="#history"><Icon name="history" />{t.history}<span aria-hidden="true">→</span></a>
-          </aside>
           </div>
-        </div>
-        <section id="history" hidden={screen !== 'history'} aria-labelledby="history-title">
-          <header className="page-heading"><h1 id="history-title" tabIndex={-1} ref={historyHeading}>{t.history}</h1></header>
-          <div className="history-overview">
+          <section id="history" className="history-section" aria-labelledby="history-title">
+          <header className="history-heading">
+            <h2 id="history-title">{t.history}</h2>
             <StreakCard label={t.streak} text={t.streakDays(rewards.streak)} />
+          </header>
+          <div className="history-overview">
             <HydrationCalendar state={currentDay(state)} language={language} t={t} />
-          </div>
           <WaterLog state={state} t={t} format={format}
             onSaveSizes={(mlGarrafa, mlCopo) => { if (!transferBusy.current) setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo })); }} />
+          </div>
           <footer className="dashboard-footer">
             <button className="reset-button" onClick={() => setResetOpen(true)} disabled={state.garrafas === 0 && state.totalMl === 0}><Icon name="reset" />{t.reset}</button>
           </footer>
-        </section>
+          </section>
+        </div>
+        </div>
         <p className="water-confirmation" role="status" aria-live="polite" aria-atomic="true">
           {confirmation && <span key={confirmation.id}>{t.waterRecorded(format.format(confirmation.amount))}</span>}
         </p>
         <Fade visible={storageError}><p className="notice" role="alert">{t.storageError}</p></Fade>
-        <Fade visible={settingsOpen}><SettingsDialog language={language} theme={theme} color={color} bottleSize={state.mlGarrafa} dailyGoal={state.metaLitros}
+        <Fade visible={settingsOpen}><SettingsDialog language={language} theme={theme} bottleSize={state.mlGarrafa} dailyGoal={state.metaLitros}
           reminders={reminders} reminderSeconds={reminderSeconds} onSaveReminders={saveReminders}
           profile={profile} onExport={downloadProfile} onImport={importProfile}
           onSave={saveSettings} onClose={() => setSettingsOpen(false)} /></Fade>

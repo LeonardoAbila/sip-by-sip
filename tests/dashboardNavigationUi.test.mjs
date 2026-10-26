@@ -3,31 +3,28 @@ import assert from 'node:assert/strict';
 import React, { act } from 'react';
 import { ui } from './helpers/ui.mjs';
 
-test('navigation supports history, browser back/forward and meaningful focus', async t => {
+test('combined dashboard keeps history visible and supports back/forward with focus', async t => {
   const h = await ui(t); await h.dashboard();
   const { document, dom, until, pause } = h;
-  const navigate = async hash => {
-    await act(async () => { document.querySelector(`.nav-actions a[href="${hash}"]`).click(); await pause(); });
-    await until(() => document.querySelector(`.nav-actions a[href="${hash}"]`).getAttribute('aria-current') === 'page');
-  };
-  await navigate('#history');
+  assert.equal(document.querySelector('#home').hidden, false);
+  assert.ok(document.querySelector('#home .hydration-calendar'));
+  assert.equal(document.querySelector('.nav-actions a[href="#history"]'), null);
+  await act(async () => { document.querySelector('.nav-actions a[href="#benefits"]').click(); await pause(); });
+  await until(() => document.querySelector('.benefits-screen'));
   assert.equal(document.querySelector('#home').hidden, true);
-  assert.equal(document.querySelector('#history').hidden, false);
-  assert.equal(document.activeElement, document.querySelector('#history h1'));
-  await navigate('#benefits');
   await act(async () => { dom.window.history.back(); await pause(); });
-  await until(() => !document.querySelector('#history').hidden);
-  assert.equal(document.activeElement, document.querySelector('#history h1'));
+  await until(() => !document.querySelector('#home').hidden);
+  assert.equal(document.activeElement, document.querySelector('#home h1'));
   await act(async () => { dom.window.history.forward(); await pause(); });
   await until(() => document.querySelector('.benefits-screen'));
-  await navigate('#home');
-  assert.equal(document.activeElement, document.querySelector('#home h1'));
+  await act(async () => { document.querySelector('.nav-actions a[href="#home"]').click(); await pause(); });
+  await until(() => !document.querySelector('#home').hidden);
   assert.equal(document.querySelector('.total').textContent, '250 ml');
-  assert.equal(document.querySelector('#history').hidden, true);
+  assert.equal(document.querySelector('.motivation-points'), null);
   assert.equal(h.downloads(), 0);
 });
 
-for (const [hash, expected] of [['#history', 'history'], ['#benefits', 'benefits'], ['#unknown', 'home'], ['', 'home']]) {
+for (const [hash, expected] of [['#history', 'home'], ['#benefits', 'benefits'], ['#unknown', 'home'], ['', 'home']]) {
   test(`initial destination ${hash || '(empty)'} resolves to ${expected}`, async t => {
     const h = await ui(t);
     await h.seed();
@@ -78,13 +75,14 @@ for (const language of ['pt-BR', 'en', 'es']) {
   });
 }
 
-test('simple home keeps history secondary and calendar follows add, undo and reset', async t => {
+test('combined home shows calendar and consecutive days without points and follows add, undo and reset', async t => {
   const h = await ui(t); await h.dashboard();
   const { document } = h;
   const { translations } = await h.load('language.js'); const copy = translations['pt-BR'];
-  assert.equal(document.querySelector('#home .hydration-calendar'), null);
-  assert.equal(document.querySelector('#home .achievement-panel'), null);
-  assert.equal(document.querySelector('#home .bottle-card'), null);
+  assert.ok(document.querySelector('#home .hydration-calendar'));
+  assert.ok(document.querySelector('#home .achievement-panel'));
+  assert.ok(document.querySelector('#home .bottle-card'));
+  assert.equal(document.querySelector('.motivation-points'), null);
   assert.ok(document.querySelector('#history .hydration-calendar').compareDocumentPosition(document.querySelector('#history .bottle-card')) & document.defaultView.Node.DOCUMENT_POSITION_FOLLOWING);
   assert.equal(document.querySelector('#home .reminder-card'), null);
   const calendarVolume = () => document.querySelector('.calendar-today .calendar-volume').textContent;
@@ -92,8 +90,6 @@ test('simple home keeps history secondary and calendar follows add, undo and res
   await h.record(copy.bottleChoice);
   assert.equal(calendarVolume(), '750 ml');
   await h.click(copy.undoShort); assert.equal(calendarVolume(), '250 ml');
-  await act(async () => { document.querySelector('a[href="#history"]').click(); await h.pause(); });
-  await h.until(() => !document.querySelector('#history').hidden);
   await h.click(copy.reset); await h.click(copy.cancel);
   await h.until(() => !document.querySelector('dialog'));
   assert.equal(calendarVolume(), '250 ml');
@@ -103,17 +99,17 @@ test('simple home keeps history secondary and calendar follows add, undo and res
 });
 
 for (const language of ['pt-BR', 'en', 'es']) {
-  test(`navigation labels and selected history are localized (${language})`, async t => {
+  test(`combined dashboard navigation is localized (${language})`, async t => {
     const h = await ui(t);
     const { translations } = await h.load('language.js'); const copy = translations[language];
     const { default: DashboardNav } = await h.load('dashboard/DashboardNav.jsx');
     const { benefitsCopy } = await h.load('WaterBenefits.jsx');
-    await h.render(DashboardNav, { screen: 'history', t: copy, benefitsLabel: benefitsCopy[language].nav,
+    await h.render(DashboardNav, { screen: 'home', t: copy, benefitsLabel: benefitsCopy[language].nav,
       onOpenSettings: () => {}, onLogout: () => {}, showLogout: true });
     assert.equal(h.document.querySelector('nav').getAttribute('aria-label'), copy.navigation);
     const links = [...h.document.querySelectorAll('.nav-actions a')];
-    assert.deepEqual(links.map(node => node.textContent), [copy.home, copy.history, benefitsCopy[language].nav]);
-    assert.equal(h.document.querySelector('.nav-actions [aria-current="page"]').textContent, copy.history);
+    assert.deepEqual(links.map(node => node.textContent), [copy.home, benefitsCopy[language].nav]);
+    assert.equal(h.document.querySelector('.nav-actions [aria-current="page"]').textContent, copy.home);
     assert.ok(h.document.querySelector('.header-tools').textContent.includes(copy.settings));
   });
 }

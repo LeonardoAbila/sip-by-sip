@@ -10,7 +10,6 @@ export default function DashboardNav({ screen, t, benefitsLabel, showLogout, onO
         </a>
         <div className="nav-actions">
           <a className="theme-toggle" href="#home" aria-current={screen === 'home' ? 'page' : undefined}><Icon name="home" />{t.home}</a>
-          <a className="theme-toggle" href="#history" aria-current={screen === 'history' ? 'page' : undefined}><Icon name="history" />{t.history}</a>
           <a className="theme-toggle" href="#benefits" aria-current={screen === 'benefits' ? 'page' : undefined}><Icon name="heart" />{benefitsLabel}</a>
         </div>
         <div className="header-tools">

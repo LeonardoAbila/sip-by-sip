@@ -5,10 +5,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../Icon.jsx';
 import Fade from '../Fade.jsx';
 import { languages, translations } from '../language.js';
-import { appColors } from '../theme.js';
 import { positiveNumber, validVolume } from '../state.js';
 
-export default function SettingsDialog({ bottleSize, dailyGoal, language, theme, color, onSave, onClose, fadingOut, profile, onExport, onImport, reminders, reminderSeconds, onSaveReminders }) {
+export default function SettingsDialog({ bottleSize, dailyGoal, language, theme, onSave, onClose, fadingOut, profile, onExport, onImport, reminders, reminderSeconds, onSaveReminders }) {
   const dialog = useRef(null);
   const opener = useRef(document.activeElement);
   const transferBusy = useRef(false);
@@ -22,7 +21,6 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
   const [selectedLanguage, setSelectedLanguage] = useState(language);
   const [languagesOpen, setLanguagesOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(theme);
-  const [selectedColor, setSelectedColor] = useState(color);
   const t = translations[selectedLanguage];
   const validBottle = validVolume(bottleInput);
   const validGoal = positiveNumber(goalInput);
@@ -42,7 +40,7 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
 
   function save(event) {
     event.preventDefault();
-    if (validBottle && validGoal) onSave(Number(bottleInput), Number(goalInput), selectedLanguage, selectedTheme, selectedColor);
+    if (validBottle && validGoal) onSave(Number(bottleInput), Number(goalInput), selectedLanguage, selectedTheme);
   }
 
   return (
@@ -88,16 +86,6 @@ export default function SettingsDialog({ bottleSize, dailyGoal, language, theme,
                   onChange={event => setSelectedTheme(event.target.checked ? 'dark' : 'light')} />
                 <Icon name={selectedTheme === 'dark' ? 'moon' : 'sun'} /> {t.darkMode}
               </label>
-              <p id="favorite-color-label">{t.favoriteColor}</p>
-              <div className="color-options" role="group" aria-labelledby="favorite-color-label">
-                {appColors.map(option => (
-                  <button type="button" className="color-option" key={option} aria-pressed={selectedColor === option}
-                    onClick={() => setSelectedColor(option)}>
-                    <span className={`color-swatch swatch-${option}`} aria-hidden="true">{selectedColor === option && <Icon name="check" />}</span>
-                    {t.colors[option]}
-                  </button>
-            ))}
-              </div>
             </fieldset>
             <div className="dialog-actions">
               <button type="button" onClick={onClose} className="secondary">{t.cancel}</button>
