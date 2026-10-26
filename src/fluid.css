@@ -1,267 +1,230 @@
-/* Presentation for the three hydration destinations. Accent palettes live in styles.css. */
-:root {
-  --page: #f5f5f7;
-  --surface: #fff;
-  --text: #1d1d1f;
-  --muted: #626268;
-  --border: #e4e4e9;
-  --input: #f5f5f7;
-  --track: #ededf1;
-  --glass: #ffffffde;
-  --panel-shadow: 0 4px 24px #16162d06;
-  --panel-radius: 28px;
-  --control-radius: 16px;
-  --space: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
+/* Shared visual language for the web experience. Palette values live in styles.css. */
+body {
+  background: var(--page);
 }
-:root[data-theme='dark'] {
-  --page: #101012;
-  --surface: #1c1c1e;
-  --text: #f5f5f7;
-  --muted: #aeaeb5;
-  --border: #38383c;
-  --input: #27272a;
-  --track: #343438;
-  --glass: #1c1c1ee8;
-  --panel-shadow: 0 4px 24px #0002;
-}
-body { background: radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 45%), var(--page); }
 button, .theme-toggle { touch-action: manipulation; }
-button, .nav-actions a { transition: transform 180ms ease, background-color 240ms ease, color 240ms ease, box-shadow 240ms ease; }
-.site-header { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom-color: var(--border); }
-.navbar { max-width: 1144px; min-height: 80px; padding: 16px 24px; gap: 16px; }
-.nav-brand { font-size: 18px; letter-spacing: -.5px; }
-.brand-mark { width: 36px; height: 36px; border-radius: 11px; box-shadow: inset 0 1px 0 #fff3; }
-.nav-actions { margin-left: auto; padding: 5px; gap: 4px; border: 1px solid var(--border); border-radius: 100px; background: var(--input); }
-.nav-actions .theme-toggle { border: 0; min-height: 44px; padding: 10px 16px; color: var(--muted); text-decoration: none; font-weight: 600; border-radius: 100px; }
-.nav-actions .theme-toggle[aria-current='page'] { color: var(--text); background: var(--surface); box-shadow: 0 2px 7px #0000000d; }
-.header-tools { display: flex; align-items: center; gap: var(--space); }
-.header-tools .theme-toggle { min-width: 44px; min-height: 44px; justify-content: center; border: 0; border-radius: var(--control-radius); }
-.nav-logout { color: var(--muted); }
-.app { max-width: 1080px; padding-top: clamp(28px, 5vw, 48px); }
-.app-home { max-width: 560px; }
-.page-heading { align-items: flex-start; text-align: left; gap: 6px; margin-bottom: 28px; }
-.page-heading h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.15; letter-spacing: -1.5px; font-weight: 700; }
-.page-heading h1[tabindex='-1']:focus { outline: none; }
-.app-home .page-heading { align-items: center; text-align: center; }
-.date-chip { font-size: 13px; }
-.daily-motivation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 14px; }
-.daily-motivation > div { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 44px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
-.daily-motivation dt { display: flex; color: var(--warm-text); }
-.daily-motivation dd { margin: 0; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.motivation-points .icon { fill: var(--warm); }
-.hydration-card, .bottle-card, .hydration-calendar, .auth-card, .achievement-panel > div {
-  border-radius: var(--panel-radius); border-color: var(--border); box-shadow: var(--panel-shadow); background: var(--surface);
+button, a, input, select { transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--accent-text); outline-offset: 3px;
 }
-.hydration-card, .bottle-card { padding: clamp(20px, 3vw, 36px); }
-.hydration-card { position: relative; overflow: hidden; }
-.hydration-card .card-heading { align-items: center; gap: 4px; }
-.buddy-encouragement { margin: 0; color: var(--muted); font-size: 13px; }
-.buddy-message { min-height: 20px; margin: 0 0 16px; font-size: 13px; color: var(--muted); text-align: center; }
-.buddy-message.success { color: var(--success); }
-.goal-celebration { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.goal-celebration i { position: absolute; left: 15%; top: 48%; width: 7px; height: 12px; border-radius: 3px; background: var(--accent); animation: sip-confetti 1600ms ease-out both; }
-.goal-celebration i:nth-child(2n) { background: #e3a843; border-radius: 50%; width: 8px; height: 8px; }
-.goal-celebration i:nth-child(2) { left: 30%; animation-delay: 80ms; }
-.goal-celebration i:nth-child(3) { left: 65%; animation-delay: 140ms; }
-.goal-celebration i:nth-child(4) { left: 85%; animation-delay: 40ms; }
-.goal-celebration i:nth-child(5) { left: 8%; top: 32%; animation-delay: 120ms; }
-.goal-celebration i:nth-child(6) { left: 90%; top: 32%; animation-delay: 160ms; }
-.goal-celebration i:nth-child(7) { left: 40%; top: 24%; animation-delay: 60ms; }
-.goal-celebration i:nth-child(8) { left: 60%; top: 24%; animation-delay: 100ms; }
-.bottle-card .card-heading { align-items: flex-start; text-align: left; }
-.card-heading h2 { font-size: 16px; font-weight: 650; letter-spacing: -.3px; }
-.goal-ring { width: min(100%, 300px); isolation: isolate; }
-.hydration-card .goal-ring { margin-block: 28px; }
-.ring-track, .ring-value { stroke-width: 11; }
+
+/* Navigation */
+.site-header { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--border); }
+.navbar { max-width: 1160px; min-height: 78px; margin: auto; padding: 12px 28px; gap: 20px; flex-wrap: nowrap; }
+.nav-brand { font-size: 19px; letter-spacing: -.6px; white-space: nowrap; }
+.brand-mark { width: 37px; height: 37px; border-radius: 12px; box-shadow: none; }
+.nav-actions { margin-left: auto; flex-wrap: nowrap; gap: 3px; padding: 4px; border: 1px solid transparent; border-radius: var(--control-radius); background: var(--input); }
+.nav-actions .theme-toggle { min-height: 44px; padding: 10px 15px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 650; white-space: nowrap; }
+.nav-actions .theme-toggle[aria-current='page'] { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px #0000000b; }
+.header-tools { display: flex; gap: 5px; }
+.header-tools .theme-toggle { min-width: 44px; min-height: 44px; justify-content: center; border: 0; border-radius: 12px; }
+.nav-logout { color: var(--muted); }
+
+/* Page framing */
+.app { width: 100%; max-width: 1120px; margin: 0 auto; padding: clamp(28px, 5vw, 54px) 0 64px; border: 0; border-radius: 0; background: transparent; box-shadow: none; text-align: left; }
+.app-home { max-width: 1120px; }
+.page-heading, .app-home .page-heading { display: flex; flex-direction: row; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 28px; text-align: left; }
+.page-heading h1 { margin: 0; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.08; letter-spacing: -.05em; font-weight: 650; }
+.page-heading h1[tabindex='-1']:focus { outline: none; }
+.page-eyebrow, .eyebrow { margin: 0 0 9px; color: var(--accent-text); font-size: 11px; font-weight: 750; letter-spacing: .15em; text-transform: uppercase; }
+.date-chip { flex-shrink: 0; font-size: 13px; }
+
+/* Home: the daily action comes first; rewards read as a quiet side note. */
+.today-layout { display: grid; grid-template-columns: minmax(0, 1fr) 252px; gap: 24px; align-items: start; }
+.today-layout > * { min-width: 0; }
+.hydration-card, .bottle-card, .hydration-calendar, .auth-card, .achievement-panel > div {
+  border: 1px solid var(--border); border-radius: var(--panel-radius); background: var(--surface); box-shadow: var(--panel-shadow);
+}
+.today-layout .hydration-card { position: relative; display: block; padding: clamp(26px, 4vw, 42px); overflow: hidden; text-align: left; background: var(--surface); }
+.hydration-card .card-heading { flex-direction: row; align-items: start; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid var(--border); text-align: left; }
+.card-heading h2 { margin: 0; font-size: 15px; font-weight: 720; letter-spacing: -.02em; }
+.card-heading .icon { color: var(--accent-text); }
+.buddy-encouragement { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.4; text-align: right; }
+.hydration-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .9fr); gap: clamp(22px, 4vw, 50px); align-items: center; padding-top: 18px; }
+.progress-overview { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.hydration-card .goal-ring { width: min(100%, 266px); margin: 4px 0 18px; isolation: isolate; }
+.ring-track, .ring-value { stroke-width: 6; }
 .ring-value { transition: stroke-dashoffset 600ms cubic-bezier(.22, 1, .36, 1); }
-.ring-content { isolation: isolate; inset: 12%; padding: 16px; border-radius: 50%; overflow: hidden; background: var(--surface); }
+.ring-content { inset: 12%; isolation: isolate; overflow: hidden; padding: 16px; border-radius: 50%; background: var(--surface); }
 .ring-content::before, .ring-content::after {
-  content: ''; position: absolute; z-index: -1; width: 200%; height: 200%; left: -50%;
-  top: calc(100% - var(--water-level) + 4%); border-radius: 43%;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  animation: fluid-wave 20s linear infinite; transition: top 600ms ease;
+  content: ''; position: absolute; z-index: -1; top: calc(100% - var(--water-level) + 4%); left: -50%; width: 200%; height: 200%;
+  border-radius: 43%; background: color-mix(in srgb, var(--accent) 10%, transparent); animation: fluid-wave 20s linear infinite; transition: top 600ms ease;
 }
 .ring-content::after { border-radius: 46%; background: color-mix(in srgb, var(--accent) 7%, transparent); animation-direction: reverse; animation-duration: 26s; }
-.total { font-size: clamp(34px, 5vw, 54px); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
-.goal-caption { font-size: 13px; }
-.percentage-pill { border: 0; background: var(--accent-soft); font-size: 12px; padding: 5px 12px; }
-.record-container-actions { column-gap: 12px; row-gap: 8px; margin-top: 0; }
-.record-container-actions .add-button {
-  width: 100%; height: auto; min-height: 100px; justify-self: stretch;
-  flex-direction: column; gap: 5px; padding: 16px 12px; border-radius: 20px; font-size: 14px;
-}
-.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent-button); color: #fff; box-shadow: 0 5px 0 color-mix(in srgb, var(--accent-button) 72%, #000); }
-.record-container-actions .add-glass-button { border: 2px solid color-mix(in srgb, var(--accent) 25%, var(--border)); background: var(--accent-soft); color: var(--accent-text); box-shadow: 0 5px 0 color-mix(in srgb, var(--accent-soft) 75%, var(--accent)); }
-.record-container-actions .button-volume { padding: 0; border: 0; font-size: 12px; font-weight: 400; }
-.record-container-actions .undo-water { min-height: 44px; padding: 10px; border: 0; border-radius: var(--control-radius); background: transparent; }
-.water-confirmation { min-height: 28px; margin: 12px 0 0; text-align: center; font-size: 13px; color: var(--accent-text); }
-.history-overview { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); gap: 24px; align-items: start; }
+.total { font-size: clamp(38px, 4.5vw, 58px); font-weight: 650; letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+.goal-caption { margin-top: 6px; font-size: 13px; }
+.percentage-pill { margin-top: 14px; padding: 5px 12px; border: 0; background: var(--accent-soft); font-size: 12px; }
+.buddy-message { margin: 0; min-height: 22px; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: center; }
+.buddy-message.success { color: var(--success); }
+.record-panel { min-width: 0; }
+.record-panel h3 { margin: 0 0 6px; font-size: 23px; letter-spacing: -.04em; }
+.record-help { margin: 0 0 20px; color: var(--muted); font-size: 13px; }
+.record-container-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: 100%; margin: 0; }
+.record-container-actions .add-button { display: grid; grid-template-columns: 27px minmax(0, 1fr); gap: 3px 12px; justify-content: start; width: 100%; min-height: 78px; height: auto; margin: 0; padding: 15px 18px; border-radius: var(--control-radius); text-align: left; }
+.record-container-actions .add-button > .icon { grid-row: span 2; width: 25px; height: 25px; }
+.record-container-actions .button-label { font-size: 14px; font-weight: 720; }
+.record-container-actions .button-volume { grid-column: 2; padding: 0; border: 0; font-size: 12px; font-weight: 500; }
+.record-container-actions .add-button:not(.add-glass-button) { background: var(--accent-button); color: #fff; box-shadow: none; }
+.record-container-actions .add-glass-button { border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); background: var(--accent-soft); color: var(--accent-text); box-shadow: none; }
+.record-container-actions .add-button:hover:enabled { filter: brightness(1.04); }
+.record-container-actions .add-button:active:enabled { transform: translateY(2px); }
+.record-container-actions .undo-water { grid-column: 1 / -1; width: 100%; min-height: 44px; margin: 2px 0 0; padding: 9px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); font-size: 12px; }
+.water-confirmation { position: fixed; z-index: 19; bottom: 24px; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); min-height: 0; margin: 0; color: var(--accent-text); text-align: center; font-size: 13px; pointer-events: none; }
+.water-confirmation:has(span) { padding: 10px 16px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface); box-shadow: var(--panel-shadow); }
+.goal-celebration { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.goal-celebration i { position: absolute; top: 48%; left: 15%; width: 7px; height: 12px; border-radius: 3px; background: var(--accent); animation: sip-confetti 1600ms ease-out both; }
+.goal-celebration i:nth-child(2n) { top: 32%; left: 75%; background: var(--warm-text); }
+
+.today-summary { padding: 26px 22px; border: 1px solid var(--border); border-radius: var(--panel-radius); background: var(--surface); box-shadow: none; }
+.summary-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: var(--accent-soft); color: var(--accent-text); }
+.summary-intro h2 { margin: 19px 0 9px; font-size: 23px; line-height: 1.25; letter-spacing: -.04em; }
+.summary-intro p { margin: 0 0 22px; color: var(--muted); font-size: 13px; }
+.today-summary .daily-motivation { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 0 0 18px; }
+.today-summary .daily-motivation > div { display: flex; align-items: center; justify-content: start; min-width: 0; min-height: 46px; padding: 10px 12px; border: 0; border-radius: 13px; background: var(--input); }
+.daily-motivation dd { margin: 0; font-size: 13px; font-weight: 720; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.motivation-points .icon { fill: var(--warm); }
+.summary-link { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 11px 0; border: 0; border-top: 1px solid var(--border); background: transparent; color: var(--text); text-decoration: none; font-size: 13px; font-weight: 650; }
+.summary-link .icon { width: 18px; height: 18px; color: var(--muted); }
+.summary-link > span:last-child { margin-left: auto; color: var(--muted); }
+
+/* History reads from days to the details of the current containers. */
+.history-overview { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 20px; align-items: start; }
 .history-overview > * { min-width: 0; }
 .achievement-panel > div { padding: 24px; }
-.achievement-symbol { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 12px; border-radius: 14px; background: var(--warm); }
-.achievement-panel strong { font-size: 32px; letter-spacing: -1px; color: var(--text); }
-.container-volumes { gap: 0; padding: 18px 0; margin: 20px 0; border-radius: 18px; background: var(--input); }
-.container-volumes > div { flex: 1; padding-inline: 8px; }
-.container-volumes > div + div { border-left: 1px solid var(--border); }
-.container-volumes dd { font-size: 22px; font-weight: 650; letter-spacing: -.6px; }
-.section-description { font-size: 12px; }
-.remaining-row { justify-content: space-between; font-size: 13px; padding-top: 8px; }
-.remaining-row strong { font-size: 21px; font-weight: 650; letter-spacing: -.5px; }
-.remaining-options { border: 0; border-radius: 18px; background: var(--input); }
-.hydration-calendar { margin-top: 24px; padding: clamp(16px, 3vw, 32px); text-align: left; }
-.calendar-heading { flex-direction: row; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-.calendar-heading h2 { font-size: 22px; letter-spacing: -.6px; }
+.achievement-symbol { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 12px; border-radius: 13px; background: var(--warm); }
+.achievement-panel strong { color: var(--text); font-size: 30px; letter-spacing: -.04em; }
+.hydration-calendar { margin: 0; padding: clamp(20px, 3vw, 32px); text-align: left; }
+.calendar-heading { flex-direction: row; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 12px; }
+.calendar-heading h2 { margin: 0; font-size: 24px; letter-spacing: -.04em; }
 .calendar-streak { display: inline-flex; align-items: center; gap: 6px; border-radius: 100px; font-size: 12px; }
 .calendar-streak .icon { width: 16px; height: 16px; }
-.calendar-day { border-color: transparent; border-radius: 16px; }
+.calendar-day { border-color: transparent; border-radius: 12px; }
 .calendar-today { outline-width: 2px; outline-offset: -2px; }
-.calendar-navigation button, .dialog-actions button, .bottle-edit-button, .panel-back { min-height: 44px; border-radius: 14px; }
+#history > .bottle-card { max-width: 100%; margin-top: 20px; padding: clamp(22px, 3vw, 32px); text-align: left; }
+.bottle-card .card-heading { align-items: start; text-align: left; }
+.container-volumes { gap: 0; padding: 18px 0; margin: 20px 0; border-radius: 16px; background: var(--input); }
+.container-volumes > div { flex: 1; padding-inline: 8px; }
+.container-volumes > div + div { border-left: 1px solid var(--border); }
+.container-volumes dd { font-size: 22px; font-weight: 720; letter-spacing: -.03em; }
+.section-description { color: var(--muted); font-size: 13px; }
+.remaining-row { justify-content: space-between; padding-top: 8px; font-size: 13px; }
+.remaining-row strong { font-size: 21px; font-weight: 700; }
+.remaining-options { border: 0; border-radius: 16px; background: var(--input); }
+.dashboard-footer { justify-content: flex-end; }
 .dashboard-footer .reset-button { min-height: 44px; padding: 10px 12px; border-radius: 12px; }
-input, .settings-dialog input { border-radius: 14px; min-height: 48px; }
-input[type='checkbox'], .settings-dialog input[type='checkbox'] { min-height: 0; width: 20px; height: 20px; }
-input:focus, select:focus { border-color: var(--accent); }
-.reset-dialog { border-radius: var(--panel-radius); background: var(--surface); box-shadow: 0 24px 100px #0003; }
-dialog::backdrop { background: #10101888; }
-.fade-shell[data-visible='true'] > dialog { animation: panel-arrive 280ms cubic-bezier(.16, 1, .3, 1) both; }
-.settings-reminders { margin-top: 24px; padding: 16px; border-radius: 18px; background: var(--input); }
-.settings-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 0; text-align: left; border: 0; background: transparent; color: var(--text); font-weight: 600; }
-.settings-row .icon:last-child { margin-left: auto; }
-.settings-reminders p { margin: 6px 0 0; }
-.transfer-open, .panel-back { min-height: 44px; padding: 10px 14px; border: 0; border-radius: 14px; }
-.auth-page { gap: clamp(24px, 6vw, 80px); }
+
+/* Benefits, forms and dialogs share the same rhythm. */
+.benefits-screen { max-width: 1020px; }
+.benefits-hero { max-width: 690px; margin: 0 0 34px; text-align: left; }
+.benefits-mark { width: 54px; height: 54px; margin-bottom: 20px; border-radius: 16px; }
+.benefits-mark .icon { width: 28px; height: 28px; }
+.benefits-hero h1 { margin: 8px 0 14px; font-size: clamp(36px, 5vw, 60px); letter-spacing: -.05em; }
+.benefits-hero .subtitle { max-width: 590px; font-size: 16px; line-height: 1.65; }
+.benefits-grid { gap: 14px; }
+.benefit-card { border-radius: var(--panel-radius); background: var(--surface); box-shadow: none; }
+.benefit-card summary { cursor: pointer; }
+.benefit-card h2 { font-size: 18px; }
+.benefits-tips { border-radius: 20px; background: var(--input); }
+.benefits-footer .benefits-back { min-height: 48px; border-radius: 14px; }
+.auth-page { max-width: 1100px; gap: clamp(28px, 7vw, 90px); }
+.auth-intro { padding: 32px 8px; }
+.auth-intro h1 { max-width: 460px; margin: 26px 0 22px; font-size: clamp(42px, 5vw, 70px); line-height: 1.04; letter-spacing: -.06em; }
+.auth-brand { margin-bottom: 44px; color: var(--accent-text); }
 .auth-card { padding: clamp(24px, 4vw, 44px); }
-.auth-card h2, .onboarding-card h1 { letter-spacing: -.8px; }
-.auth-card .add-button { min-height: 52px; border-radius: var(--control-radius); background: var(--accent-button); }
-.auth-intro h1 { font-weight: 700; letter-spacing: -2px; }
-.auth-goal, .onboarding-reasons > div { border-radius: 20px; }
+.auth-card h2, .onboarding-card h1 { letter-spacing: -.04em; }
+.auth-welcome { margin: 0 0 20px; color: var(--muted); line-height: 1.6; }
+.local-profile-details { margin-bottom: 24px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--input); color: var(--muted); font-size: 12px; }
+.local-profile-details .settings-help { margin: 0; line-height: 1.65; }
+.auth-card .add-button { min-height: 52px; background: var(--accent-button); border-radius: var(--control-radius); }
+.onboarding-page { max-width: 1000px; }
+.onboarding-card { max-width: 650px; }
+.onboarding-card h1 { font-size: clamp(30px, 4vw, 42px); }
+.onboarding-reasons > div, .auth-goal { border-radius: 18px; }
+.goal-reveal { background: var(--input); border-radius: 20px; }
+.settings-dialog, .reset-dialog, .pour-dialog { border: 1px solid var(--border); border-radius: 22px; background: var(--surface); box-shadow: 0 24px 80px #0003; }
+.settings-dialog { max-height: calc(100dvh - 32px); }
+.settings-dialog .settings { gap: 14px; }
+.settings-dialog input, input { min-height: 48px; border-radius: 13px; }
+input[type='checkbox'], .settings-dialog input[type='checkbox'] { width: 20px; height: 20px; min-height: 0; }
+.appearance-settings, .settings-reminders { border: 1px solid var(--border); border-radius: 16px; background: var(--input); }
+.settings-reminders { margin-top: 20px; padding: 16px; }
+.settings-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--text); text-align: left; font-weight: 650; }
+.settings-row .icon:last-child { margin-left: auto; }
+.dialog-actions button, .calendar-navigation button, .bottle-edit-button, .panel-back, .transfer-open { min-height: 44px; border-radius: 12px; }
+.transfer-open, .panel-back { padding: 10px 14px; }
+.pour-dialog { max-width: 400px; }
+.pour-dialog::backdrop, dialog::backdrop { background: #14231b8a; }
+.fade-shell[data-visible='true'] > dialog { animation: panel-arrive 280ms cubic-bezier(.16, 1, .3, 1) both; }
+
 @keyframes fluid-wave { to { transform: rotate(360deg); } }
-@keyframes sip-confetti { from { opacity: 1; transform: translateY(0) rotate(0); } to { opacity: 0; transform: translateY(-100px) rotate(200deg); } }
-@keyframes panel-arrive { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@media (hover: hover) {
-  .record-container-actions .add-button:hover:enabled { filter: brightness(1.04); }
-}
-.record-container-actions .add-button:active:enabled { transform: translateY(4px); box-shadow: 0 1px 0 var(--accent-button); }
-@media (max-width: 720px) {
-  :root { --panel-radius: 24px; }
-  #root:has(.app) { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
-  .navbar { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; min-height: 68px; padding: 12px 16px; gap: 8px; }
+@keyframes sip-confetti { to { opacity: 0; transform: translateY(-100px) rotate(200deg); } }
+@keyframes panel-arrive { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+@media (max-width: 900px) {
+  .today-layout { grid-template-columns: minmax(0, 1fr); }
+  :root { --panel-radius: 22px; }
+  #root:has(.app) { padding-bottom: calc(105px + env(safe-area-inset-bottom)); }
+  .site-header { width: calc(100% + 32px); }
+  .navbar { min-height: 66px; padding: 10px 16px; gap: 8px; }
   .nav-brand { font-size: 17px; gap: 8px; }
-  .header-tools { gap: 4px; }
-  .header-tools .theme-toggle { padding: 10px; }
+  .header-tools { gap: 3px; }
+  .header-tools .theme-toggle { padding: 9px; }
   .header-tools .theme-toggle span { display: none; }
   .nav-actions {
-    position: fixed; z-index: 21; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%;
-    transform: translateX(-50%); width: min(440px, calc(100vw - 32px)); margin: 0;
-    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 8px 40px #0000001a;
+    position: fixed; z-index: 21; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(440px, calc(100vw - 24px)); margin: 0; padding: 5px;
+    border: 1px solid var(--border); border-radius: 20px; background: var(--glass); box-shadow: 0 12px 42px #0002;
   }
-  .nav-actions .theme-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px; padding: 7px 4px; gap: 4px; font-size: 11px; border-radius: 22px; overflow-wrap: anywhere; }
+  .nav-actions .theme-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 58px; padding: 7px 4px; border-radius: 15px; font-size: 11px; overflow-wrap: anywhere; white-space: normal; }
   .nav-actions .theme-toggle[aria-current='page'] { background: var(--accent-soft); color: var(--accent-text); box-shadow: none; }
   .nav-actions .icon { width: 21px; height: 21px; }
-  .app { max-width: 540px; }
-  .app-home { max-width: 480px; }
-  .app-home .page-heading { margin-bottom: 16px; }
-  .app-home .page-heading h1 { font-size: 30px; }
-  .app-home .hydration-card { padding: 16px; }
-  .hydration-card .goal-ring { width: min(100%, 190px); margin-block: 8px; }
-  .record-container-actions .add-button { min-height: 80px; padding: 10px; }
-  .buddy-message { margin-bottom: 12px; font-size: 12px; }
-  .buddy-encouragement { font-size: 12px; }
-  .history-overview { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .achievement-panel > div { display: grid; grid-template-columns: auto 1fr auto; align-items: center; text-align: left; gap: 12px; padding: 18px 20px; }
+  .app { max-width: 580px; padding-top: 30px; }
+  .page-heading, .app-home .page-heading { align-items: start; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .page-heading h1 { font-size: 36px; }
+  .hydration-workspace { grid-template-columns: minmax(0, 1fr); gap: 14px; padding-top: 10px; }
+  .hydration-card .goal-ring { width: 190px; margin: 2px 0 8px; }
+  .record-panel { padding-top: 16px; border-top: 1px solid var(--border); }
+  .record-panel h3 { font-size: 19px; }
+  .record-help { margin-bottom: 14px; }
+  .record-container-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .record-container-actions .add-button { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 94px; padding: 11px 7px; gap: 3px; text-align: center; }
+  .record-container-actions .button-label { font-size: 12px; }
+  .record-container-actions .undo-water { margin-top: 0; }
+  .today-summary { display: block; }
+  .today-summary .daily-motivation { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 14px; }
+  .summary-intro h2 { margin-top: 14px; font-size: 20px; }
+  .history-overview { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .achievement-panel > div { flex-direction: row; text-align: left; justify-content: start; gap: 12px; padding: 16px 18px; }
   .achievement-symbol { margin: 0; }
   .achievement-panel p { margin: 0; }
-  .achievement-panel strong { font-size: 24px; }
-  .calendar-day { border-radius: 12px; }
+  .achievement-panel strong { margin-left: auto; font-size: 24px; }
+  .hydration-calendar { padding: 20px 14px; }
+  .calendar-day { border-radius: 10px; }
   .calendar-volume { font-size: 10px; font-weight: 400; overflow-wrap: normal; }
-  .reminder-toast { bottom: calc(104px + env(safe-area-inset-bottom)); }
+  .benefits-grid { grid-template-columns: 1fr; }
+  .auth-page { grid-template-columns: minmax(0, 1fr); gap: 12px; max-width: 540px; padding: 20px 0 48px; }
+  .auth-intro { padding: 0; }
+  .auth-intro h1 { margin: 18px 0 12px; font-size: 40px; }
+  .auth-brand { margin-bottom: 12px; }
   .settings-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 24px); margin-top: auto; margin-bottom: 8px; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .reminder-toast { bottom: calc(100px + env(safe-area-inset-bottom)); }
+  .water-confirmation { bottom: calc(91px + env(safe-area-inset-bottom)); }
 }
-@media (max-width: 360px) {
-  .hydration-calendar { padding-inline: 12px; }
-  .record-container-actions .add-button { font-size: 13px; }
-  .total { font-size: 34px; }
+@media (max-width: 380px) {
+  .site-header { width: calc(100% + 24px); }
+  .today-layout .hydration-card { padding: 20px 15px; }
+  .hydration-card .card-heading { flex-direction: column; gap: 5px; }
+  .buddy-encouragement { text-align: left; }
+  .total { font-size: 38px; }
+  .record-container-actions .add-button { min-height: 88px; }
+  .calendar-grid { gap: 4px; }
+  .calendar-day { min-height: 74px; }
 }
-/* Opaque surfaces above are the fallback when backdrop filtering is unavailable. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .nav-actions { background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(140%); backdrop-filter: blur(24px) saturate(140%); }
-  dialog::backdrop { background: #10101855; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-  @media (min-width: 721px) {
-    .site-header { background: var(--glass); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); }
-  }
+  .nav-actions { background: color-mix(in srgb, var(--surface) 92%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ring-content::before, .ring-content::after, .fade-shell[data-visible='true'] > dialog { animation: none; transition: none; }
-  .record-container-actions .add-button:hover, .record-container-actions .add-button:active { transform: none; }
   .goal-celebration { display: none; }
-}
-
-/* Task-focused dashboard: progress, recording, then supporting information. */
-.app-home { max-width: 1080px; }
-.app-home .page-heading { flex-direction: row; justify-content: space-between; align-items: flex-end; text-align: left; margin-bottom: 28px; }
-.page-eyebrow { margin: 0 0 10px; color: var(--accent-text); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; }
-.today-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
-.today-layout > * { min-width: 0; }
-.today-layout .hydration-card { padding: 28px; }
-.hydration-card .card-heading { align-items: flex-start; text-align: left; padding-bottom: 22px; border-bottom: 1px solid var(--border); gap: 8px; }
-.hydration-workspace { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px; align-items: center; width: 100%; padding-top: 24px; }
-.progress-overview { min-width: 0; display: flex; flex-direction: column; align-items: center; }
-.hydration-card .goal-ring { width: min(100%, 260px); margin: 12px 0 24px; }
-.total { font-size: clamp(30px, 3.5vw, 46px); }
-.buddy-message { margin: 0; line-height: 1.6; }
-.record-panel { min-width: 0; }
-.record-panel h3 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.5px; }
-.record-help { margin: 0 0 20px; color: var(--muted); font-size: 13px; }
-.record-container-actions { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-.record-container-actions .add-button { min-height: 78px; padding: 16px; border-radius: 16px; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 4px 10px; text-align: left; }
-.record-container-actions .add-button > .icon { grid-row: span 2; }
-.record-container-actions .button-label { font-size: 13px; font-weight: 650; }
-.record-container-actions .button-volume { grid-column: 2; }
-.record-container-actions .add-button:not(.add-glass-button) { box-shadow: none; }
-.record-container-actions .add-glass-button { border-width: 1px; box-shadow: none; }
-.record-container-actions .undo-water { font-size: 12px; margin-top: 4px; }
-.today-summary { padding: 26px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--panel-radius); }
-.summary-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--accent-soft); color: var(--accent-text); }
-.summary-intro h2 { margin: 20px 0 10px; font-size: 23px; line-height: 1.35; letter-spacing: -.7px; }
-.summary-intro p { margin: 0 0 24px; color: var(--muted); font-size: 13px; }
-.today-summary .daily-motivation { grid-template-columns: 1fr; margin-bottom: 20px; gap: 10px; }
-.today-summary .daily-motivation > div { justify-content: flex-start; background: var(--input); border: 0; padding: 14px; }
-.summary-link { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 12px 0; border: 0; border-top: 1px solid var(--border); background: transparent; color: var(--text); text-decoration: none; text-align: left; font-size: 13px; font-weight: 600; }
-.summary-link > span:last-child { margin-left: auto; color: var(--muted); }
-.summary-link .icon { color: var(--muted); width: 18px; height: 18px; }
-.auth-intro { padding: 32px 12px; }
-.auth-intro h1 { max-width: 440px; font-size: clamp(40px, 5vw, 68px); line-height: 1.06; margin-block: 32px 24px; }
-.auth-brand { color: var(--accent-text); }
-.auth-welcome { color: var(--muted); margin: 0 0 24px; line-height: 1.6; }
-.local-profile-details { margin-bottom: 24px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--input); font-size: 12px; color: var(--muted); }
-.local-profile-details .settings-help { margin: 0; line-height: 1.65; }
-@media (min-width: 721px) and (max-width: 1000px) {
-  .today-layout { grid-template-columns: minmax(0, 1fr) 230px; gap: 16px; }
-  .today-layout .hydration-card, .today-summary { padding: 20px; }
-  .hydration-workspace { gap: 18px; }
-  .header-tools .theme-toggle span { display: none; }
-}
-@media (max-width: 720px) {
-  .app-home { max-width: 540px; }
-  .app-home .page-heading { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-  .page-eyebrow { font-size: 10px; margin-bottom: 8px; }
-  .today-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .today-layout .hydration-card { padding: 22px; }
-  .hydration-workspace { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 12px; }
-  .hydration-card .goal-ring { width: 220px; max-width: 100%; margin: 12px 0 18px; }
-  .total { font-size: 40px; }
-  .record-panel { width: 100%; padding-top: 20px; border-top: 1px solid var(--border); }
-  .record-panel h3 { font-size: 18px; }
-  .record-help { margin-bottom: 16px; }
-  .record-container-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .record-container-actions .add-button { display: flex; flex-direction: column; justify-content: center; text-align: center; min-height: 96px; padding: 12px 8px; }
-  .record-container-actions .button-label { font-size: 12px; }
-  .today-summary { padding: 22px; }
-  .summary-intro h2 { font-size: 20px; margin-top: 14px; }
-  .today-summary .daily-motivation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .today-summary .daily-motivation > div { padding: 12px; }
-  .auth-intro { padding: 8px 0; }
-  .auth-intro h1 { font-size: 42px; margin-block: 24px 16px; }
+  .record-container-actions .add-button:active:enabled { transform: none; }
 }

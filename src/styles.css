@@ -1,33 +1,42 @@
+/* Shared surfaces and spacing; saved accent palettes are defined below. */
 :root {
-  --page: #f5f7f6;
-  --surface: #ffffff;
-  --text: #213d37;
-  --muted: #657b73;
-  --border: #e1e9e5;
-  --input: #f7faf8;
-  --track: #eaf2ed;
-  --secondary: #edf5f0;
-  --accent-text: #187960;
+  --page: #f8f7f3;
+  --surface: #fffefa;
+  --text: #25332f;
+  --muted: #62736d;
+  --border: #e4e9e2;
+  --input: #f3f5f0;
+  --track: #e7eee8;
+  --secondary: #ecf4ed;
+  --accent-text: #18795e;
   --error: #a33232;
   --success: #167857;
+  --glass: var(--surface);
+  --panel-shadow: 0 4px 24px #263d3005;
+  --panel-radius: 24px;
+  --control-radius: 16px;
+  --space: 8px;
   color-scheme: light;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text);
   background: var(--page);
   font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
 }
 :root[data-theme='dark'] {
-  --page: #111e1a;
-  --surface: #1a2b25;
-  --text: #e5f1eb;
-  --muted: #abc0b5;
-  --border: #334a3f;
-  --input: #13221c;
-  --track: #2c4137;
-  --secondary: #283d32;
+  --page: #151d1a;
+  --surface: #202b25;
+  --text: #f0f5ef;
+  --muted: #b1c2b7;
+  --border: #3a4b40;
+  --input: #27362c;
+  --track: #3a4c3e;
+  --secondary: #2e4536;
   --accent-text: #83daba;
   --error: #ffaaaa;
   --success: #7dddb6;
+  --glass: var(--surface);
+  --panel-shadow: 0 4px 24px #0002;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }

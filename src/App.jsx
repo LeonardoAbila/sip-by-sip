@@ -199,10 +199,10 @@ export default function App({ profile, onLogout, onProfileRestored, importComple
           <header className="page-heading"><h1 id="history-title" tabIndex={-1} ref={historyHeading}>{t.history}</h1></header>
           <div className="history-overview">
             <StreakCard label={t.streak} text={t.streakDays(rewards.streak)} />
-            <WaterLog state={state} t={t} format={format}
-              onSaveSizes={(mlGarrafa, mlCopo) => { if (!transferBusy.current) setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo })); }} />
+            <HydrationCalendar state={currentDay(state)} language={language} t={t} />
           </div>
-          <HydrationCalendar state={currentDay(state)} language={language} t={t} />
+          <WaterLog state={state} t={t} format={format}
+            onSaveSizes={(mlGarrafa, mlCopo) => { if (!transferBusy.current) setState(previous => ({ ...currentDay(previous), mlGarrafa, mlCopo })); }} />
           <footer className="dashboard-footer">
             <button className="reset-button" onClick={() => setResetOpen(true)} disabled={state.garrafas === 0 && state.totalMl === 0}><Icon name="reset" />{t.reset}</button>
           </footer>

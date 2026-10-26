@@ -85,6 +85,7 @@ test('simple home keeps history secondary and calendar follows add, undo and res
   assert.equal(document.querySelector('#home .hydration-calendar'), null);
   assert.equal(document.querySelector('#home .achievement-panel'), null);
   assert.equal(document.querySelector('#home .bottle-card'), null);
+  assert.ok(document.querySelector('#history .hydration-calendar').compareDocumentPosition(document.querySelector('#history .bottle-card')) & document.defaultView.Node.DOCUMENT_POSITION_FOLLOWING);
   assert.equal(document.querySelector('#home .reminder-card'), null);
   const calendarVolume = () => document.querySelector('.calendar-today .calendar-volume').textContent;
   assert.equal(calendarVolume(), '250 ml');

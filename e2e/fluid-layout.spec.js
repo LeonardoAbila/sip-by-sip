@@ -1,4 +1,4 @@
-/* global document, window, getComputedStyle */
+/* global document, window, getComputedStyle, Node */
 import { test, expect } from '@playwright/test';
 import { register, record } from './helpers.js';
 
@@ -42,9 +42,20 @@ test('home, history and preferences stay reachable across phone and desktop size
       for (const link of await page.locator('.nav-actions a').all()) await uncovered(page, link);
       await page.locator('.nav-actions a[href="#history"]').click();
       await expect(page.locator('.hydration-calendar')).toBeVisible();
+      expect(await page.locator('.hydration-calendar').evaluate(node => Boolean(node.compareDocumentPosition(document.querySelector('#history .bottle-card')) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
       await expect(page.locator('#history h1')).toBeFocused();
       await noOverflow(page);
       await uncovered(page, page.locator('.reset-button'));
+      await page.locator('.nav-actions a[href="#benefits"]').click();
+      await expect(page.locator('#benefits-title')).toBeFocused();
+      await noOverflow(page);
+      const benefit = page.locator('.benefit-card').first();
+      await benefit.locator('summary').focus();
+      await page.keyboard.press('Enter');
+      await expect(benefit).toHaveAttribute('open', '');
+      await expect(benefit.locator('p')).toBeVisible();
+      await expect(page.locator('.benefits-footer a[target="_blank"]')).toHaveAttribute('href', /cdc\.gov/);
+      await uncovered(page, page.locator('.benefits-back'));
       await page.locator('.settings-trigger').click();
       await expect(page.getByRole('dialog')).toBeVisible();
       expect(await page.getByRole('dialog').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
@@ -52,6 +63,7 @@ test('home, history and preferences stay reachable across phone and desktop size
       await expect(page.locator('.settings-trigger')).toBeFocused();
     }
   }
+  await page.locator('.nav-actions a[href="#history"]').click();
   // CSS zoom exercises a magnified layout in addition to the narrow viewport checks.
   await page.setViewportSize({ width: 768, height: 900 });
   await page.evaluate(() => { document.body.style.zoom = '2'; });
@@ -75,7 +87,7 @@ test('all accent palettes preserve neutral surfaces and readable water actions i
   for (const theme of ['light', 'dark']) {
     for (const color of ['green', 'blue', 'purple', 'rose', 'orange']) {
       await preferences(page, 'pt-BR', theme, color);
-      expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--page').trim())).toBe(theme === 'dark' ? '#101012' : '#f5f5f7');
+      expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--page').trim())).toBe(theme === 'dark' ? '#151d1a' : '#f8f7f3');
       for (const button of await page.locator('.record-container-actions .add-button').all()) {
         const colors = await button.evaluate(node => ({ foreground: getComputedStyle(node).color, background: getComputedStyle(node).backgroundColor }));
         expect(contrast(colors.foreground, colors.background)).toBeGreaterThanOrEqual(4.5);
@@ -125,9 +137,9 @@ test('capture home and history for desktop and phone including dark, reduced mot
     await page.emulateMedia({ reducedMotion: view.theme === 'dark' ? 'reduce' : 'no-preference' });
     await preferences(page, 'pt-BR', view.theme);
     if (view.theme === 'dark') for (let index = 0; index < 5; index += 1) await record(page);
-    for (const destination of ['home', 'history']) {
+    for (const destination of ['home', 'history', 'benefits']) {
       await page.locator(`.nav-actions a[href="#${destination}"]`).click();
-      await expect(page.locator(`#${destination}`)).toBeVisible();
+      await expect(page.locator(destination === 'benefits' ? '.benefits-screen' : `#${destination}`)).toBeVisible();
       if (view.theme === 'dark' && destination === 'home') await expect(page.locator('.percentage-pill')).toHaveText('100%');
       await page.evaluate(() => window.scrollTo(0, 0));
       if (view.theme === 'dark' && destination === 'home') {
@@ -141,6 +153,12 @@ test('capture home and history for desktop and phone including dark, reduced mot
       await page.screenshot({ path, fullPage: true, animations: 'disabled' });
       await testInfo.attach(`${view.name}-${destination}`, { path, contentType: 'image/png' });
     }
+    await page.locator('.settings-trigger').click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    const settingsPath = testInfo.outputPath(`${view.name}-settings.png`);
+    await page.screenshot({ path: settingsPath, animations: 'disabled' });
+    await testInfo.attach(`${view.name}-settings`, { path: settingsPath, contentType: 'image/png' });
+    await page.keyboard.press('Escape');
   }
   expect(await page.locator('.ring-content').evaluate(node => getComputedStyle(node, '::before').animationName)).toBe('none');
   await expect(page.locator('.water-buddy')).toHaveCount(0);
@@ -177,11 +195,11 @@ test('opaque fallback remains readable without backdrop-filter support', async (
   const style = await page.locator('.nav-actions').evaluate(node => ({
     background: getComputedStyle(node).backgroundColor, filter: getComputedStyle(node).backdropFilter,
   }));
-  expect(style.background).toBe('rgb(255, 255, 255)');
+  expect(style.background).toBe('rgb(255, 254, 250)');
   expect(style.filter).toBe('none');
   await uncovered(page, page.locator('.add-glass-button'));
   await page.locator('.settings-trigger').click();
-  expect(await page.getByRole('dialog').evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgb(255, 255, 255)');
+  expect(await page.getByRole('dialog').evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgb(255, 254, 250)');
   await page.keyboard.press('Escape');
   await noOverflow(page);
 });
