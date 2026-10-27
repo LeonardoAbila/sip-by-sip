@@ -29,6 +29,7 @@ private struct PourPresentation: Identifiable {
 struct ContentView: View {
     @EnvironmentObject private var store: WaterStore
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var benefits = false
     @State private var remindersOpen = false
@@ -65,6 +66,11 @@ struct ContentView: View {
             .navigationTitle("Sip by Sip")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { store.setTheme(colorScheme == .dark ? "light" : "dark") } label: {
+                        Image(systemName: colorScheme == .dark ? "sun.max" : "moon")
+                    }.accessibilityLabel(store.text(colorScheme == .dark ? "activateLight" : "activateDark"))
+                }
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 8) {
                         Text("Sip by Sip").font(.headline).lineLimit(1).minimumScaleFactor(0.8)

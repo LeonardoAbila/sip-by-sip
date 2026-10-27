@@ -2,6 +2,8 @@ import Foundation
 
 enum Copy {
     static let values: [String: [String]] = [
+        "activateDark": ["Ativar modo noturno", "Enable dark mode", "Activar modo oscuro"],
+        "activateLight": ["Ativar modo claro", "Enable light mode", "Activar modo claro"],
         "editVolumes": ["Ajustar ml / L", "Adjust ml / L", "Ajustar ml / L"],
         "dailyOverview": ["SEU DIA EM EQUILÍBRIO", "YOUR DAY IN BALANCE", "TU DÍA EN EQUILIBRIO"],
         "dashboardTitle": ["Hoje", "Today", "Hoy"],

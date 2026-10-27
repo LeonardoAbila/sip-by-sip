@@ -28,7 +28,7 @@ No third-party packages are required. Xcode's build phase converts the bundled r
 - Bottle and glass sizes can be edited in Settings. The blue **ml / L** button between Home and Benefits opens a dedicated sheet for bottle size, glass size and daily goal. Previous entries retain their recorded amount and container.
 - `UserDefaults` stores settings, dated entry snapshots and completed dates. Existing settings and bottle totals migrate without inventing undoable entries or historical daily volumes.
 - Local date changes save the departing date and restore an existing snapshot when revisiting a date, including after time-zone travel. Unknown days remain distinct from known zero totals. Resetting today preserves other dates and completed-date history.
-- Português (BR), English and Español, with localized dates/numbers; system, light and dark themes.
+- Português (BR), English and Español, with localized dates/numbers; system, light and dark themes. A moon/sun button in the header switches themes immediately and remembers the choice; the preview stores its theme separately from the web app.
 - Native Settings and Reminders sheets with temporary drafts, save and cancellation.
 - The intake card starts directly below the date without a separate Today title. The ring contains animated water that follows progress; recording opens a matching bottle/glass pouring scene with automatic dismissal and accessibility focus return. The browser preview includes the same water feedback.
 - Native water reminders every 15, 30, 60 or 120 minutes, subject to notification permissions and iOS delivery settings. Foreground delivery shows an in-app reminder; adding water or dismissing it restarts the schedule. **Test reminder** previews without changing progress.

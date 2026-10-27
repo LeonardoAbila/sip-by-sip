@@ -71,6 +71,11 @@ final class WaterStore: NSObject, ObservableObject, UNUserNotificationCenterDele
         day = WaterDay()
         persist()
     }
+    func setTheme(_ theme: String) {
+        guard ["system", "light", "dark"].contains(theme) else { return }
+        settings.theme = theme
+        persist()
+    }
     func save(_ value: WaterSettings) async {
         checkDay()
         settings = value

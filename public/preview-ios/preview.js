@@ -1,5 +1,7 @@
 /* global document, window, setTimeout, clearTimeout */
 const paths = {
+  moon: '<path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
   drop: '<path d="M12 3C10 6 5 11 5 15a7 7 0 0 0 14 0c0-4-5-9-7-12Z"/>',
   bottle: '<path d="M9 2h6v4l3 4v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10l3-4V2Z"/><path d="M9 6h6M6 12h12M9 16h6"/>',
   glass: '<path d="M5 3h14l-2 18H7L5 3Z"/><path d="M6 9h12"/>',
@@ -137,13 +139,29 @@ function openSettings(quantitiesOnly = false) {
   $('#dark-mode').checked = document.body.classList.contains('dark');
   $('#settings-dialog').showModal();
 }
+function applyTheme(dark, remember = true) {
+  document.body.classList.toggle('dark', dark);
+  const label = dark ? 'Ativar modo claro' : 'Ativar modo noturno';
+  $('#theme-toggle').innerHTML = icon(dark ? 'sun' : 'moon');
+  $('#theme-toggle').setAttribute('aria-label', label);
+  $('#theme-toggle').setAttribute('aria-pressed', String(dark));
+  $('#theme-toggle').title = label;
+  $('#dark-mode').checked = dark;
+  if (remember) {
+    try { window.localStorage.setItem('sipBySipIosPreviewTheme', dark ? 'dark' : 'light'); } catch { /* Theme remains usable without storage. */ }
+  }
+}
+$('#theme-toggle').addEventListener('click', () => applyTheme(!document.body.classList.contains('dark')));
+let savedTheme;
+try { savedTheme = window.localStorage.getItem('sipBySipIosPreviewTheme'); } catch { /* Follow the system when storage is unavailable. */ }
+applyTheme(savedTheme === 'dark' || (savedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches), false);
 $('#settings').addEventListener('click', () => openSettings(false));
 $('#edit-sizes').addEventListener('click', () => openSettings(true));
 $('#cancel-settings').addEventListener('click', () => $('#settings-dialog').close());
 $('#settings-form').addEventListener('submit', event => {
   event.preventDefault();
   settings.bottle = Number($('#bottle-input').value); settings.glass = Number($('#glass-input').value); settings.goal = Number($('#goal-input').value);
-  document.body.classList.toggle('dark', $('#dark-mode').checked);
+  applyTheme($('#dark-mode').checked);
   $('#settings-dialog').close(); render();
 });
 $('#reminders').addEventListener('click', () => notify('Na versão iOS, os lembretes serão configurados pelas notificações do iPhone.'));
