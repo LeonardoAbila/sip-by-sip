@@ -3,9 +3,13 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var store: WaterStore
     @Environment(\.dismiss) private var dismiss
+    let quantitiesOnly: Bool
     @State private var draft: WaterSettings
     @State private var saving = false
-    init(initial: WaterSettings) { _draft = State(initialValue: initial) }
+    init(initial: WaterSettings, quantitiesOnly: Bool = false) {
+        _draft = State(initialValue: initial)
+        self.quantitiesOnly = quantitiesOnly
+    }
     private func t(_ key: String) -> String { Copy.text(key, language: draft.language) }
     private var valid: Bool { validWaterVolume(draft.bottleMl) && validWaterVolume(draft.glassMl) && draft.goalLiters.isFinite && draft.goalLiters > 0 && draft.goalLiters <= 1_000_000 }
 
@@ -18,22 +22,24 @@ struct SettingsView: View {
                     HStack { Text(t("goal")); TextField("2", value: $draft.goalLiters, format: .number).keyboardType(.decimalPad).multilineTextAlignment(.trailing) }
                     if !valid { Text(t("invalid")).foregroundStyle(.red) }
                 } footer: { Text(t("help")) }
-                Section {
-                    Picker(t("language"), selection: $draft.language) {
-                        Text("Português (BR)").tag("pt-BR")
-                        Text("English").tag("en")
-                        Text("Español").tag("es")
-                    }
-                    Picker(t("theme"), selection: $draft.theme) {
-                        Text(t("system")).tag("system")
-                        Text(t("light")).tag("light")
-                        Text(t("dark")).tag("dark")
+                if !quantitiesOnly {
+                    Section {
+                        Picker(t("language"), selection: $draft.language) {
+                            Text("Português (BR)").tag("pt-BR")
+                            Text("English").tag("en")
+                            Text("Español").tag("es")
+                        }
+                        Picker(t("theme"), selection: $draft.theme) {
+                            Text(t("system")).tag("system")
+                            Text(t("light")).tag("light")
+                            Text(t("dark")).tag("dark")
+                        }
                     }
                 }
 
             }
             .environment(\.locale, Locale(identifier: draft.language))
-            .navigationTitle(t("settings"))
+            .navigationTitle(t(quantitiesOnly ? "editVolumes" : "settings"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(t("cancel")) { dismiss() }.disabled(saving) }
                 ToolbarItem(placement: .confirmationAction) {

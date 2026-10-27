@@ -33,6 +33,7 @@ struct ContentView: View {
     @State private var benefits = false
     @State private var remindersOpen = false
     @State private var settingsOpen = false
+    @State private var quantitiesOpen = false
     @State private var resetOpen = false
     @State private var pourEntry: PourPresentation?
     @State private var lastContainer: WaterContainer = .bottle
@@ -80,6 +81,7 @@ struct ContentView: View {
             .safeAreaInset(edge: .bottom, spacing: 0) { navigationBar }
             .sheet(isPresented: $remindersOpen) { RemindersView(initial: store.settings) }
             .sheet(isPresented: $settingsOpen) { SettingsView(initial: store.settings) }
+            .sheet(isPresented: $quantitiesOpen) { SettingsView(initial: store.settings, quantitiesOnly: true) }
             .sheet(item: $pourEntry, onDismiss: { focusedContainer = lastContainer }) { entry in
                 PourPopup(amount: entry.amount, container: entry.container, onClose: { pourEntry = nil })
                     .presentationDetents([.height(470)])
@@ -102,6 +104,14 @@ struct ContentView: View {
     private var navigationBar: some View {
         HStack(spacing: 6) {
             destination("home", icon: "house", selected: !benefits) { benefits = false }
+            Button { quantitiesOpen = true } label: {
+                VStack(spacing: 5) {
+                    Image(systemName: "slider.horizontal.3").font(.title3)
+                    Text("ml / L").font(.caption.weight(.semibold))
+                }.frame(maxWidth: .infinity, minHeight: 50)
+                    .foregroundStyle(.white)
+                    .background(NativePalette.blue, in: RoundedRectangle(cornerRadius: 13))
+            }.buttonStyle(.plain).accessibilityLabel(store.text("editVolumes"))
             destination("benefits", icon: "heart", selected: benefits) { benefits = true }
         }
         .padding(6).frame(maxWidth: 340)
@@ -123,12 +133,7 @@ struct ContentView: View {
     }
     private func dashboard(wide: Bool) -> some View {
         VStack(alignment: .leading, spacing: 28) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(store.text("dailyOverview")).font(.caption2.bold()).tracking(2).foregroundStyle(NativePalette.blue)
-                Text(store.text("dashboardTitle")).font(.system(.largeTitle, design: .default, weight: .semibold))
-                    .accessibilityAddTraits(.isHeader)
-                dateLabel
-            }
+            dateLabel
             VStack(spacing: 22) {
                 HStack(alignment: .top) {
                     Label(store.text("consumption"), systemImage: "drop").font(.subheadline.bold())
@@ -187,6 +192,7 @@ struct ContentView: View {
     private var progress: some View {
         VStack(spacing: 20) {
             ZStack {
+                NativeWaterFill(level: store.progress).frame(width: 172, height: 172)
                 Circle().stroke(NativePalette.border, lineWidth: 5)
                 Circle().trim(from: 0, to: store.progress)
                     .stroke(NativePalette.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round))
@@ -240,9 +246,43 @@ struct ContentView: View {
     }
 }
 
+private struct NativeWaterFill: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let level: Double
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { timeline in
+            WaterSurface(level: level, phase: reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate / 3)
+                .fill(NativePalette.blue.opacity(0.15))
+                .clipShape(Circle())
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.6), value: level)
+        }.accessibilityHidden(true)
+    }
+}
+
+private struct WaterSurface: Shape {
+    var level: Double
+    var phase: Double
+    var animatableData: Double {
+        get { level }
+        set { level = newValue }
+    }
+    func path(in rect: CGRect) -> Path {
+        guard level > 0, rect.width > 0 else { return Path() }
+        let surface = rect.height * (1 - CGFloat(min(max(level, 0), 1)))
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: rect.height))
+        for x in stride(from: CGFloat.zero, through: rect.width, by: CGFloat(2)) {
+            let y = surface + CGFloat(sin(Double(x / rect.width) * .pi * 2 + phase)) * 3
+            path.addLine(to: CGPoint(x: x, y: y))
+        }
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+        path.closeSubpath()
+        return path
+    }
+}
+
 private struct NativeWaterMetrics: View {
     @EnvironmentObject private var store: WaterStore
-    @State private var editing = false
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text(store.text("bottleLog")).font(.headline)
@@ -251,8 +291,6 @@ private struct NativeWaterMetrics: View {
                 Divider()
                 metric(.glass)
             }.padding(14).background(NativePalette.blue.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
-            Button { editing = true } label: { Label(store.text("changeSize"), systemImage: "drop").font(.footnote).padding(5) }
-                .buttonStyle(.bordered).frame(maxWidth: .infinity)
             Text("\(store.day.count(.bottle)) \(store.text("bottlesShort")) · \(store.day.count(.glass)) \(store.text("glassesShort"))")
                 .font(.caption).foregroundStyle(.secondary)
             if !store.day.entries.isEmpty {
@@ -278,7 +316,7 @@ private struct NativeWaterMetrics: View {
                     }.padding(16).background(NativePalette.blue.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
                 }.frame(maxWidth: .infinity)
             }
-        }.sheet(isPresented: $editing) { SettingsView(initial: store.settings) }
+        }
     }
     private func metric(_ container: WaterContainer) -> some View {
         VStack(spacing: 8) {

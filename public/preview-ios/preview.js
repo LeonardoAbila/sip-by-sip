@@ -5,7 +5,8 @@ const paths = {
   glass: '<path d="M5 3h14l-2 18H7L5 3Z"/><path d="M6 9h12"/>',
   home: '<path d="m3 10 9-7 9 7v11H3V10Z"/><path d="M9 21v-8h6v8"/>',
   heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
-  flame: '<path d="M13 2c2 6-5 7-3 12 2-1 3-3 3-5 5 4 7 8 3 12-4 3-10 1-10-5 0-5 5-8 7-14Z"/>',
+  flame: '<path d="M12 2c1 5-2 6-3 9-1-2-2-3-2-3C2 13 4 21 12 22c8-1 10-9 5-14 0 3-2 4-2 4 1-4-1-7-3-10Z"/><path d="M12 12c-1 2-3 3-3 5a3 3 0 0 0 6 0c0-2-2-3-3-5Z"/>',
+  sliders: '<path d="M4 7h16M4 17h16M9 4v6M15 14v6"/>',
   undo: '<path d="M3 9h10a7 7 0 0 1 0 14M3 9l5-5M3 9l5 5" transform="translate(0 -2)"/>',
   bell: '<path d="M5 16h14l-2-3V9a5 5 0 0 0-10 0v4l-2 3ZM10 20h4M12 2v2"/>',
   settings: '<path d="m9 3-1 3-3 1-2 4 2 3v3l4 3 3-1 3 1 4-3v-3l2-3-2-4-3-1-1-3H9Z"/><circle cx="12" cy="12" r="3"/>',
@@ -62,6 +63,7 @@ function render() {
   $('#goal-caption').textContent = `de ${format.format(settings.goal)} L hoje`;
   $('#percentage').textContent = `${Math.floor(percentage * 100)}%`;
   $('#progress-ring').style.strokeDashoffset = 609.47 * (1 - percentage);
+  $('.ring').style.setProperty('--water-level', `${percentage * 100}%`);
   $('#remaining-caption').textContent = remaining > 0 ? `Faltam ${volume(remaining)} para a meta.` : 'Meta alcançada!';
   $('#encouragement').textContent = percentage >= 1 ? 'Um hábito para comemorar!' : percentage >= 0.5 ? 'Você está no caminho!' : 'Cada gole conta.';
   $('#streak').textContent = `${completedToday ? 4 : 3} dias`;
@@ -88,7 +90,7 @@ function render() {
 for (const container of ['bottle', 'glass']) {
   $(`#add-${container}`).addEventListener('click', () => {
     entries.push({ container, amount: settings[container] }); render();
-    notify(`+${format.format(settings[container])} ml registrados`);
+    openPour(settings[container], container);
   });
 }
 $('#undo').addEventListener('click', () => { entries.pop(); render(); notify('Último registro desfeito'); });
@@ -96,23 +98,47 @@ $('#reset').addEventListener('click', () => { if (window.confirm('Zerar os regis
 for (const [selector, delta] of [['#previous-month', -1], ['#next-month', 1]]) {
   $(selector).addEventListener('click', () => { selectedMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + delta, 1); render(); });
 }
+let pourTimer;
+let pourOpener;
+function openPour(amount, container) {
+  clearTimeout(pourTimer);
+  pourOpener = document.activeElement;
+  $('#pour-amount').textContent = `+${format.format(amount)} ml`;
+  $('.pour-scene').dataset.container = container;
+  $('#pour-vessel').setAttribute('d', container === 'glass'
+    ? 'M150 126H226L214 270H162Z'
+    : 'M173 126H203V150Q222 160 222 178V255Q222 270 208 270H168Q154 270 154 255V178Q154 160 173 150Z');
+  $('#pour-water').innerHTML = container === 'glass'
+    ? '<path class="pour-water" d="M161 174H215L207 264H169Z" fill="var(--blue)"/>'
+    : '<rect class="pour-water" x="160" y="174" width="56" height="90" rx="10" fill="var(--blue)"/>';
+  $('#pour-dialog').showModal();
+  pourTimer = setTimeout(() => $('#pour-dialog').close(), 3400);
+}
+$('#pour-close').addEventListener('click', () => $('#pour-dialog').close());
+$('#pour-dialog').addEventListener('close', () => {
+  clearTimeout(pourTimer);
+  if (pourOpener?.isConnected) pourOpener.focus({ preventScroll: true });
+});
 function navigate() {
+  if ($('#pour-dialog').open) $('#pour-dialog').close();
   const destination = window.location.hash === '#benefits' ? 'benefits' : 'home';
   $('#home').hidden = destination !== 'home'; $('#benefits').hidden = destination !== 'benefits';
   document.querySelectorAll('.bottom-nav a').forEach(link => {
     if (link.hash === `#${destination}`) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
   $('.phone-content').scrollTop = 0;
-  $(`#${destination} h2`).focus({ preventScroll: true });
+  $(destination === 'home' ? '#intake-title' : '#benefits h2').focus({ preventScroll: true });
 }
 window.addEventListener('hashchange', navigate);
-function openSettings() {
+function openSettings(quantitiesOnly = false) {
+  $('#settings-title').textContent = quantitiesOnly ? 'Ajustar ml / L' : 'Configurações';
+  $('.theme-switch').hidden = quantitiesOnly;
   $('#bottle-input').value = settings.bottle; $('#glass-input').value = settings.glass; $('#goal-input').value = settings.goal;
   $('#dark-mode').checked = document.body.classList.contains('dark');
   $('#settings-dialog').showModal();
 }
-$('#settings').addEventListener('click', openSettings);
-$('#edit-sizes').addEventListener('click', openSettings);
+$('#settings').addEventListener('click', () => openSettings(false));
+$('#edit-sizes').addEventListener('click', () => openSettings(true));
 $('#cancel-settings').addEventListener('click', () => $('#settings-dialog').close());
 $('#settings-form').addEventListener('submit', event => {
   event.preventDefault();

@@ -2,6 +2,7 @@ import Foundation
 
 enum Copy {
     static let values: [String: [String]] = [
+        "editVolumes": ["Ajustar ml / L", "Adjust ml / L", "Ajustar ml / L"],
         "dailyOverview": ["SEU DIA EM EQUILÍBRIO", "YOUR DAY IN BALANCE", "TU DÍA EN EQUILIBRIO"],
         "dashboardTitle": ["Hoje", "Today", "Hoy"],
         "home": ["Início", "Home", "Inicio"],

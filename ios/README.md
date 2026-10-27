@@ -25,12 +25,12 @@ No third-party packages are required. Xcode's build phase converts the bundled r
 - Black and white surfaces with a blue accent, matching the approved web layout.
 - Combined Home and History: intake ring, bottle/glass recording, undo, calendar and container metrics. Consecutive days appear beside the Sip by Sip name in the navigation header; points are absent.
 - A compact Home/Benefits navigation bar with short transitions and reduced-motion support.
-- Bottle and glass sizes can be edited in Settings. The centered **Alterar ml** button opens those settings. Previous entries retain their recorded amount and container.
+- Bottle and glass sizes can be edited in Settings. The blue **ml / L** button between Home and Benefits opens a dedicated sheet for bottle size, glass size and daily goal. Previous entries retain their recorded amount and container.
 - `UserDefaults` stores settings, dated entry snapshots and completed dates. Existing settings and bottle totals migrate without inventing undoable entries or historical daily volumes.
 - Local date changes save the departing date and restore an existing snapshot when revisiting a date, including after time-zone travel. Unknown days remain distinct from known zero totals. Resetting today preserves other dates and completed-date history.
 - Português (BR), English and Español, with localized dates/numbers; system, light and dark themes.
 - Native Settings and Reminders sheets with temporary drafts, save and cancellation.
-- A pouring popup for the matching bottle/glass, automatic dismissal and accessibility focus return.
+- The intake card starts directly below the date without a separate Today title. The ring contains animated water that follows progress; recording opens a matching bottle/glass pouring scene with automatic dismissal and accessibility focus return. The browser preview includes the same water feedback.
 - Native water reminders every 15, 30, 60 or 120 minutes, subject to notification permissions and iOS delivery settings. Foreground delivery shows an in-app reminder; adding water or dismissing it restarts the schedule. **Test reminder** previews without changing progress.
 
 ## Validation status
