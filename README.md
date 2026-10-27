@@ -1,5 +1,7 @@
 # Sip by Sip — learning React
 
+**Quer usar o aplicativo? [Acesse o app e veja o guia rápido](acesse-o-app/README.md).**
+
 A water bottle counter built with React and JavaScript. The interface supports Brazilian Portuguese (the default), English, and Spanish.
 
 ## Run it
