@@ -23,7 +23,7 @@ No third-party packages are required. Xcode's build phase converts the bundled r
 ## Features
 
 - Black and white surfaces with a blue accent, matching the approved web layout.
-- Combined Home and History: intake ring, bottle/glass recording, undo, calendar and container metrics. Consecutive days appear before the date; points are absent.
+- Combined Home and History: intake ring, bottle/glass recording, undo, calendar and container metrics. Consecutive days appear beside the Sip by Sip name in the navigation header; points are absent.
 - A compact Home/Benefits navigation bar with short transitions and reduced-motion support.
 - Bottle and glass sizes can be edited in Settings. The centered **Alterar ml** button opens those settings. Previous entries retain their recorded amount and container.
 - `UserDefaults` stores settings, dated entry snapshots and completed dates. Existing settings and bottle totals migrate without inventing undoable entries or historical daily volumes.

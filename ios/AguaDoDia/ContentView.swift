@@ -64,6 +64,12 @@ struct ContentView: View {
             .navigationTitle("Sip by Sip")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 8) {
+                        Text("Sip by Sip").font(.headline).lineLimit(1).minimumScaleFactor(0.8)
+                        streak
+                    }
+                }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button { remindersOpen = true } label: { Image(systemName: "bell") }
                         .accessibilityLabel(store.text("reminders"))
@@ -121,10 +127,7 @@ struct ContentView: View {
                 Text(store.text("dailyOverview")).font(.caption2.bold()).tracking(2).foregroundStyle(NativePalette.blue)
                 Text(store.text("dashboardTitle")).font(.system(.largeTitle, design: .default, weight: .semibold))
                     .accessibilityAddTraits(.isHeader)
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 18) { streak; dateLabel }
-                    VStack(alignment: .leading, spacing: 12) { streak; dateLabel }
-                }
+                dateLabel
             }
             VStack(spacing: 22) {
                 HStack(alignment: .top) {
@@ -163,13 +166,15 @@ struct ContentView: View {
         }
     }
     private var streak: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "flame").foregroundStyle(NativePalette.blue)
-            Text(store.text("streak")).font(.caption).foregroundStyle(.secondary)
-            Text("\(store.streak) \(store.text(store.streak == 1 ? "day" : "days"))").font(.headline)
-        }.padding(12).background(NativePalette.surface, in: RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(NativePalette.border))
-            .accessibilityElement(children: .combine)
+        HStack(spacing: 5) {
+            Image(systemName: "flame")
+            Text("\(store.streak) \(store.text(store.streak == 1 ? "day" : "days"))")
+                .lineLimit(1).fixedSize()
+        }.font(.caption.weight(.semibold)).foregroundStyle(NativePalette.blue)
+            .padding(.horizontal, 8).padding(.vertical, 6)
+            .background(NativePalette.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 9))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("\(store.text("streak")): \(store.streak) \(store.text(store.streak == 1 ? "day" : "days"))")
     }
     private var dateLabel: some View {
         HStack(spacing: 7) {

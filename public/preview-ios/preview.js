@@ -65,6 +65,7 @@ function render() {
   $('#remaining-caption').textContent = remaining > 0 ? `Faltam ${volume(remaining)} para a meta.` : 'Meta alcançada!';
   $('#encouragement').textContent = percentage >= 1 ? 'Um hábito para comemorar!' : percentage >= 0.5 ? 'Você está no caminho!' : 'Cada gole conta.';
   $('#streak').textContent = `${completedToday ? 4 : 3} dias`;
+  $('#streak').closest('.streak').setAttribute('aria-label', `Dias consecutivos: ${completedToday ? 4 : 3} dias`);
   for (const type of ['bottle', 'glass']) {
     $(`#${type}-button-size`).textContent = `${format.format(settings[type])} ml`;
     $(`#${type}-size`).textContent = `${format.format(settings[type])} ml`;
