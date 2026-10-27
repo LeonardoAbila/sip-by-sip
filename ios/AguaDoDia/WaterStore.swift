@@ -2,26 +2,12 @@ import SwiftUI
 import UserNotifications
 import AVFoundation
 
-struct WaterSettings: Codable {
-    var bottleMl = 500.0
-    var goalLiters = 2.0
-    var language = "pt-BR"
-    var theme = "system"
-    var reminders = false
-    var minutes = 30
-    var sound = true
-}
-
-struct WaterDay: Codable {
-    var date = Calendar.current.startOfDay(for: Date())
-    var bottles = 0
-    var totalMl = 0.0
-}
-
 @MainActor
 final class WaterStore: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     @Published var settings: WaterSettings
     @Published private(set) var day: WaterDay
+    @Published private(set) var history: WaterHistory
+    private var activeDateKey: String
     @Published var reminderVisible = false
     @Published var notificationError = false
     private var player: AVAudioPlayer?
@@ -30,19 +16,20 @@ final class WaterStore: NSObject, ObservableObject, UNUserNotificationCenterDele
         let defaults = UserDefaults.standard
         var preferences = defaults.data(forKey: "water.settings")
             .flatMap { try? JSONDecoder().decode(WaterSettings.self, from: $0) } ?? WaterSettings()
-        if !preferences.bottleMl.isFinite || preferences.bottleMl <= 0 { preferences.bottleMl = 500 }
-        if !preferences.goalLiters.isFinite || preferences.goalLiters <= 0 { preferences.goalLiters = 2 }
-        if ![15, 30, 60, 120].contains(preferences.minutes) { preferences.minutes = 30 }
-        if !["pt-BR", "en", "es"].contains(preferences.language) { preferences.language = "pt-BR" }
-        if !["system", "light", "dark"].contains(preferences.theme) { preferences.theme = "system" }
+        preferences.validate()
         settings = preferences
         var saved = defaults.data(forKey: "water.day")
             .flatMap { try? JSONDecoder().decode(WaterDay.self, from: $0) } ?? WaterDay()
         if saved.bottles < 0 || !saved.totalMl.isFinite || saved.totalMl < 0 { saved = WaterDay() }
         day = saved
+        history = defaults.data(forKey: "water.history.v1")
+            .flatMap { try? JSONDecoder().decode(WaterHistory.self, from: $0) } ?? WaterHistory()
+        activeDateKey = defaults.string(forKey: "water.activeDateKey") ?? LocalDay.key(saved.date)
+        if LocalDay.date(activeDateKey) == nil { activeDateKey = LocalDay.key(saved.date) }
         super.init()
         UNUserNotificationCenter.current().delegate = self
         checkDay()
+        persist()
     }
 
     var progress: Double { min(day.totalMl / (settings.goalLiters * 1000), 1) }
@@ -51,20 +38,43 @@ final class WaterStore: NSObject, ObservableObject, UNUserNotificationCenterDele
         value.formatted(.number.locale(Locale(identifier: settings.language)).precision(.fractionLength(0...2)))
     }
     func checkDay() {
-        if !Calendar.current.isDateInToday(day.date) { day = WaterDay(); persist() }
+        let current = LocalDay.key()
+        guard activeDateKey != current else { return }
+        history.record(day, on: activeDateKey, goalLiters: settings.goalLiters)
+        activeDateKey = current
+        day = history.days[current] ?? WaterDay()
+        persist()
     }
-    func addBottle() {
+    var streak: Int { history.streak() }
+    var remainingMl: Double { max(0, (settings.goalLiters * 100_000 - day.totalMl * 100).rounded()) / 100 }
+    func volume(_ amount: Double) -> String {
+        amount >= 1000 ? "\(number(amount / 1000)) L" : "\(number(amount)) ml"
+    }
+    func size(_ container: WaterContainer) -> Double { container == .bottle ? settings.bottleMl : settings.glassMl }
+    func needed(_ container: WaterContainer) -> Int { Int(ceil(remainingMl / size(container))) }
+    func addBottle() { addWater(.bottle) }
+    func addWater(_ container: WaterContainer) {
         checkDay()
-        day.bottles += 1
-        day.totalMl += settings.bottleMl
+        day.add(size(container), container: container)
         reminderVisible = false
         stopSound()
         persist()
         Task { await scheduleReminders(requestPermission: false) }
     }
-    func resetDay() { day = WaterDay(); persist() }
+    func undoWater() {
+        checkDay()
+        day.undo()
+        persist()
+    }
+    func resetDay() {
+        checkDay()
+        day = WaterDay()
+        persist()
+    }
     func save(_ value: WaterSettings) async {
+        checkDay()
         settings = value
+        settings.validate()
         reminderVisible = false
         persist()
         await scheduleReminders(requestPermission: true)
@@ -75,7 +85,10 @@ final class WaterStore: NSObject, ObservableObject, UNUserNotificationCenterDele
         Task { await scheduleReminders(requestPermission: false) }
     }
     func persist() {
+        history.record(day, on: activeDateKey, goalLiters: settings.goalLiters)
         let defaults = UserDefaults.standard
+        defaults.set(activeDateKey, forKey: "water.activeDateKey")
+        if let data = try? JSONEncoder().encode(history) { defaults.set(data, forKey: "water.history.v1") }
         if let data = try? JSONEncoder().encode(settings) { defaults.set(data, forKey: "water.settings") }
         if let data = try? JSONEncoder().encode(day) { defaults.set(data, forKey: "water.day") }
     }

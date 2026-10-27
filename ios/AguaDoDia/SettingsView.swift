@@ -7,13 +7,14 @@ struct SettingsView: View {
     @State private var saving = false
     init(initial: WaterSettings) { _draft = State(initialValue: initial) }
     private func t(_ key: String) -> String { Copy.text(key, language: draft.language) }
-    private var valid: Bool { draft.bottleMl.isFinite && draft.bottleMl > 0 && draft.goalLiters.isFinite && draft.goalLiters > 0 }
+    private var valid: Bool { validWaterVolume(draft.bottleMl) && validWaterVolume(draft.glassMl) && draft.goalLiters.isFinite && draft.goalLiters > 0 && draft.goalLiters <= 1_000_000 }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
                     HStack { Text(t("bottle")); TextField("500", value: $draft.bottleMl, format: .number).keyboardType(.decimalPad).multilineTextAlignment(.trailing) }
+                    HStack { Text(t("glass")); TextField("250", value: $draft.glassMl, format: .number).keyboardType(.decimalPad).multilineTextAlignment(.trailing) }
                     HStack { Text(t("goal")); TextField("2", value: $draft.goalLiters, format: .number).keyboardType(.decimalPad).multilineTextAlignment(.trailing) }
                     if !valid { Text(t("invalid")).foregroundStyle(.red) }
                 } footer: { Text(t("help")) }

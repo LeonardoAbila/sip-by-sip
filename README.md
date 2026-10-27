@@ -171,6 +171,8 @@ The reminder audio is **pouring with two drips at the end** by Mafon2, released 
 
 ## Native iOS version
 
+[Open the interactive mobile layout preview](https://leonardoabila.github.io/sip-by-sip/preview-ios/). This is a browser demonstration with temporary sample data; native iOS development lives in `ios/`.
+
 A separate SwiftUI implementation is in `ios/`. Open `ios/AguaDoDia.xcodeproj` on a Mac with Xcode. See `ios/README.md` for setup, features, and validation limits. Local backup archives are excluded from Git; the current web source is in this repository.
 
 - Open **Benefícios** in the navigation to read about hydration, everyday tips, and the CDC source. **Voltar e registrar água** returns to your dashboard; progress and reminders stay active while reading. The screen supports Portuguese, English, Spanish, and direct access through `#benefits`.

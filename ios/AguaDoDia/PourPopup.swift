@@ -4,6 +4,7 @@ struct PourPopup: View {
     @EnvironmentObject private var store: WaterStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let amount: Double
+    let container: WaterContainer
     var onClose: () -> Void
     @State private var pouring = false
     @State private var filled = false
@@ -12,14 +13,14 @@ struct PourPopup: View {
         VStack(spacing: 12) {
             HStack { Spacer(); Button(action: onClose) { Image(systemName: "xmark.circle.fill").font(.title2) }.accessibilityLabel(store.text("close")) }
             Text(store.text("added")).font(.title2.bold())
-            Text("+\(store.number(amount)) ml").font(.title.bold()).foregroundStyle(.blue)
+            Text("+\(store.number(amount)) ml").font(.title.bold()).foregroundStyle(NativePalette.blue)
             ZStack {
                 // The open spout sits directly above the falling stream.
                 ZStack {
-                    RoundedRectangle(cornerRadius: 16).stroke(.blue, lineWidth: 7)
+                    RoundedRectangle(cornerRadius: 16).stroke(NativePalette.blue, lineWidth: 7)
                         .frame(width: 36, height: 54).offset(x: -46, y: 0)
                     JugShape().fill(.cyan.opacity(0.4))
-                    JugShape().stroke(.blue, lineWidth: 3)
+                    JugShape().stroke(NativePalette.blue, lineWidth: 3)
                     Capsule().fill(.white.opacity(0.6)).frame(width: 5, height: 48).offset(x: -20, y: 10)
                 }.frame(width: 126, height: 110)
                     .rotationEffect(.degrees(pouring ? 30 : 0), anchor: UnitPoint(x: 1, y: 0.2))
@@ -27,15 +28,15 @@ struct PourPopup: View {
                 Capsule().fill(.cyan.opacity(0.8)).frame(width: 8, height: 72)
                     .opacity(pouring && !reduceMotion ? 1 : 0).offset(x: 18, y: -12)
                 ZStack(alignment: .bottom) {
-                    RoundedRectangle(cornerRadius: 18).fill(.cyan.opacity(0.12))
-                    RoundedRectangle(cornerRadius: 14).fill(.blue.opacity(0.7))
+                    RoundedRectangle(cornerRadius: container == .glass ? 8 : 18).fill(.cyan.opacity(0.12))
+                    RoundedRectangle(cornerRadius: container == .glass ? 5 : 14).fill(NativePalette.blue.opacity(0.7))
                         .frame(height: filled ? 102 : 0).padding(5)
-                    RoundedRectangle(cornerRadius: 18).stroke(.blue, lineWidth: 3)
-                    Image(systemName: "drop.fill").font(.title).foregroundStyle(.white)
+                    RoundedRectangle(cornerRadius: container == .glass ? 8 : 18).stroke(NativePalette.blue, lineWidth: 3)
+                    Image(systemName: container.symbol).font(.title).foregroundStyle(.white)
                 }.frame(width: 72, height: 125).offset(x: 18, y: 82)
             }.frame(height: 290).accessibilityHidden(true)
         }.padding(20).frame(maxWidth: 360)
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 28))
+            .background(NativePalette.surface, in: RoundedRectangle(cornerRadius: 28))
             .shadow(radius: 24)
             .accessibilityAddTraits(.isModal)
             .task {

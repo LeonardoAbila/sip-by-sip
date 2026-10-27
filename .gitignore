@@ -9,3 +9,7 @@ dist/
 # Browser test diagnostics
 playwright-report/
 test-results/
+
+# Native Swift build products
+/ios/.build/
+/ios/.swiftpm/

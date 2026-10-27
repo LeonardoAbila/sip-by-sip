@@ -1,0 +1,22 @@
+name: Validate native iOS app
+
+on:
+  push:
+    branches: ['main']
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  pull_request:
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Test hydration data and legacy migration
+        run: swift test --package-path ios
+      - name: Build native interface without signing
+        run: xcodebuild -project ios/AguaDoDia.xcodeproj -scheme AguaDoDia -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
